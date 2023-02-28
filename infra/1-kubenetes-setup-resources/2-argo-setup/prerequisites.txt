@@ -1,0 +1,2 @@
+Argo installed in cluster (e.g. via helm), using provided chart/values.yaml file (at least).
+Working ingress and ClusterIssuer named letsencrypt-prod.
