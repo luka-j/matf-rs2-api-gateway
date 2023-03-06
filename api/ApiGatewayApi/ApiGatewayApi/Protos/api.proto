@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+option csharp_namespace = "ApiGatewayApi";
+
+package api;
+
+service RequestProcessor { // implemented by request processor microservice
+  rpc ProcessRequest (ExecutionRequest) returns (ExecutionResponse);
+}
+
+service HttpRequester { // implemented by this microservice, called by request processor for making HTTP requests
+  rpc MakeHttpRequest (ExecutionRequest) returns (ExecutionResponse);
+}
+
+
+message Entity {
+  oneof content {
+    string string = 1;
+    int64 integer = 2;
+    DecimalEntity decimal = 3;
+    bool boolean = 4;
+    ListEntity list = 5;
+    ObjectEntity object = 6;
+  }
+}
+
+message PrimitiveEntity {
+  oneof content {
+    string string = 1;
+    int64 integer = 2;
+    DecimalEntity decimal = 3;
+    bool boolean = 4;
+  }
+}
+
+message PrimitiveList {
+  repeated PrimitiveEntity value = 1;
+}
+
+message PrimitiveOrList {
+  oneof content {
+    PrimitiveEntity primitive = 1;
+    PrimitiveList list = 2;
+  }
+}
+
+message DecimalEntity {
+  int64 unit = 1;
+  int32 nanos = 2; 
+  // see https://visualrecode.com/blog/csharp-decimals-in-grpc/ for deserialization
+}
+message ListEntity {
+  repeated Entity value = 1;
+}
+
+message ObjectEntity {
+  map<string, Entity> properties = 1;
+}
+
+message PrimitiveObjectEntity {
+  map<string, PrimitiveEntity> properties = 1;
+}
+
+message AuthRoles {
+  repeated string roleNames = 1;
+}
+message AuthAttributes {
+  map<string, string> attributes = 1; 
+}
+
+message AuthData {
+  string userId = 1;
+  string username = 2;
+  optional AuthRoles roles = 3;
+  optional AuthAttributes attributes = 4;
+  // todo other stuff, probably
+}
+
+message RequestMetadata {
+  string requestId = 1;
+  string ipAddress = 2;
+  string startTime = 3;
+  optional AuthData authData = 4;
+  // todo metadata ?
+}
+
+message ExecutionRequest {
+  string apiName = 1;
+  string apiVersion = 2;
+  RequestMetadata requestMetadata = 3;
+
+  optional Entity requestBody = 4;
+  optional PrimitiveOrList queryParameters = 5;
+  optional PrimitiveObjectEntity pathParameters = 6;
+  optional PrimitiveObjectEntity headerParameters = 7;
+}
+
+message ExecutionResponse {
+  int32 status = 1;
+  optional Entity responseBody = 2;
+  optional PrimitiveObjectEntity headers = 3;
+}
