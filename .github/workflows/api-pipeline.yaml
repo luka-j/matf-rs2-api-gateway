@@ -5,6 +5,7 @@ on:
     branches: ['master']
     paths:
     - 'api/ApiGatewayApi/**'
+    - '.github/workflows/api-pipeline.yaml'
 
 env:
   REGISTRY: ghcr.io
@@ -41,7 +42,7 @@ jobs:
         id: build-push
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          context: .
+          context: api/ApiGatewayApi
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
