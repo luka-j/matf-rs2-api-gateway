@@ -5,6 +5,7 @@ on:
     branches: ['master', 'api-cicd-test']
     paths:
     - 'api/ApiGatewayApi/**'
+    - '.github/workflows/api-pipeline.yaml'
 
 env:
   REGISTRY: ghcr.io
