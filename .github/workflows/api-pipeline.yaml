@@ -2,7 +2,7 @@ name: Publish and deploy API microservice
 
 on:
   push:
-    branches: ['master']
+    branches: ['master', 'api-cicd-test']
     paths:
     - 'api/ApiGatewayApi/**'
 
