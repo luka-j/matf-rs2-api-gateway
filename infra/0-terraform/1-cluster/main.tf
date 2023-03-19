@@ -21,4 +21,5 @@ module "kubernetes" {
   worker_node_pool_subnet_id = "${module.vcn.private_subnet_ocid}"
   endpoint_subnet_id = "${module.vcn.private_subnet_ocid}"
   availability_domains = module.compartment.availability_domains
+  ssh_public_key = "${var.ssh_public_key}"
 }

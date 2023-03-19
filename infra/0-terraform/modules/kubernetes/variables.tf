@@ -3,6 +3,11 @@ variable "compartment_id" {
   type = string
 }
 
+variable "ssh_public_key" {
+  description = "SSH public key of the pair that will be used for SSH access for the bastion host instance"
+  type = string
+}
+
 variable "name" {
   type = string
 }

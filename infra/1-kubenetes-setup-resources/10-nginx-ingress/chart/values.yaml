@@ -1,0 +1,23 @@
+controller:
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 120m
+      memory: 150Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 95
+    targetMemoryUtilizationPercentage: 95
+    
+  
+  service:
+    annotations:
+      oci.oraclecloud.com/load-balancer-type: "nlb"
+    
+  metrics:
+    enabled: true
+    service:
+      labels:
+        monitoring: IngressNginx
