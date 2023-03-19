@@ -61,6 +61,7 @@ jobs:
     - name: Update version in deployment manifest
       run: |
           sed -i 's#image: ${{ env.REGISTRY }}.*#image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}#' api/k8s-resources/deployment.yaml
+          sed -i 's#targetRevision: .*#targetRevision: ${{ github.ref }}#' infra/2-argo-apps/api-app.yaml
     - name: Commit files
       run: |
           git config user.name "GitHub CI Runner"
@@ -71,3 +72,4 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         branch: ${{ github.ref }}
+        force_with_lease: true
