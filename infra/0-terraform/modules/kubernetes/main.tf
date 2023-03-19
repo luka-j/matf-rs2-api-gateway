@@ -73,11 +73,13 @@ resource "oci_containerengine_node_pool" "oke_node_pool" {
 
 resource "oci_core_instance" "bastion_host" {
     #Required
-    availability_domain = var.availability_domains[0].name
+    availability_domain = "XiDj:EU-FRANKFURT-1-AD-3" # Micro instances are available only in AD3
     compartment_id = "${var.compartment_id}"
     shape = "VM.Standard.E2.1.Micro"
+    display_name = "bastion"
     shape_config {
         memory_in_gbs = 1
+        ocpus = 1
     }
     source_details {
         #Required
@@ -87,5 +89,8 @@ resource "oci_core_instance" "bastion_host" {
     }
     create_vnic_details {
         subnet_id = "${var.service_lb_subnet_id}"
+    }
+    metadata = {
+        ssh_authorized_keys = "${var.ssh_public_key}"
     }
 }
