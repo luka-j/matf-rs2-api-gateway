@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/luka-j/matf-rs2-api-gateway.git
-    targetRevision: master
+    targetRevision: refs/heads/master
     path: api/k8s-resources
   destination:
     server: https://kubernetes.default.svc
