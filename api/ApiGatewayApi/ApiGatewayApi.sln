@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGatewayApi", "ApiGatewayApi\ApiGatewayApi.csproj", "{EA7F498E-A374-4909-9E4C-5585A3D7726F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{4114D7E1-2330-4B8D-A27A-8F28F0B08260}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{EA7F498E-A374-4909-9E4C-5585A3D7726F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA7F498E-A374-4909-9E4C-5585A3D7726F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA7F498E-A374-4909-9E4C-5585A3D7726F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4114D7E1-2330-4B8D-A27A-8F28F0B08260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4114D7E1-2330-4B8D-A27A-8F28F0B08260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4114D7E1-2330-4B8D-A27A-8F28F0B08260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4114D7E1-2330-4B8D-A27A-8F28F0B08260}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
