@@ -1,7 +1,5 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:7.0.2-bullseye-slim-arm64v8 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:7.0.2-bullseye-slim-arm64v8 AS base
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 5000
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0.102-bullseye-slim-amd64 AS build
 WORKDIR /src
