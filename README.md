@@ -7,3 +7,4 @@ WIP
 ## Further reading
 - PROJECT.md — Project outline
 - REPO.md — Repo outline
+- CICD.md — CI/CD setup outline
