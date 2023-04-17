@@ -41,6 +41,7 @@ public class ApiCollection
 
     public ApiConfig? GetCurrentConfig(ApiIdentifier id, DateTime now)
     {
+        if (!_configs.ContainsKey(id)) return null;
         var eligibleConfigs = _configs[id];
         return eligibleConfigs.First(config => config.IsActive(now));
     }
