@@ -1,4 +1,6 @@
+using ApiGatewayApi.ApiConfigs;
 using ApiGatewayApi.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,10 +9,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddGrpc();
+builder.Services.AddGrpcReflection();
 builder.Services.AddControllers();
+
+builder.Services.AddSingleton<ApiRepository>();
+
+Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
+    .WriteTo.Console()
+    .CreateLogger();
 
 var app = builder.Build();
 
+app.MapGrpcReflectionService();
 app.MapGrpcService<HttpRequesterService>();
 app.MapGrpcService<ConfigManagementService>();
 app.MapControllers();
