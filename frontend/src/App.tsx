@@ -1,7 +1,16 @@
-import React from "react";
+import { Suspense } from "react";
+import { RouterProvider } from "react-router-dom";
+
+import { router } from "./lib/siteRoutes";
 
 const App = () => {
-  return <div className="text-3xl">Hello world</div>;
+  return (
+    <>
+      <Suspense fallback={<div>Loading...</div>}>
+        <RouterProvider router={router} />
+      </Suspense>
+    </>
+  );
 };
 
 export default App;
