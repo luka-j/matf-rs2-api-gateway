@@ -13,6 +13,17 @@ public class ApiCollection
     private readonly Dictionary<ApiIdentifier, SortedSet<ApiConfig>> _configs = new();
     private readonly ILogger _logger = Serilog.Log.Logger;
 
+    private class ApiConfigValidityStartComparer : IComparer<ApiConfig?>
+    {
+        public int Compare(ApiConfig? x, ApiConfig? y)
+        {
+            if (ReferenceEquals(x, y)) return 0;
+            if (ReferenceEquals(null, y)) return 1;
+            if (ReferenceEquals(null, x)) return -1;
+            return -x.ValidFrom.CompareTo(y.ValidFrom);
+        }
+    }
+
     /// <summary>
     /// Add a new config to the collection. Config's validity start must be in the future and ApiSpec's
     /// spec string must be a valid OAS3 spec.
@@ -30,7 +41,7 @@ public class ApiCollection
         var id = parsedConfig.Id;
         if (!_configs.ContainsKey(id))
         {
-            _configs.Add(id, new SortedSet<ApiConfig>(Comparer<ApiConfig>.Create((c1, c2) => c2.ValidFrom.CompareTo(c1.ValidFrom))));
+            _configs.Add(id, new SortedSet<ApiConfig>(new ApiConfigValidityStartComparer()));
         }
 
         _configs[id].Add(parsedConfig);
@@ -70,7 +81,14 @@ public class ApiCollection
     {
         if (!_configs.ContainsKey(id)) return null;
         var eligibleConfigs = _configs[id];
-        return eligibleConfigs.First(config => config.IsActive(now));
+        try
+        {
+            return eligibleConfigs.First(config => config.IsActive(now));
+        }
+        catch (InvalidOperationException e)
+        {
+            return null;
+        }
     }
 
     /// <summary>
@@ -88,7 +106,7 @@ public class ApiCollection
     {
         foreach (var (key, value) in _configs)
         {
-            var configs = new SortedSet<ApiConfig>();
+            var configs = new SortedSet<ApiConfig>(new ApiConfigValidityStartComparer());
             foreach (var config in value)
             {
                 if (config.ValidFrom.AddSeconds(5) >= now)
@@ -107,7 +125,7 @@ public class ApiCollection
     
     private static void CheckStartDateValidity(DateTime validFrom, DateTime now)
     {
-        if (now.AddSeconds(1) < validFrom)
+        if (now.AddSeconds(1) > validFrom)
         {
             throw new ApiConfigException("API config validity is set to a too early time!");
         }
