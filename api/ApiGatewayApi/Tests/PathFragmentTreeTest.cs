@@ -27,49 +27,49 @@ public class PathFragmentTreeTest
     }
     
     [Fact]
-    public void ResolveBasicPath()
+    public void GivenBasicPath_WhenResolving_ReturnCorrectPathItem()
     {
         var resolved = _pathSegmentTree.ResolvePath("test/path/1");
         Assert.Equal("1", resolved?.Description);
     }
 
     [Fact]
-    public void DontResolveNonexistentPath()
+    public void GivenNonexistentPath_WhenResolving_ReturnNull()
     {
         var resolved = _pathSegmentTree.ResolvePath("unknown");
         Assert.Null(resolved);
     }
 
     [Fact]
-    public void ResolvePathWithWildcard()
+    public void GivenPathWhichMatchesWildcard_WhenResolving_ReturnCorrectPathItem()
     {
         var resolved = _pathSegmentTree.ResolvePath("wildcard/anything");
         Assert.Equal("3", resolved?.Description);
     }
 
     [Fact]
-    public void DontResolveWildcardPathWithTrailingNonMatch()
+    public void GivenPathWhosePrefixIsWildcardPath_WhenResolving_ReturnNull()
     {
         var resolved = _pathSegmentTree.ResolvePath("wildcard/anything/else");
         Assert.Null(resolved);
     }
 
     [Fact]
-    public void ResolveWildcardPathWithTrailingMatch()
+    public void GivenPathWhichMatchesPathWithWildcard_WhenResolving_ReturnCorrectPathItem()
     {
         var resolved = _pathSegmentTree.ResolvePath("wildcard/anything/something");
         Assert.Equal("4", resolved?.Description);
     }
 
     [Fact]
-    public void ResolveMoreSpecificWildcardPath()
+    public void GivenPathWhichMatchesMultiplePaths_WhenResolving_ReturnMostSpecificPathItem()
     {
         var resolved = _pathSegmentTree.ResolvePath("wildcard/specific/something");
         Assert.Equal("5", resolved?.Description);
     }
 
     [Fact]
-    public void DontBuildPathTreeWithAmbiguousPaths()
+    public void GivenAmbiguousPathItems_WhenBuildingPathSegmentTree_ThrowApiConfigException()
     {
         var paths = new OpenApiPaths();
         var item1 = new OpenApiPathItem { Description = "1" };
