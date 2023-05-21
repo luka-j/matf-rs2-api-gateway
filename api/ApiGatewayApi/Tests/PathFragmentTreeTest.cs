@@ -7,7 +7,7 @@ namespace Tests;
 public class PathFragmentTreeTest
 {
 
-    private readonly PathFragmentTree _pathFragmentTree;
+    private readonly PathSegmentTree _pathSegmentTree;
 
     public PathFragmentTreeTest()
     {
@@ -23,48 +23,48 @@ public class PathFragmentTreeTest
         paths.Add("wildcard/{item}/something", item4);
         paths.Add("wildcard/specific/{thing}", item5);
         
-        _pathFragmentTree = PathFragmentTree.BuildTree(paths);
+        _pathSegmentTree = PathSegmentTree.BuildTree(paths);
     }
     
     [Fact]
     public void ResolveBasicPath()
     {
-        var resolved = _pathFragmentTree.ResolvePath("test/path/1");
+        var resolved = _pathSegmentTree.ResolvePath("test/path/1");
         Assert.Equal("1", resolved?.Description);
     }
 
     [Fact]
     public void DontResolveNonexistentPath()
     {
-        var resolved = _pathFragmentTree.ResolvePath("unknown");
+        var resolved = _pathSegmentTree.ResolvePath("unknown");
         Assert.Null(resolved);
     }
 
     [Fact]
     public void ResolvePathWithWildcard()
     {
-        var resolved = _pathFragmentTree.ResolvePath("wildcard/anything");
+        var resolved = _pathSegmentTree.ResolvePath("wildcard/anything");
         Assert.Equal("3", resolved?.Description);
     }
 
     [Fact]
     public void DontResolveWildcardPathWithTrailingNonMatch()
     {
-        var resolved = _pathFragmentTree.ResolvePath("wildcard/anything/else");
+        var resolved = _pathSegmentTree.ResolvePath("wildcard/anything/else");
         Assert.Null(resolved);
     }
 
     [Fact]
     public void ResolveWildcardPathWithTrailingMatch()
     {
-        var resolved = _pathFragmentTree.ResolvePath("wildcard/anything/something");
+        var resolved = _pathSegmentTree.ResolvePath("wildcard/anything/something");
         Assert.Equal("4", resolved?.Description);
     }
 
     [Fact]
     public void ResolveMoreSpecificWildcardPath()
     {
-        var resolved = _pathFragmentTree.ResolvePath("wildcard/specific/something");
+        var resolved = _pathSegmentTree.ResolvePath("wildcard/specific/something");
         Assert.Equal("5", resolved?.Description);
     }
 
@@ -77,6 +77,6 @@ public class PathFragmentTreeTest
         paths.Add("test/{something}/path", item1);
         paths.Add("test/{else}/path", item2);
         
-        Assert.Throws<ApiConfigException>(() => PathFragmentTree.BuildTree(paths));
+        Assert.Throws<ApiConfigException>(() => PathSegmentTree.BuildTree(paths));
     }
 }

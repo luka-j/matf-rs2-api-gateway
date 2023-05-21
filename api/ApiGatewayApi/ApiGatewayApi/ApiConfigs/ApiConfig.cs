@@ -4,22 +4,32 @@ using Microsoft.OpenApi.Writers;
 
 namespace ApiGatewayApi.ApiConfigs;
 
+/// <summary>
+/// Represents API configuration, holding api spec, identifier and validity start time.
+/// </summary>
 public class ApiConfig
 {
     public DateTime ValidFrom { get; }
     public OpenApiDocument Spec { get; }
-    public ApiIdentifier Id { get;  }
+    public ApiIdentifier Id { get; }
     
-    private readonly PathFragmentTree _pathTree;
+    private readonly PathSegmentTree _pathTree;
     private static readonly List<KeyValuePair<Func<OpenApiDocument, bool>, ApiConfigException>> SpecValidators = InitializeValidators();
 
+    /// <summary>
+    /// Create new API config based on OpenApiDocument spec with given validity start time.
+    /// </summary>
+    /// <param name="spec">OpenApiDocument representing API spec. It must contain basic metadata (title, version,
+    /// a single server and its URL).</param>
+    /// <param name="validFrom">Validity start time for this config. This config should not be used before its
+    /// validity start.</param>
     public ApiConfig(OpenApiDocument spec, DateTime validFrom)
     {
         ValidateConfig(spec);
         ValidFrom = validFrom;
         Spec = spec;
         Id = new ApiIdentifier(spec.Info.Title, spec.Info.Version);
-        _pathTree = PathFragmentTree.BuildTree(spec.Paths);
+        _pathTree = PathSegmentTree.BuildTree(spec.Paths);
     }
 
     private static List<KeyValuePair<Func<OpenApiDocument, bool>, ApiConfigException>> InitializeValidators()
@@ -46,11 +56,26 @@ public class ApiConfig
         }
     }
 
+    /// <summary>
+    /// Check whether this API Config is active. If this method returns false, no other operations should be
+    /// performed on this ApiConfig object.
+    /// </summary>
+    /// <param name="now">Current time</param>
+    /// <returns>Whether this API config is active. This method returning true doesn't guarantee this config
+    /// should be used (e.g. maybe there's another config which is also active and newer), i.e. it doesn't
+    /// guarantee <i>validity</i>.</returns>
     public bool IsActive(DateTime now)
     {
         return now >= ValidFrom;
     }
 
+    /// <summary>
+    /// Resolve OpenApiOperation on this config, given HTTP method and URL path.
+    /// </summary>
+    /// <param name="method">HTTP method of the request.</param>
+    /// <param name="path">Path part of the URL (excluding query params and fragment).</param>
+    /// <returns>OpenApiOperation if it exists, null if it doesn't.</returns>
+    /// <exception cref="ApiRuntimeException">If passed method isn't a HTTP request method.</exception>
     public OpenApiOperation? ResolveOperation(string method, string path)
     {
         var pathItem = _pathTree.ResolvePath(path);
@@ -64,6 +89,10 @@ public class ApiConfig
         return pathItem.Operations[op];
     }
 
+    /// <summary>
+    /// Serialize spec of this config to string.
+    /// </summary>
+    /// <returns>API Spec in OAS3 YAML format.</returns>
     public string GetSpecString()
     {
         var stringWriter = new StringWriter();
@@ -72,6 +101,10 @@ public class ApiConfig
         return stringWriter.ToString();
     }
 
+    /// <summary>
+    /// Get metadata of this API Config.
+    /// </summary>
+    /// <returns>An ApiMetadata object corresponding to this ApiConfig.</returns>
     public ApiMetadata GetMetadata()
     {
         return new ApiMetadata(Spec.Info.Title, Spec.Info.Version, Spec.Servers[0].Url);

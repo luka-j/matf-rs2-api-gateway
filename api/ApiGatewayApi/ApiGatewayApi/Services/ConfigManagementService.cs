@@ -37,6 +37,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
             }
         });
     }
+    
     public override Task<Empty> DeleteBackendConfig(ConfigId request, ServerCallContext context)
     {
         return Task.Run(() =>
@@ -50,6 +51,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
             return new Empty();
         });
     }
+    
     public override Task<Empty> UpdateBackendConfig(ConfigData request, ServerCallContext context)
     {
         return Task.Run(() =>
@@ -65,6 +67,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
             }
         });
     }
+    
     
     public override Task<ConfigData> GetFrontendConfig(ConfigId request, ServerCallContext context)
     {
@@ -87,6 +90,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
             }
         });
     }
+    
     public override Task<Empty> DeleteFrontendConfig(ConfigId request, ServerCallContext context)
     {        return Task.Run(() =>
         {
@@ -117,6 +121,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
         });
     }
 
+    
     public override Task<ConfigList> GetAllBackendConfigs(Empty request, ServerCallContext context)
     {
         return Task.Run(() =>
@@ -134,6 +139,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
             return ret;
         });
     }
+    
     public override Task<ConfigList> GetAllFrontendConfigs(Empty request, ServerCallContext context)
     {
         return Task.Run(() =>
