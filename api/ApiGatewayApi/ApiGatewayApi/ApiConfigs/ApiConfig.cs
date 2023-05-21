@@ -45,6 +45,8 @@ public class ApiConfig
             new ApiConfigException("We currently support only a single server entry.")));
         validators.Add(new(spec => spec.Servers[0].Url == null, 
             new ApiConfigException("ApiConfig server.url must be populated")));
+        validators.Add(new(spec => spec.Paths == null, 
+            new ApiConfigException("Paths must be defined")));
         return validators;
     }
 
@@ -86,6 +88,7 @@ public class ApiConfig
             throw new ApiRuntimeException(method + " is not a valid method!");
         }
 
+        if (!pathItem.Operations.ContainsKey(op)) return null;
         return pathItem.Operations[op];
     }
 
