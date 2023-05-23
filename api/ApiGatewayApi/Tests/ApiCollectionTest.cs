@@ -113,4 +113,39 @@ paths:
     Assert.True(deleteConfig);
     Assert.False(hasConfig);
   }
+
+  [Fact]
+  public void GivenCollectionWithMultiplePastVersionsOfConfig_WhenRevertingPendingChanges_ThenDontRevertAnything()
+  {
+    var now = DateTime.Now;
+    var configValidFrom1 = now + TimeSpan.FromMinutes(1);
+    var configValidFrom2 = now + TimeSpan.FromMinutes(2);
+    _apiCollection.AddConfig(new ApiSpec(SPEC_STRING, configValidFrom1));
+    var v2Spec = SPEC_STRING.Replace("localhost", "127.0.0.1");
+    _apiCollection.AddConfig(new ApiSpec(v2Spec, configValidFrom2));
+
+    var revertedChanges = _apiCollection.RevertPendingChanges(now + TimeSpan.FromMinutes(3));
+    
+    Assert.Equal(0, revertedChanges);
+  }
+
+  [Fact]
+  public void GivenCollectionsWithPendingChange_whenRevertingPendingChanges_RevertPendingChange()
+  {
+    var now = DateTime.Now;
+    var configValidFrom1 = now + TimeSpan.FromMinutes(1);
+    var configValidFrom2 = now + TimeSpan.FromMinutes(2);
+    var revertAt = now + TimeSpan.FromSeconds(90);
+    _apiCollection.AddConfig(new ApiSpec(SPEC_STRING, configValidFrom1));
+    var v2Spec = SPEC_STRING.Replace("localhost", "127.0.0.1");
+    _apiCollection.AddConfig(new ApiSpec(v2Spec, configValidFrom2));
+
+    var revertedChanges = _apiCollection.RevertPendingChanges(revertAt);
+    
+    Assert.Equal(1, revertedChanges);
+
+    var currentConfig = _apiCollection.GetCurrentConfig(new ApiIdentifier("test", "v1"), revertAt.AddSeconds(1));
+    Assert.NotNull(currentConfig);
+    Assert.Equal("http://localhost:8080", currentConfig.GetMetadata().BasePath);
+  }
 }
