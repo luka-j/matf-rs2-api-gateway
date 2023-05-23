@@ -13,6 +13,11 @@ public class ApiCollection
     private readonly Dictionary<ApiIdentifier, SortedSet<ApiConfig>> _configs = new();
     private readonly ILogger _logger = Serilog.Log.Logger;
 
+    private static readonly TimeSpan VALIDITY_MIN_OFFSET = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan PRUNE_AFTER = TimeSpan.FromMinutes(1);
+
+    private readonly object _pruningLock = new object();
+
     private class ApiConfigValidityStartComparer : IComparer<ApiConfig?>
     {
         public int Compare(ApiConfig? x, ApiConfig? y)
@@ -101,31 +106,57 @@ public class ApiCollection
         return _configs.Remove(id);
     }
 
+    /// <summary>
+    /// Delete versions of all configs that start after now.
+    /// </summary>
+    /// <param name="now">Moment in time after which to delete all configs.</param>
+    /// <returns>How many config versions were deleted.</returns>
+    public int RevertPendingChanges(DateTime now)
+    {
+        lock (_pruningLock)
+        {
+            var removedConfigs = 0;
+            foreach (var (key, value) in _configs)
+            {
+                removedConfigs += value.RemoveWhere(apiConfig => apiConfig.ValidFrom >= now);
+            }
+
+            return removedConfigs;
+        }
+    }
+
     // remove all configs which are active, but not valid, i.e. for which there's a newer active config
     private void Prune(DateTime now)
     {
-        foreach (var (key, value) in _configs)
+        lock (_pruningLock)
         {
-            var configs = new SortedSet<ApiConfig>(new ApiConfigValidityStartComparer());
-            foreach (var config in value)
+            foreach (var (key, value) in _configs)
             {
-                if (config.ValidFrom.AddSeconds(5) >= now)
+                var configs = new SortedSet<ApiConfig>(new ApiConfigValidityStartComparer());
+                ApiConfig? newest = null;
+                foreach (var config in value)
                 {
+                    if (newest != null)
+                    {
+                        newest = config;
+                        configs.Add(newest);
+                    }
+
                     configs.Add(config);
-                    continue;
+                    if (config.ValidFrom + PRUNE_AFTER < now)
+                    {
+                        break;
+                    }
                 }
 
-                configs.Add(config);
-                break;
+                _configs[key] = configs;
             }
-
-            _configs[key] = configs;
         }
     }
     
     private static void CheckStartDateValidity(DateTime validFrom, DateTime now)
     {
-        if (now.AddSeconds(1) > validFrom)
+        if (now + VALIDITY_MIN_OFFSET > validFrom)
         {
             throw new ApiConfigException("API config validity is set to a too early time!");
         }
