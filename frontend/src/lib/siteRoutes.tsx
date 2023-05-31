@@ -21,12 +21,12 @@ export const router = createBrowserRouter(
       <Route path="/callback" element={<Callback />} />
 
       <Route path="/dashboard" element={<DashboardLayout />}>
-        <Route path="overview" element={<Overview />} />
+        <Route index element={<Overview />} />
         <Route path="datasources" element={<Datasources />} />
         <Route path="frontends" element={<Frontends />} />
         <Route path="backends" element={<Backends />} />
         <Route path="editor" element={<Editor />} />
-        <Route path="*" element={<Navigate to="/overview" />} />
+        <Route path="*" element={<Navigate to="/" />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/login" />} />
