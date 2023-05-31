@@ -16,7 +16,7 @@ const Callback = () => {
   }, [currentUser, loginAndSetUser, navigate]);
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center">
+    <div className="w-screen h-screen flex items-center justify-center bg-gray-900">
       <Loader className="w-24 h-24" />
     </div>
   );
