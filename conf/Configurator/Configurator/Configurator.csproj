@@ -12,10 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Protobuf Include="..\..\..\api\ApiGatewayApi\ApiGatewayApi\Protos\config.proto" GrpcServices="Client">
       <Link>Protos\config.proto</Link>
     </Protobuf>

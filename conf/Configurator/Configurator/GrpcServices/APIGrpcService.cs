@@ -13,33 +13,41 @@ namespace Configurator.GrpcServices
 
         public async Task<Empty> UpdateFrontend(string data, string validFrom)
         {
-            var updateRequest = new ConfigData();
-            updateRequest.Data = data;
-            updateRequest.ValidFrom = validFrom;
+            ConfigData updateRequest = new()
+            {
+                Data = data,
+                ValidFrom = validFrom
+            };
             return await _configManagementClient.UpdateFrontendConfigAsync(updateRequest);
         }
 
         public async Task<Empty> DeleteFrontend(string apiName, string apiVersion)
         {
-            var deleteRequest = new ConfigId();
-            deleteRequest.ApiName = apiName;    
-            deleteRequest.ApiVersion = apiVersion;
+            ConfigId deleteRequest = new()
+            {
+                ApiName = apiName,
+                ApiVersion = apiVersion
+            };
             return await _configManagementClient.DeleteFrontendConfigAsync(deleteRequest);
         }
 
         public async Task<Empty> UpdateBackend(string data, string validFrom)
         {
-            var updateRequest = new ConfigData();
-            updateRequest.Data = data;
-            updateRequest.ValidFrom = validFrom;
+            ConfigData updateRequest = new()
+            {
+                Data = data,
+                ValidFrom = validFrom
+            };
             return await _configManagementClient.UpdateBackendConfigAsync(updateRequest);
         }
 
         public async Task<Empty> DeleteBackend(string apiName, string apiVersion)
         {
-            var deleteRequest = new ConfigId();
-            deleteRequest.ApiName = apiName;
-            deleteRequest.ApiVersion = apiVersion;
+            ConfigId deleteRequest = new()
+            {
+                ApiName = apiName,
+                ApiVersion = apiVersion
+            };
             return await _configManagementClient.DeleteBackendConfigAsync(deleteRequest);
         }
 
@@ -55,9 +63,11 @@ namespace Configurator.GrpcServices
 
         public async Task<ConfigData> GetFrontend(string apiName, string apiVersion)
         {
-            var getRequest = new ConfigId();
-            getRequest.ApiName = apiName;
-            getRequest.ApiVersion = apiVersion;
+            ConfigId getRequest = new()
+            {
+                ApiName = apiName,
+                ApiVersion = apiVersion
+            };
             return await _configManagementClient.GetFrontendConfigAsync(getRequest);
         } 
 
@@ -68,9 +78,11 @@ namespace Configurator.GrpcServices
 
         public async Task<ConfigData> GetBackend(string apiName, string apiVersion)
         {
-            var getRequest = new ConfigId();
-            getRequest.ApiName = apiName;
-            getRequest.ApiVersion = apiVersion;
+            ConfigId getRequest = new()
+            {
+                ApiName = apiName,
+                ApiVersion = apiVersion
+            };
             return await _configManagementClient.GetBackendConfigAsync(getRequest);
         }
     }
