@@ -8,12 +8,10 @@ namespace Configurator.Controllers
     [ApiController]
     public class ConfiguratorController : ControllerBase
     {
-        private readonly IConfigRepository _configRepository;
         private readonly ConfiguratorService _configuratorService;
 
-        public ConfiguratorController(IConfigRepository configRepository, ConfiguratorService configuratorService)
+        public ConfiguratorController(ConfiguratorService configuratorService)
         {
-            _configRepository = configRepository ?? throw new ArgumentNullException(nameof(configRepository));
             _configuratorService = configuratorService ?? throw new ArgumentNullException(nameof(configuratorService));
         }
 
@@ -28,9 +26,7 @@ namespace Configurator.Controllers
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public async Task<ActionResult<bool>> ModifyAndUpdateConfig([FromBody] IEnumerable<Config> configs)
         {
-            await _configRepository.ModifyConfigs(configs);
-
-            return Ok(await _configuratorService.UpdateConfigs());
+            return Ok(await _configuratorService.ModifyAndUpdate(configs));
         }
     }
 }

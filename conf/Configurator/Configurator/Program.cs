@@ -11,7 +11,13 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
 
-builder.Services.AddSingleton<IConfigRepository, DirectoryConfigRepository>();
+if (bool.Parse(builder.Configuration["GitHubSettings:UseGitHub"]))
+{
+    builder.Services.AddSingleton<IConfigRepository, GitHubConfigRepository>();
+} else
+{
+    builder.Services.AddSingleton<IConfigRepository, DirectoryConfigRepository>();
+}
 
 builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>(
                 options => options.Address = new Uri(builder.Configuration["GrpcSettings:APIURL"]));

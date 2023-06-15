@@ -1,4 +1,5 @@
-﻿using Configurator.GrpcServices;
+﻿using Configurator.Entities;
+using Configurator.GrpcServices;
 using Configurator.Repositories;
 
 namespace Configurator.Services
@@ -23,18 +24,17 @@ namespace Configurator.Services
             _ = UpdatePeriodically();
         }
 
-        public async Task<bool> UpdateConfigs()
+        public async Task<bool> Update(IEnumerable<Config> configs)
         {
-            var configs = await _configRepository.GetAllConfigs();
-
             DateTime validFrom = DateTime.Now.AddSeconds(VALIDFROM_SECONDS);
             DateTime timeout = DateTime.Now.AddSeconds(TIMEOUT_SECONDS);
 
             List<Task<bool>> completes = new();
 
-            foreach(var config in configs) {
+            foreach (var config in configs)
+            {
                 Task? task = null;
-                switch(config.Category)
+                switch (config.Category)
                 {
                     case "frontends":
                         task = _apiService.UpdateFrontend(config.Data, validFrom.ToString());
@@ -54,13 +54,27 @@ namespace Configurator.Services
             }
 
             foreach (var complete in completes)
-                if (!await complete) {
+                if (!await complete)
+                {
                     await _apiService.RevertPendingChanges();
                     //TODO call revert for all other conections
                     return false;
                 };
 
             return true;
+        }
+        public async Task<bool> UpdateConfigs()
+        {
+            var configs = await _configRepository.GetAllConfigs();
+
+            return await Update(configs);
+        }
+
+        public async Task<bool> ModifyAndUpdate(IEnumerable<Config> configs)
+        {
+            var newConfigs = await _configRepository.ModifyConfigs(configs);
+
+            return await Update(newConfigs);
         }
 
         private static async Task<bool> WaitWithTimeout(Task task, DateTime timeout)

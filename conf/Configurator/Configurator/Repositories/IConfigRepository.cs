@@ -6,7 +6,7 @@ namespace Configurator.Repositories
     {
         protected enum CATEGORIES { frontends, backends, middlewares, datasources };
 
-        Task ModifyConfigs(IEnumerable<Config> configs);
+        Task<IEnumerable<Config>> ModifyConfigs(IEnumerable<Config> configs);
 
         Task DeleteConfigs(IEnumerable<Config> configs);
 
