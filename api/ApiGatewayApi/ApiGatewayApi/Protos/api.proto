@@ -91,12 +91,17 @@ message RequestMetadata {
 message ExecutionRequest {
   string apiName = 1;
   string apiVersion = 2;
-  RequestMetadata requestMetadata = 3;
+  string path = 3;
+  string method = 4;
+  RequestMetadata requestMetadata = 5;
 
-  optional Entity requestBody = 4;
-  optional PrimitiveOrListObjectEntity queryParameters = 5;
-  optional PrimitiveObjectEntity pathParameters = 6;
-  optional PrimitiveObjectEntity headerParameters = 7;
+  optional Entity requestBody = 6;
+  optional PrimitiveOrListObjectEntity queryParameters = 7;
+  optional PrimitiveObjectEntity pathParameters = 8;
+  optional PrimitiveObjectEntity headerParameters = 9;
+  
+  optional int32 timeout = 10;
+  optional int32 repeat = 11;
 }
 
 message ExecutionResponse {
