@@ -61,6 +61,10 @@ message PrimitiveObjectEntity {
   map<string, PrimitiveEntity> properties = 1;
 }
 
+message PrimitiveOrListObjectEntity {
+  map<string, PrimitiveOrList> properties = 1;
+}
+
 message AuthRoles {
   repeated string roleNames = 1;
 }
@@ -90,7 +94,7 @@ message ExecutionRequest {
   RequestMetadata requestMetadata = 3;
 
   optional Entity requestBody = 4;
-  optional PrimitiveOrList queryParameters = 5;
+  optional PrimitiveOrListObjectEntity queryParameters = 5;
   optional PrimitiveObjectEntity pathParameters = 6;
   optional PrimitiveObjectEntity headerParameters = 7;
 }
