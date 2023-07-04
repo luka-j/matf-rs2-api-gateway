@@ -1,5 +1,3 @@
-import { AiFillPlusCircle } from "react-icons/ai";
-
 import BackendCard from "./components/BackendCard";
 
 const backends = [
