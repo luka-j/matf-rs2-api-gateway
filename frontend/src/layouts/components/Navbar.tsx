@@ -12,14 +12,12 @@ const Navbar = () => {
     <nav>
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <a href="/dashboard" className="flex items-center">
-          <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">
-            API Gateway
-          </span>
+          <span className="self-center text-2xl font-semibold whitespace-nowrap ">API Gateway</span>
         </a>
         <div className="flex md:order-2">
           <button
             onClick={logoutUser}
-            className="focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-4 py-2 text-center mr-3 md:mr-0 bg-blue-600 hover:bg-blue-700 focus:ring-blue-800"
+            className="focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-4 py-2 text-center mr-3 md:mr-0 bg-blue-600 hover:bg-blue-700 focus:ring-blue-800 text-black"
           >
             Logout
           </button>
@@ -57,7 +55,7 @@ const Navbar = () => {
             <li>
               <a
                 href="#"
-                className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent  md:p-0 md:text-blue-500"
+                className="block py-2 pl-3 pr-4  bg-blue-700 rounded md:bg-transparent  md:p-0 md:text-blue-500"
                 aria-current="page"
               >
                 Example1
@@ -66,7 +64,7 @@ const Navbar = () => {
             <li>
               <a
                 href="#"
-                className="block py-2 pl-3 pr-4  rounded  md:p-0 md:hover:text-blue-500 text-white hover:bg-gray-700 hover:text-white md:hover:bg-transparent border-gray-700"
+                className="block py-2 pl-3 pr-4  rounded  md:p-0 md:hover:text-blue-500  hover:bg-gray-700 hover: md:hover:bg-transparent border-gray-700"
               >
                 Example2
               </a>
@@ -74,7 +72,7 @@ const Navbar = () => {
             <li>
               <a
                 href="#"
-                className="block py-2 pl-3 pr-4  rounded  md:p-0 md:hover:text-blue-500 text-white hover:bg-gray-700 hover:text-white md:hover:bg-transparent border-gray-700"
+                className="block py-2 pl-3 pr-4  rounded  md:p-0 md:hover:text-blue-500  hover:bg-gray-700 hover: md:hover:bg-transparent border-gray-700"
               >
                 Example3
               </a>
@@ -82,7 +80,7 @@ const Navbar = () => {
             <li>
               <a
                 href="#"
-                className="block py-2 pl-3 pr-4  rounded  md:p-0 md:hover:text-blue-500 text-white hover:bg-gray-700 hover:text-white md:hover:bg-transparent border-gray-700"
+                className="block py-2 pl-3 pr-4  rounded  md:p-0 md:hover:text-blue-500  hover:bg-gray-700 hover: md:hover:bg-transparent border-gray-700"
               >
                 Example4
               </a>
