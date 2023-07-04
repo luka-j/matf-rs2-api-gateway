@@ -30,7 +30,7 @@ const FrontBackOverview = ({ frontBackList, type, up, total }: IFrontBackOvervie
   return (
     <div className="mt-12 w-full max-w-md p-4  border  rounded-lg shadow sm:p-8 bg-gray-800 border-gray-700">
       <div className="flex items-center justify-between mb-4">
-        <h5 className="text-xl font-bold leading-none  text-white">
+        <h5 className="text-xl font-bold leading-none  ">
           {type.toUpperCase()}: {up}/{total} up
         </h5>
         <a
@@ -51,7 +51,7 @@ const FrontBackOverview = ({ frontBackList, type, up, total }: IFrontBackOvervie
                   })}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate text-white">{frontBack.name}</p>
+                  <p className="text-sm font-medium truncate ">{frontBack.name}</p>
                   <p className="text-sm  truncate text-gray-400">{frontBack.path}</p>
                 </div>
                 <a

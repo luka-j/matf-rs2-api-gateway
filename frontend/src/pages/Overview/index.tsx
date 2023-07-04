@@ -113,11 +113,11 @@ export type System = (typeof apis)[number];
 
 const Dashboard = () => {
   return (
-    <main className="mt-8 mx-auto max-w-7xl">
-      <h1 className="text-4xl text-center font-bold text-white">API Gateway Dashboard</h1>
+    <main className="mt-8 mx-auto max-w-7xl pb-8">
+      <h1 className="text-4xl text-center font-bold ">API Gateway Dashboard</h1>
 
       <div className="mt-8 block w-full p-6  border  rounded-lg shadow  bg-gray-800 border-gray-700">
-        <h2 className="mb-2 text-3xl font-semibold text-white">Config Overview</h2>
+        <h2 className="mb-2 text-3xl font-semibold ">Config Overview</h2>
         <p className="font-normal  text-gray-400">Here you can preview and edit your configs.</p>
         <div className="flex justify-between items-center flex-col md:flex-row">
           <FrontBackOverview frontBackList={frontends} type="Frontends" up={5} total={7} />
@@ -128,14 +128,14 @@ const Dashboard = () => {
       <div className="mt-8 block w-full p-6  border  rounded-lg shadow  bg-gray-800 border-gray-700">
         <div className="flex justify-between">
           <div>
-            <h5 className="mb-2 text-3xl font-semibold text-white">Datasources</h5>
+            <h5 className="mb-2 text-3xl font-semibold ">Datasources</h5>
             <p className="font-normal  text-gray-400">
               Here you can preview and edit your datasources.
             </p>
           </div>
           <a
             href="/dashboard/datasources"
-            className="focus:ring-4 focus:outline-none font-medium rounded-lg text-sm h-10 px-4 py-2 text-center mr-3 md:mr-0 bg-blue-600 hover:bg-blue-700 focus:ring-blue-800"
+            className="focus:ring-4 focus:outline-none font-medium rounded-lg text-sm h-10 px-4 py-2 text-center mr-3 md:mr-0 bg-blue-600 hover:bg-blue-700 focus:ring-blue-800 text-black"
           >
             See details
           </a>
@@ -148,7 +148,7 @@ const Dashboard = () => {
       </div>
 
       <div className="mt-8 block w-full p-6  border  rounded-lg shadow  bg-gray-800 border-gray-700">
-        <h2 className="mb-2 text-3xl font-semibold text-white">System Overview</h2>
+        <h2 className="mb-2 text-3xl font-semibold ">System Overview</h2>
         <p className="font-normal  text-gray-400">Here you can preview and edit your systems.</p>
         <div className="flex justify-between items-center flex-col md:flex-row">
           <SystemOverview systemList={apis} instanceAmount={3} title="API" />
