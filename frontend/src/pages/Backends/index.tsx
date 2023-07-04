@@ -1,8 +1,8 @@
 import { AiFillPlusCircle } from "react-icons/ai";
 
-import FrontendCard from "./components/FrontendCard";
+import BackendCard from "./components/BackendCard";
 
-const frontends = [
+const backends = [
   {
     id: 1,
     name: "API 1, v1",
@@ -35,20 +35,17 @@ const frontends = [
   },
 ];
 
-const Frontends = () => {
+const Backends = () => {
   return (
     <main className="mt-8 mx-auto max-w-7xl pb-8">
-      <h1 className="text-4xl text-center font-bold items-center justify-between inline-flex gap-4 w-full">
-        Frontends
-        <div className="mt-1 hover:bg-gray-600 rounded-full p-1 cursor-pointer transition-all duration-300 active:bg-transparent">
-          <AiFillPlusCircle />
-        </div>
+      <h1 className="text-4xl text-center font-bold items-center justify-center inline-flex gap-4 w-full">
+        Backends
       </h1>
 
       <div className="mt-8 block w-full p-6 pt-0  border  rounded-lg shadow  bg-gray-800 border-gray-700">
         <div className="flex justify-between items-center flex-col md:flex-row flex-wrap">
-          {frontends.map((frontend) => (
-            <FrontendCard key={frontend.id} {...frontend} />
+          {backends.map((backend) => (
+            <BackendCard key={backend.id} {...backend} />
           ))}
         </div>
       </div>
@@ -56,4 +53,4 @@ const Frontends = () => {
   );
 };
 
-export default Frontends;
+export default Backends;

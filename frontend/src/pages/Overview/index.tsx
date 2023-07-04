@@ -135,12 +135,12 @@ const Dashboard = () => {
           </div>
           <a
             href="/dashboard/datasources"
-            className="focus:ring-4 focus:outline-none font-medium rounded-lg text-sm h-10 px-4 py-2 text-center mr-3 md:mr-0 bg-blue-600 hover:bg-blue-700 focus:ring-blue-800 text-black"
+            className="focus:ring-4 focus:outline-none font-medium rounded-lg text-sm h-10 px-4 py-2 text-center mr-3 md:mr-0 bg-blue-600 hover:bg-blue-700 focus:ring-blue-800 text-black whitespace-nowrap"
           >
             See details
           </a>
         </div>
-        <div className="flex justify-between items-center flex-col md:flex-row gap-12">
+        <div className="flex justify-between items-center flex-col md:flex-row md:gap-12">
           <DatasourceOverview datasourceList={caches} title="Caches" />
           <DatasourceOverview datasourceList={databases} title="Databases" />
           <DatasourceOverview datasourceList={queues} title="Queues" />

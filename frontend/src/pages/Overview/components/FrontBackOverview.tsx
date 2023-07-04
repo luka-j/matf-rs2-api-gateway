@@ -34,7 +34,7 @@ const FrontBackOverview = ({ frontBackList, type, up, total }: IFrontBackOvervie
           {type.toUpperCase()}: {up}/{total} up
         </h5>
         <a
-          href="/dashboard/frontends"
+          href={`/dashboard/${type.toLowerCase()}`}
           className="text-sm font-medium hover:underline text-blue-500"
         >
           View all
