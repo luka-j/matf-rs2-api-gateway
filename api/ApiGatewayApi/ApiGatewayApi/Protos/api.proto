@@ -107,5 +107,5 @@ message ExecutionRequest {
 message ExecutionResponse {
   int32 status = 1;
   optional Entity responseBody = 2;
-  optional PrimitiveObjectEntity headers = 3;
+  optional PrimitiveOrListObjectEntity headers = 3;
 }

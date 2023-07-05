@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Microsoft.OpenApi.Models;
 
 namespace ApiGatewayApi.Filters;
@@ -8,6 +9,12 @@ public class RequestResponseFilter
     {
         // todo
         return data;
+    }
+
+    public Entity FilterBody(OpenApiRequestBody spec, JsonNode data)
+    {
+        // todo
+        return new Entity();
     }
 
     public Tuple<PrimitiveObjectEntity, PrimitiveObjectEntity, PrimitiveOrListObjectEntity> FilterParams(
