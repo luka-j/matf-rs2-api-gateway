@@ -11,12 +11,6 @@ public class RequestResponseFilter
         return data;
     }
 
-    public Entity FilterBody(OpenApiRequestBody spec, JsonNode data)
-    {
-        // todo
-        return new Entity();
-    }
-
     public Tuple<PrimitiveObjectEntity, PrimitiveObjectEntity, PrimitiveOrListObjectEntity> FilterParams(
         IList<OpenApiParameter> spec, PrimitiveObjectEntity pathParams, PrimitiveObjectEntity headerParams,
         PrimitiveOrListObjectEntity queryParams)

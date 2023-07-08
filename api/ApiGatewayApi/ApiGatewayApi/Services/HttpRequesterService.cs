@@ -7,9 +7,9 @@ namespace ApiGatewayApi.Services;
 public class HttpRequesterService : HttpRequester.HttpRequesterBase
 {
     private readonly ILogger _logger = Serilog.Log.Logger;
-    private readonly Requester.HttpRequester _requester;
+    private readonly Processing.HttpRequester _requester;
 
-    public HttpRequesterService(Requester.HttpRequester requester)
+    public HttpRequesterService(Processing.HttpRequester requester)
     {
         _requester = requester;
     }

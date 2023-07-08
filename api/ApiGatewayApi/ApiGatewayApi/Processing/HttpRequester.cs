@@ -10,18 +10,21 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Models;
 using ILogger = Serilog.ILogger;
 
-namespace ApiGatewayApi.Requester;
+namespace ApiGatewayApi.Processing;
 
 public class HttpRequester
 {
     private readonly ILogger _logger = Serilog.Log.Logger;
     private readonly ApiRepository _apiRepository;
     private readonly RequestResponseFilter _filter;
+    private readonly EntityMapper _entityMapper;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public HttpRequester(RequestResponseFilter filter, ApiRepository apiRepository, IHttpClientFactory httpClientFactory)
+    public HttpRequester(RequestResponseFilter filter, EntityMapper entityMapper, 
+        ApiRepository apiRepository, IHttpClientFactory httpClientFactory)
     {
         _filter = filter;
+        _entityMapper = entityMapper;
         _apiRepository = apiRepository;
         _httpClientFactory = httpClientFactory;
     }
@@ -54,7 +57,7 @@ public class HttpRequester
 
         var httpClient = _httpClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri(apiConfig.Spec.Servers[0].Url);
-        var httpMessage = MakeHttpRequestMessage(request.Method, request.Path, requestBodyEntity, pathParams,
+        var httpMessage = MakeHttpRequestMessage(request.Method, apiConfig.Spec.Servers[0].Url + request.Path, requestBodyEntity, pathParams,
             headerParams, queryParams);
         
         var response = await httpClient.SendAsync(httpMessage);
@@ -64,46 +67,53 @@ public class HttpRequester
         var responseHeaders = ParseHeaders(response.Headers, response.Content.Headers);
         executionResponse.Headers = responseHeaders;
         var responseBody = JsonNode.Parse(await response.Content.ReadAsStreamAsync());
-        if (responseBody != null)
-        {
-            var filteredBody = _filter.FilterBody(operation.RequestBody, responseBody);
-            executionResponse.ResponseBody = filteredBody;
-        }
+        if (responseBody == null) return executionResponse;
 
+        var mappedBody = _entityMapper.MapToEntity(responseBody);
+        var filteredBody = _filter.FilterBody(operation.RequestBody, mappedBody);
+        executionResponse.ResponseBody = filteredBody;
         return executionResponse;
     }
 
     private HttpRequestMessage MakeHttpRequestMessage(string method, string path, Entity requestBody,
-        PrimitiveObjectEntity pathParams, PrimitiveObjectEntity headers, PrimitiveOrListObjectEntity queryParams)
+        PrimitiveObjectEntity? pathParams, PrimitiveObjectEntity? headers, PrimitiveOrListObjectEntity? queryParams)
     {
         var message = new HttpRequestMessage
         {
             Method = new HttpMethod(method),
-            RequestUri = BuildUri(path, pathParams, queryParams),
-            Content = { Headers = {  }}
+            RequestUri = BuildUri(path, pathParams, queryParams)
         };
         PopulateContent(message, requestBody, headers);
         return message;
     }
 
-    private Uri BuildUri(string path, PrimitiveObjectEntity pathParams, PrimitiveOrListObjectEntity queryParams)
+    private Uri BuildUri(string path, PrimitiveObjectEntity? pathParams, PrimitiveOrListObjectEntity? queryParams)
     {
         var parsedPath = ReplacePathParams(path, pathParams);
-        return new Uri(QueryHelpers.AddQueryString(parsedPath, GetQueryParams(queryParams)));
+        if (queryParams != null)
+        {
+            parsedPath = QueryHelpers.AddQueryString(parsedPath, GetQueryParams(queryParams));
+        }
+        return new Uri(parsedPath);
     }
 
-    private void PopulateContent(HttpRequestMessage message, Entity? body, PrimitiveObjectEntity headers)
+    private void PopulateContent(HttpRequestMessage message, Entity? body, PrimitiveObjectEntity? headers)
     {
         if (body != null)
         {
-            var content = new StringContent("");
+            var requestBody = _entityMapper.MapToBody(body);
+            var content = new StringContent(requestBody.ToJsonString());
             message.Content = content;
+            message.Headers.Add("Content-Type", "application/json");
         }
 
-        PopulateHeaders(headers, message.Content.Headers);
+        if (headers != null)
+        {
+            PopulateHeaders(headers, message.Headers);
+        }
     }
 
-    private static void PopulateHeaders(PrimitiveObjectEntity headerParams, HttpContentHeaders headers)
+    private static void PopulateHeaders(PrimitiveObjectEntity headerParams, HttpRequestHeaders headers)
     {
         foreach (var (key, value) in headerParams.Properties)
         {
@@ -111,8 +121,10 @@ public class HttpRequester
         }
     }
 
-    private static string ReplacePathParams(string path, PrimitiveObjectEntity pathParams)
+    private static string ReplacePathParams(string path, PrimitiveObjectEntity? pathParams)
     {
+        if (pathParams == null) return path;
+        
         var segments = path.Split('/');
         var sb = new StringBuilder();
         foreach (var segment in segments)
