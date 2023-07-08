@@ -1,5 +1,4 @@
 using ApiGatewayApi.ApiConfigs;
-using ApiGatewayApi.Filters;
 using ApiGatewayApi.Processing;
 using ApiGatewayApi.Services;
 using Serilog;

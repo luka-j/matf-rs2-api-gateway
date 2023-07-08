@@ -4,7 +4,6 @@ using System.Text;
 using System.Text.Json.Nodes;
 using ApiGatewayApi.ApiConfigs;
 using ApiGatewayApi.Exceptions;
-using ApiGatewayApi.Filters;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Models;
@@ -49,6 +48,7 @@ public class HttpRequester
         {
             throw new PathNotFound("Path not found");
         }
+        _logger.Debug("Resolved OAS operation {Operation}", operation.OperationId);
 
         var requestBodyEntity = _filter.FilterBody(operation.RequestBody, request.RequestBody);
         var (pathParams, headerParams, queryParams) = 
@@ -59,19 +59,26 @@ public class HttpRequester
         httpClient.BaseAddress = new Uri(apiConfig.Spec.Servers[0].Url);
         var httpMessage = MakeHttpRequestMessage(request.Method, apiConfig.Spec.Servers[0].Url + request.Path, requestBodyEntity, pathParams,
             headerParams, queryParams);
+        _logger.Debug("Sending HTTP message: {HttpMessage}", httpMessage);
         
         var response = await httpClient.SendAsync(httpMessage);
+        _logger.Debug("Got HTTP response: {Response}", response);
+        var responseSpec = ResolveOpenApiResponse(operation.Responses, response);
 
         var executionResponse = new ExecutionResponse();
         executionResponse.Status = (int) response.StatusCode;
         var responseHeaders = ParseHeaders(response.Headers, response.Content.Headers);
-        executionResponse.Headers = responseHeaders;
+        executionResponse.Headers = _filter.FilterHeaders(responseSpec.Headers, responseHeaders);
         var responseBody = JsonNode.Parse(await response.Content.ReadAsStreamAsync());
-        if (responseBody == null) return executionResponse;
+        _logger.Debug("Got HTTP response body: {ResponseBody}", responseBody);
+        if (responseBody != null)
+        {
+            var mappedBody = _entityMapper.MapToEntity(responseBody);
+            var filteredBody = _filter.FilterBody(responseSpec.Content["application/json"], mappedBody);
+            executionResponse.ResponseBody = filteredBody;
+        }
 
-        var mappedBody = _entityMapper.MapToEntity(responseBody);
-        var filteredBody = _filter.FilterBody(operation.RequestBody, mappedBody);
-        executionResponse.ResponseBody = filteredBody;
+        _logger.Debug("Returning execution response: {ExecutionResponse}", executionResponse);
         return executionResponse;
     }
 
@@ -231,5 +238,13 @@ public class HttpRequester
             default: 
                 return null;
         }
+    }
+
+    private static OpenApiResponse ResolveOpenApiResponse(OpenApiResponses responses, HttpResponseMessage message)
+    {
+        var stringCode = ((int)message.StatusCode).ToString();
+        
+        if (responses.TryGetValue(stringCode, out var response)) return response;
+        throw new ApiRuntimeException("Invalid response " + stringCode);
     }
 }

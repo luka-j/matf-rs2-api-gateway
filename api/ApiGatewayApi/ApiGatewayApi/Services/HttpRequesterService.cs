@@ -18,7 +18,7 @@ public class HttpRequesterService : HttpRequester.HttpRequesterBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("MakeHttpRequest request: {}", request);
+            _logger.Information("MakeHttpRequest request: {Request}", request);
             try
             {
                 return _requester.MakeRequest(request);

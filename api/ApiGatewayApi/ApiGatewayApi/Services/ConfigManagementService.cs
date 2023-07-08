@@ -20,7 +20,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("GetBackendConfig request: {}", request);
+            _logger.Information("GetBackendConfig request: {Request}", request);
             try
             {
                 var configData = _repository.Backends.GetCurrentConfig(
@@ -42,7 +42,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("DeleteBackendConfig request: {}", request);
+            _logger.Information("DeleteBackendConfig request: {Request}", request);
             var status = _repository.Backends.DeleteConfig(new ApiIdentifier(request.ApiName, request.ApiVersion));
             if (!status)
             {
@@ -56,7 +56,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("UpdateBackendConfig request: {}", request);
+            _logger.Information("UpdateBackendConfig request: {Request}", request);
             try {
                 _repository.Backends.AddConfig(new ApiSpec(request.Data, DateTime.Parse(request.ValidFrom)));
                 return new Empty();
@@ -73,7 +73,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("GetFrontendConfig request: {}", request);
+            _logger.Information("GetFrontendConfig request: {Request}", request);
             try
             {
                 var configData = _repository.Frontends.GetCurrentConfig(
@@ -94,7 +94,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     public override Task<Empty> DeleteFrontendConfig(ConfigId request, ServerCallContext context)
     {        return Task.Run(() =>
         {
-            _logger.Information("DeleteFrontendConfig request: {}", request);
+            _logger.Information("DeleteFrontendConfig request: {Request}", request);
             var status = _repository.Frontends.DeleteConfig(new ApiIdentifier(request.ApiName, request.ApiVersion));
             if (!status)
             {
@@ -108,7 +108,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("UpdateFrontendConfig request: {}", request);
+            _logger.Information("UpdateFrontendConfig request: {Request}", request);
             try
             {
                 _repository.Frontends.AddConfig(new ApiSpec(request.Data, DateTime.Parse(request.ValidFrom)));
@@ -126,7 +126,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
         return Task.Run(() =>
         {
             DateTime now = DateTime.Now;
-            _logger.Information("RevertPendingUpdates, time: {}", now);
+            _logger.Information("RevertPendingUpdates, time: {Now}", now);
             int revertedFrontends = _repository.Frontends.RevertPendingChanges(now);
             int revertedBackends = _repository.Backends.RevertPendingChanges(now);
             return new RevertChangesResponse
@@ -142,7 +142,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("GetAllBackendConfigs request: {}", request);
+            _logger.Information("GetAllBackendConfigs request: {Request}", request);
             var configMetadata = _repository.Backends.GetAllConfigsMetadata(DateTime.Now)
                 .Select(metadata => new ConfigMetadata
                 {
@@ -160,7 +160,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("GetAllBackendConfigs request: {}", request);
+            _logger.Information("GetAllBackendConfigs request: {Request}", request);
             var configMetadata = _repository.Frontends.GetAllConfigsMetadata(DateTime.Now)
                 .Select(metadata => new ConfigMetadata
                 {

@@ -1,11 +1,17 @@
 using System.Text.Json.Nodes;
 using Microsoft.OpenApi.Models;
 
-namespace ApiGatewayApi.Filters;
+namespace ApiGatewayApi.Processing;
 
 public class RequestResponseFilter
 {
     public Entity FilterBody(OpenApiRequestBody spec, Entity data)
+    {
+        // todo
+        return data;
+    }
+    
+    public Entity FilterBody(OpenApiMediaType spec, Entity data)
     {
         // todo
         return data;
@@ -20,7 +26,13 @@ public class RequestResponseFilter
             headerParams, queryParams);
     }
 
-    public PrimitiveObjectEntity FilterHeaders(IList<OpenApiParameter> spec, PrimitiveObjectEntity headers)
+    public PrimitiveOrListObjectEntity FilterHeaders(IList<OpenApiParameter> spec, PrimitiveOrListObjectEntity headers)
+    {
+        // todo
+        return headers;
+    }
+
+    public PrimitiveOrListObjectEntity FilterHeaders(IDictionary<string, OpenApiHeader> spec, PrimitiveOrListObjectEntity headers)
     {
         // todo
         return headers;
