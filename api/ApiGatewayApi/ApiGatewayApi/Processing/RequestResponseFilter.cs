@@ -1,4 +1,3 @@
-using System.Text.Json.Nodes;
 using Microsoft.OpenApi.Models;
 
 namespace ApiGatewayApi.Processing;
@@ -17,12 +16,12 @@ public class RequestResponseFilter
         return data;
     }
 
-    public Tuple<PrimitiveObjectEntity, PrimitiveObjectEntity, PrimitiveOrListObjectEntity> FilterParams(
-        IList<OpenApiParameter> spec, PrimitiveObjectEntity pathParams, PrimitiveObjectEntity headerParams,
+    public Tuple<PrimitiveObjectEntity, PrimitiveOrListObjectEntity, PrimitiveOrListObjectEntity> FilterParams(
+        IList<OpenApiParameter> spec, PrimitiveObjectEntity pathParams, PrimitiveOrListObjectEntity headerParams,
         PrimitiveOrListObjectEntity queryParams)
     {
         // todo
-        return new Tuple<PrimitiveObjectEntity, PrimitiveObjectEntity, PrimitiveOrListObjectEntity>(pathParams,
+        return new Tuple<PrimitiveObjectEntity, PrimitiveOrListObjectEntity, PrimitiveOrListObjectEntity>(pathParams,
             headerParams, queryParams);
     }
 

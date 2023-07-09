@@ -11,6 +11,7 @@ using ILogger = Serilog.ILogger;
 
 namespace ApiGatewayApi.Processing;
 
+
 public class HttpRequester
 {
     private readonly ILogger _logger = Serilog.Log.Logger;
@@ -82,8 +83,8 @@ public class HttpRequester
         return executionResponse;
     }
 
-    private HttpRequestMessage MakeHttpRequestMessage(string method, string path, Entity requestBody,
-        PrimitiveObjectEntity? pathParams, PrimitiveObjectEntity? headers, PrimitiveOrListObjectEntity? queryParams)
+    public HttpRequestMessage MakeHttpRequestMessage(string method, string path, Entity? requestBody,
+        PrimitiveObjectEntity? pathParams, PrimitiveOrListObjectEntity? headers, PrimitiveOrListObjectEntity? queryParams)
     {
         var message = new HttpRequestMessage
         {
@@ -104,14 +105,13 @@ public class HttpRequester
         return new Uri(parsedPath);
     }
 
-    private void PopulateContent(HttpRequestMessage message, Entity? body, PrimitiveObjectEntity? headers)
+    private void PopulateContent(HttpRequestMessage message, Entity? body, PrimitiveOrListObjectEntity? headers)
     {
         if (body != null)
         {
             var requestBody = _entityMapper.MapToJsonNode(body);
-            var content = new StringContent(requestBody.ToJsonString());
+            var content = JsonContent.Create(requestBody);
             message.Content = content;
-            message.Headers.Add("Content-Type", "application/json");
         }
 
         if (headers != null)
@@ -120,11 +120,18 @@ public class HttpRequester
         }
     }
 
-    private static void PopulateHeaders(PrimitiveObjectEntity headerParams, HttpRequestHeaders headers)
+    private static void PopulateHeaders(PrimitiveOrListObjectEntity headerParams, HttpRequestHeaders headers)
     {
         foreach (var (key, value) in headerParams.Properties)
         {
-            headers.Add(key, PrimitiveEntityToString(value));
+            if (value.ContentCase == PrimitiveOrList.ContentOneofCase.Primitive)
+            {
+                headers.Add(key, PrimitiveEntityToString(value.Primitive));
+            } else if (value.ContentCase == PrimitiveOrList.ContentOneofCase.List)
+            {
+                var headerValues = value.List.Value.Select(PrimitiveEntityToString);
+                headers.Add(key, headerValues);
+            }
         }
     }
 
@@ -136,12 +143,12 @@ public class HttpRequester
         var sb = new StringBuilder();
         foreach (var segment in segments)
         {
-            if (segment.StartsWith(":"))
+            if (segment.StartsWith("{") && segment.EndsWith("}"))
             {
-                var paramName = segment[1..];
+                var paramName = segment[1..^1];
                 if (pathParams.Properties.TryGetValue(paramName, out var property))
                 {
-                    sb.Append(property);
+                    sb.Append(PrimitiveEntityToString(property));
                 }
                 else
                 {

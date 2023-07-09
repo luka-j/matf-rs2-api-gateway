@@ -3,7 +3,7 @@ using ApiGatewayApi.Exceptions;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 
-namespace Tests;
+namespace Tests.ApiConfigs;
 
 public class ApiConfigTest
 {

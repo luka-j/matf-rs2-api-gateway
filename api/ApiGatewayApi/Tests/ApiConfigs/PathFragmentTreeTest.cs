@@ -2,7 +2,7 @@ using ApiGatewayApi.ApiConfigs;
 using ApiGatewayApi.Exceptions;
 using Microsoft.OpenApi.Models;
 
-namespace Tests;
+namespace Tests.ApiConfigs;
 
 public class PathFragmentTreeTest
 {

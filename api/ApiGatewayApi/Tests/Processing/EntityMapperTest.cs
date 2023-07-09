@@ -2,7 +2,7 @@
 using ApiGatewayApi;
 using ApiGatewayApi.Processing;
 
-namespace Tests;
+namespace Tests.Processing;
 
 public class EntityMapperTest
 {
@@ -45,7 +45,7 @@ public class EntityMapperTest
     public void GivenComplexObject_WhenMappingToJsonNodeAndBack_ReturnEqualResultAsOriginal()
     {
         var result = _mapper.MapToJsonNode(_complexEntity).ToJsonString();
-        var original = _mapper.MapToEntity(JsonNode.Parse(result));
+        var original = _mapper.MapToEntity(JsonNode.Parse(result)!);
         Assert.Equal(_complexEntity, original);
     }
 }
