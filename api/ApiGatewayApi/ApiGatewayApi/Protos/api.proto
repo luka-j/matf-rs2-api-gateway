@@ -61,6 +61,10 @@ message PrimitiveObjectEntity {
   map<string, PrimitiveEntity> properties = 1;
 }
 
+message PrimitiveOrListObjectEntity {
+  map<string, PrimitiveOrList> properties = 1;
+}
+
 message AuthRoles {
   repeated string roleNames = 1;
 }
@@ -87,16 +91,21 @@ message RequestMetadata {
 message ExecutionRequest {
   string apiName = 1;
   string apiVersion = 2;
-  RequestMetadata requestMetadata = 3;
+  string path = 3;
+  string method = 4;
+  RequestMetadata requestMetadata = 5;
 
-  optional Entity requestBody = 4;
-  optional PrimitiveOrList queryParameters = 5;
-  optional PrimitiveObjectEntity pathParameters = 6;
-  optional PrimitiveObjectEntity headerParameters = 7;
+  optional Entity requestBody = 6;
+  optional PrimitiveOrListObjectEntity queryParameters = 7;
+  optional PrimitiveObjectEntity pathParameters = 8;
+  optional PrimitiveOrListObjectEntity headerParameters = 9;
+  
+  optional int32 timeout = 10;
+  optional int32 repeat = 11;
 }
 
 message ExecutionResponse {
   int32 status = 1;
   optional Entity responseBody = 2;
-  optional PrimitiveObjectEntity headers = 3;
+  optional PrimitiveOrListObjectEntity headers = 3;
 }

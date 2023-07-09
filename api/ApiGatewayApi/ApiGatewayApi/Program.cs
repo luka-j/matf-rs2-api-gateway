@@ -1,4 +1,5 @@
 using ApiGatewayApi.ApiConfigs;
+using ApiGatewayApi.Processing;
 using ApiGatewayApi.Services;
 using Serilog;
 
@@ -11,8 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
 
 builder.Services.AddSingleton<ApiRepository>();
+builder.Services.AddSingleton<RequestResponseFilter>();
+builder.Services.AddSingleton<HttpRequester>();
+builder.Services.AddSingleton<EntityMapper>();
 
 Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
     .WriteTo.Console()

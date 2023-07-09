@@ -1,7 +1,7 @@
 using ApiGatewayApi.ApiConfigs;
 using ApiGatewayApi.Exceptions;
 
-namespace Tests;
+namespace Tests.ApiConfigs;
 
 public class ApiCollectionTest
 {
