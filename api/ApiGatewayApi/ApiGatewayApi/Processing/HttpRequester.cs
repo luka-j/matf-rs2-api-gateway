@@ -108,7 +108,7 @@ public class HttpRequester
     {
         if (body != null)
         {
-            var requestBody = _entityMapper.MapToBody(body);
+            var requestBody = _entityMapper.MapToJsonNode(body);
             var content = new StringContent(requestBody.ToJsonString());
             message.Content = content;
             message.Headers.Add("Content-Type", "application/json");

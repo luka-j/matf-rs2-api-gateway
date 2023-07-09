@@ -29,9 +29,4 @@
       </Content>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Requester\" />
-      <Folder Include="Utils\" />
-    </ItemGroup>
-
 </Project>
