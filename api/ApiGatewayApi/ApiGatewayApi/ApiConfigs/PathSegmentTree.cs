@@ -28,7 +28,7 @@ public class PathSegmentTree
 
 
     /// <summary>
-    /// Build and return a tree corresponding to the OpenApiPaths spec.
+    /// Build and return a tree corresponding to the OpenApiPaths spec. Leading slashes in paths are ignored.
     /// </summary>
     /// <param name="oasPaths">Spec containing paths and items for each path.</param>
     /// <returns>An instance of PathSegmentTree which can be used for efficient lookup
@@ -42,7 +42,9 @@ public class PathSegmentTree
         var wholeTree = new PathSegmentTree();
         foreach (var (path, item) in oasPaths)
         {
-            var fragments = path.Split('/');
+            var trimmedPath = path;
+            if (path.StartsWith('/')) trimmedPath = path[1..];
+            var fragments = trimmedPath.Split('/');
             var tree = wholeTree;
             for (var i = 0; i < fragments.Length ; i++)
             {

@@ -83,7 +83,8 @@ public class ApiConfig
         var pathItem = _pathTree.ResolvePath(path);
         if (pathItem == null) return null;
 
-        if (!Enum.TryParse(method, out OperationType op))
+        var capitalizedMethod = char.ToUpper(method[0]) + method[1..].ToLower();
+        if (!Enum.TryParse(capitalizedMethod, out OperationType op))
         {
             throw new ApiRuntimeException(method + " is not a valid method!");
         }

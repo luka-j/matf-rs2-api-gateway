@@ -58,8 +58,9 @@ public class HttpRequester
 
         var httpClient = _httpClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri(apiConfig.Spec.Servers[0].Url);
-        var httpMessage = MakeHttpRequestMessage(request.Method, apiConfig.Spec.Servers[0].Url + request.Path, requestBodyEntity, pathParams,
-            headerParams, queryParams);
+        var httpMessage = MakeHttpRequestMessage(request.Method,
+            ConcatPaths(apiConfig.Spec.Servers[0].Url, request.Path), requestBodyEntity, 
+            pathParams, headerParams, queryParams);
         _logger.Debug("Sending HTTP message: {HttpMessage}", httpMessage);
         
         var response = await httpClient.SendAsync(httpMessage);
@@ -257,5 +258,18 @@ public class HttpRequester
         
         if (responses.TryGetValue(stringCode, out var response)) return response;
         throw new ApiRuntimeException("Invalid response " + stringCode);
+    }
+
+    private static string ConcatPaths(string p1, string p2)
+    {
+        var slashes = 0;
+        slashes += p1.EndsWith('/') ? 1 : 0;
+        slashes += p2.StartsWith('/') ? 1 : 0;
+        return slashes switch
+        {
+            0 => p1 + '/' + p2,
+            1 => p1 + p2,
+            _ => p1 + p2[1..]
+        };
     }
 }
