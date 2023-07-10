@@ -19,6 +19,7 @@ builder.Services.AddSingleton<RequestResponseFilter>();
 builder.Services.AddSingleton<HttpRequester>();
 builder.Services.AddSingleton<EntityMapper>();
 builder.Services.AddSingleton<RequestExecutor>();
+builder.Services.AddSingleton<RequestProcessorGateway>();
 
 Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
     .WriteTo.Console()

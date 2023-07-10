@@ -56,7 +56,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("UpdateBackendConfig request: {Request}", request);
+            _logger.Information("UpdateBackendConfig, ValidFrom: {ValidFrom}", request.ValidFrom);
             try {
                 _repository.Backends.AddConfig(new ApiSpec(request.Data, DateTime.Parse(request.ValidFrom)));
                 return new Empty();
@@ -108,7 +108,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("UpdateFrontendConfig request: {Request}", request);
+            _logger.Information("UpdateFrontendConfig ValidFrom: {ValidFrom}", request.ValidFrom);
             try
             {
                 _repository.Frontends.AddConfig(new ApiSpec(request.Data, DateTime.Parse(request.ValidFrom)));

@@ -2,6 +2,7 @@ using System.Text.Json;
 using ApiGatewayApi.ApiConfigs;
 using ApiGatewayApi.Exceptions;
 using ApiGatewayApi.Processing;
+using Grpc.Reflection.V1Alpha;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using ILogger = Serilog.ILogger;
@@ -27,12 +28,22 @@ public class ExposedApisController : ControllerBase
         {
             var now = DateTime.Now;
             _requestExecutor.ExecuteRequest(path, now, HttpContext);
-            HttpContext.Response.CompleteAsync();
         }
         catch (HttpResponseException e)
         {
             response.StatusCode = e.ResponseCode;
+            response.StartAsync();
             response.WriteAsJsonAsync(e.ResponseBody);
+            response.CompleteAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "An unexpected exception occurred");
+            response.StatusCode = 500;
+            response.StartAsync();
+            response.WriteAsJsonAsync(new HttpResponseException.ErrorResponse("INTERNAL_SERVER_ERROR",
+                "An unexpected error has occured. Please try again later."));
+            response.CompleteAsync();
         }
     }
 }

@@ -15,6 +15,7 @@ namespace ApiGatewayApi.ApiConfigs;
 /// </summary>
 public class PathSegmentTree
 {
+    public record OasPathItemWithPath(OpenApiPathItem Item, string SpecPath);
 
     // we're treating segments which start and end with a curly brace (e.g. {foobar})
     // as path parameters, i.e. wildcards. we don't particularly care about the name
@@ -24,7 +25,7 @@ public class PathSegmentTree
     private static readonly string WILDCARD = "{}";
     
     private readonly Dictionary<string, PathSegmentTree> _children;
-    private OpenApiPathItem? _leaf;
+    private OasPathItemWithPath? _leaf;
 
 
     /// <summary>
@@ -69,7 +70,7 @@ public class PathSegmentTree
                 throw new ApiConfigException("API path is ambiguous: " + path);
             }
 
-            tree._leaf = item;
+            tree._leaf = new OasPathItemWithPath(item, path);
         }
 
         return wholeTree;
@@ -85,13 +86,13 @@ public class PathSegmentTree
     /// params (wildcards) are treated as less specific, i.e. if there's "a/{b}" is more specific than
     /// "{a}/b", so path "a/b" will be matched to it. Paths without wildcards (e.g. "a/b") are always
     /// the most specific and will be matched first if they exist.</returns>
-    public OpenApiPathItem? ResolvePath(string path)
+    public OasPathItemWithPath? ResolvePath(string path)
     {
         var fragments = ImmutableQueue.Create(path.Split('/'));
         return ResolvePathInternal(fragments);
     }
 
-    private OpenApiPathItem? ResolvePathInternal(ImmutableQueue<string> fragments)
+    private OasPathItemWithPath? ResolvePathInternal(ImmutableQueue<string> fragments)
     {
         if (fragments.Count() == 0)
         {

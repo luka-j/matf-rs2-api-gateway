@@ -57,7 +57,6 @@ public class HttpRequester
                 request.QueryParameters);
 
         var httpClient = _httpClientFactory.CreateClient();
-        httpClient.BaseAddress = new Uri(apiConfig.Spec.Servers[0].Url);
         var httpMessage = MakeHttpRequestMessage(request.Method,
             ConcatPaths(apiConfig.Spec.Servers[0].Url, request.Path), requestBodyEntity, 
             pathParams, headerParams, queryParams);
@@ -67,10 +66,12 @@ public class HttpRequester
         _logger.Debug("Got HTTP response: {Response}", response);
         var responseSpec = ResolveOpenApiResponse(operation.Responses, response);
 
-        var executionResponse = new ExecutionResponse();
-        executionResponse.Status = (int) response.StatusCode;
         var responseHeaders = ParseHeaders(response.Headers, response.Content.Headers);
-        executionResponse.Headers = _filter.FilterHeaders(responseSpec.Headers, responseHeaders);
+        var executionResponse = new ExecutionResponse
+        {
+            Status = (int) response.StatusCode,
+            Headers = _filter.FilterHeaders(responseSpec.Headers, responseHeaders),
+        };
         var responseBody = JsonNode.Parse(await response.Content.ReadAsStreamAsync());
         _logger.Debug("Got HTTP response body: {ResponseBody}", responseBody);
         if (responseBody != null)
@@ -125,22 +126,22 @@ public class HttpRequester
         }
     }
 
-    private static void PopulateHeaders(PrimitiveOrListObjectEntity headerParams, HttpRequestHeaders headers)
+    private void PopulateHeaders(PrimitiveOrListObjectEntity headerParams, HttpRequestHeaders headers)
     {
         foreach (var (key, value) in headerParams.Properties)
         {
             if (value.ContentCase == PrimitiveOrList.ContentOneofCase.Primitive)
             {
-                headers.Add(key, PrimitiveEntityToString(value.Primitive));
+                headers.Add(key, _entityMapper.PrimitiveEntityToString(value.Primitive));
             } else if (value.ContentCase == PrimitiveOrList.ContentOneofCase.List)
             {
-                var headerValues = value.List.Value.Select(PrimitiveEntityToString);
+                var headerValues = value.List.Value.Select(_entityMapper.PrimitiveEntityToString);
                 headers.Add(key, headerValues);
             }
         }
     }
 
-    private static string ReplacePathParams(string path, PrimitiveObjectEntity? pathParams)
+    private string ReplacePathParams(string path, PrimitiveObjectEntity? pathParams)
     {
         if (pathParams == null) return path;
         
@@ -153,7 +154,7 @@ public class HttpRequester
                 var paramName = segment[1..^1];
                 if (pathParams.Properties.TryGetValue(paramName, out var property))
                 {
-                    sb.Append(PrimitiveEntityToString(property));
+                    sb.Append(_entityMapper.PrimitiveEntityToString(property));
                 }
                 else
                 {
@@ -184,12 +185,12 @@ public class HttpRequester
             switch (queryParam.Value.ContentCase)
             {
                 case PrimitiveOrList.ContentOneofCase.List:
-                    var vals = queryParam.Value.List.Value.Select(PrimitiveEntityToString);
+                    var vals = queryParam.Value.List.Value.Select(_entityMapper.PrimitiveEntityToString);
                     ret.Add(new KeyValuePair<string, StringValues>(queryParam.Key, 
                         new StringValues(vals.ToArray())));
                     break;
                 case PrimitiveOrList.ContentOneofCase.Primitive:
-                    var val = PrimitiveEntityToString(queryParam.Value.Primitive);
+                    var val = _entityMapper.PrimitiveEntityToString(queryParam.Value.Primitive);
                     ret.Add(new KeyValuePair<string, StringValues>(queryParam.Key, new StringValues(val)));
                     break;
             }
@@ -198,58 +199,13 @@ public class HttpRequester
         return ret;
     }
 
-    private static PrimitiveOrListObjectEntity ParseHeaders(HttpResponseHeaders responseHeaders, 
+    private PrimitiveOrListObjectEntity ParseHeaders(HttpResponseHeaders responseHeaders, 
         HttpContentHeaders contentHeaders)
     {
         var result = new PrimitiveOrListObjectEntity();
-        ParseHeadersImpl(responseHeaders, result);
-        ParseHeadersImpl(contentHeaders, result);
+        _entityMapper.MapToPrimitiveOrListObjectEntity(responseHeaders, result);
+        _entityMapper.MapToPrimitiveOrListObjectEntity(contentHeaders, result);
         return result;
-    }
-
-    private static void ParseHeadersImpl(HttpHeaders headers, PrimitiveOrListObjectEntity result)
-    {
-        foreach (var header in headers)
-        {
-            var headerEntity = new PrimitiveOrList();
-            var value = header.Value.ToList();
-            if (value.Count() > 1)
-            {
-                var list = new PrimitiveList();
-                foreach (var singleVal in value)
-                {
-                    var primitiveEntity = new PrimitiveEntity();
-                    primitiveEntity.String = singleVal;
-                    list.Value.Add(primitiveEntity);
-                }
-
-                headerEntity.List = list;
-            }
-            else
-            {
-                var stringEntity = new PrimitiveEntity();
-                stringEntity.String = value.Single();
-                headerEntity.Primitive = stringEntity;
-            }
-            result.Properties[header.Key] = headerEntity;
-        }
-    } 
-
-    private static string? PrimitiveEntityToString(PrimitiveEntity entity)
-    {
-        switch (entity.ContentCase)
-        {
-            case PrimitiveEntity.ContentOneofCase.Boolean:
-                return entity.Boolean.ToString();
-            case PrimitiveEntity.ContentOneofCase.Decimal:
-                return entity.Decimal.ToDecimal().ToString(CultureInfo.InvariantCulture);
-            case PrimitiveEntity.ContentOneofCase.Integer:
-                return entity.Integer.ToString();
-            case PrimitiveEntity.ContentOneofCase.String:
-                return entity.String;
-            default: 
-                return null;
-        }
     }
 
     private static OpenApiResponse ResolveOpenApiResponse(OpenApiResponses responses, HttpResponseMessage message)
