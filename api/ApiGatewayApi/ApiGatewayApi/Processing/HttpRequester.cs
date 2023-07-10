@@ -75,8 +75,12 @@ public class HttpRequester
         if (responseBody != null)
         {
             var mappedBody = _entityMapper.MapToEntity(responseBody);
-            var filteredBody = _filter.FilterBody(responseSpec.Content["application/json"], mappedBody);
+            var filteredBody = _filter.FilterBody(responseSpec, mappedBody);
             executionResponse.ResponseBody = filteredBody;
+        }
+        else
+        {
+            _filter.FilterBody(responseSpec, null);
         }
 
         _logger.Debug("Returning execution response: {ExecutionResponse}", executionResponse);
