@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option csharp_namespace = "ApiGatewayApi";
+
+package config;
+
+service ConfigManagement {
+  rpc UpdateFrontendConfig (ConfigData) returns (Empty);
+  rpc DeleteFrontendConfig (ConfigId) returns (Empty);
+  rpc UpdateBackendConfig (ConfigData) returns (Empty);
+  rpc DeleteBackendConfig (ConfigId) returns (Empty);
+  
+  rpc RevertPendingUpdates(Empty) returns (RevertChangesResponse);
+  
+  rpc GetAllFrontendConfigs (Empty) returns (ConfigList);
+  rpc GetFrontendConfig (ConfigId) returns (ConfigData);
+  rpc GetAllBackendConfigs (Empty) returns (ConfigList);
+  rpc GetBackendConfig (ConfigId) returns (ConfigData);
+}
+
+message Empty {}
+
+message ConfigId {
+  string apiName = 1;
+  string apiVersion = 2;
+}
+message ConfigData {
+  string data = 1;
+  string validFrom = 2;
+}
+message ConfigMetadata {
+  string apiName = 1;
+  string apiVersion = 2;
+  string basePath = 3;
+}
+message ConfigList {
+  repeated ConfigMetadata configs = 1;
+}
+message RevertChangesResponse {
+  int32 revertedFrontends = 1;
+  int32 revertedBackends = 2;
+}
