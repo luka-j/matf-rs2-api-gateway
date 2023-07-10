@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+  name: conf-ingress
+  namespace: api-gateway
+spec:
+  rules:
+  - host: dashboard-rs2.luka-j.rocks
+    http:
+      paths:
+      - backend:
+          service:
+            name: dashboard-service
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - dashboard-rs2.luka-j.rocks
+    secretName: conf-tls-secret

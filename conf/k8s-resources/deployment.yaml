@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: conf-deployment
+  namespace: api-gateway
+  labels:
+    app: conf
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: conf
+  revisionHistoryLimit: 1
+  template:
+    metadata:
+      labels:
+        app: conf
+    spec:
+      containers:
+      - name: conf
+        image: ghcr.io/luka-j/matf-rs2-api-gateway-conf
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5001
