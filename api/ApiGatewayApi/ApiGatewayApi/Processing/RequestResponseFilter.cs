@@ -9,7 +9,10 @@ public partial class RequestResponseFilter
 {
     private readonly Serilog.ILogger _logger = Serilog.Log.Logger;
     
-    public Entity? FilterBody(OpenApiRequestBody spec, Entity? data)
+    [GeneratedRegex("^[a-zA-Z0-9\\+/]*={0,2}$")]
+    private static partial Regex Base64Regex();
+
+    public Entity? FilterBody(OpenApiRequestBody? spec, Entity? data)
     {
         if (data == null)
         {
@@ -73,7 +76,7 @@ public partial class RequestResponseFilter
             case "object":
                 return FilterObject(spec.Properties, spec.Required, data);
             case "array":
-                return FilterArray(spec.Items, data);
+                return FilterArray(spec, data);
             case "string":
                 return ValidateString(spec, data);
             case "integer":
@@ -183,12 +186,23 @@ public partial class RequestResponseFilter
             throw new ParamValidationException("Expected list, got " + data.ContentCase);
         }
 
+        if (spec.MinItems != null && data.List.Value.Count < spec.MinItems)
+        {
+            throw new ParamValidationException("List must have at least " + spec.MinItems + " items, got: " +
+                                               data.List.Value);
+        }
+        if (spec.MaxItems != null && data.List.Value.Count > spec.MaxItems)
+        {
+            throw new ParamValidationException("List must have at most " + spec.MaxItems + " items, got: " +
+                                               data.List.Value);
+        }
+
         var entityList = data.List;
         var ret = new Entity();
         var retList = new ListEntity();
         foreach (var entity in entityList.Value)
         {
-            retList.Value.Add(FilterSchema(spec, entity));
+            retList.Value.Add(FilterSchema(spec.Items, entity));
         }
 
         ret.List = retList;
@@ -411,7 +425,7 @@ public partial class RequestResponseFilter
     }
 
     public Tuple<PrimitiveObjectEntity, PrimitiveOrListObjectEntity, PrimitiveOrListObjectEntity> FilterParams(
-        IList<OpenApiParameter> spec, PrimitiveObjectEntity pathParams, PrimitiveOrListObjectEntity headerParams,
+        IEnumerable<OpenApiParameter> spec, PrimitiveObjectEntity pathParams, PrimitiveOrListObjectEntity headerParams,
         PrimitiveOrListObjectEntity queryParams)
     {
         var paramGroups = spec.GroupBy(param => param.In);
@@ -512,14 +526,20 @@ public partial class RequestResponseFilter
         {
             _logger.Warning("additionalProperties are not supported and will be discarded");
         }
-        var primitiveEntityRepresentation = new Entity
+
+        Entity? primitiveEntityRepresentation = null;
+        if (data.ContentCase == PrimitiveOrList.ContentOneofCase.Primitive)
         {
-            Boolean = data.Primitive.Boolean,
-            Decimal = data.Primitive.Decimal,
-            Integer = data.Primitive.Integer,
-            String = data.Primitive.String
-        };
-        
+            primitiveEntityRepresentation = data.Primitive.ContentCase switch
+            {
+                PrimitiveEntity.ContentOneofCase.Boolean => new Entity { Boolean = data.Primitive.Boolean },
+                PrimitiveEntity.ContentOneofCase.Decimal => new Entity { Decimal = data.Primitive.Decimal },
+                PrimitiveEntity.ContentOneofCase.Integer => new Entity { Integer = data.Primitive.Integer },
+                PrimitiveEntity.ContentOneofCase.String => new Entity { String = data.Primitive.String },
+                _ => throw new ApiRuntimeException("Unexpected primitive content case " + data.Primitive.ContentCase)
+            };
+        }
+
         switch (spec.Type)
         {
             case "string":
@@ -546,7 +566,7 @@ public partial class RequestResponseFilter
 
                 validated = ValidateBoolean(spec, primitiveEntityRepresentation);
                 return new PrimitiveOrList { Primitive = new PrimitiveEntity { Boolean = validated.Boolean } };
-            case "list":
+            case "array":
                 if (data.ContentCase == PrimitiveOrList.ContentOneofCase.Primitive)
                 {
                     var parsed = ValidatePrimitiveOrList(spec.Items, data);
@@ -586,12 +606,13 @@ public partial class RequestResponseFilter
 
     private PrimitiveEntity ValidatePrimitive(OpenApiSchema spec, PrimitiveEntity data)
     {
-        var primitiveEntityRepresentation = new Entity
+        var primitiveEntityRepresentation = data.ContentCase switch
         {
-            Boolean = data.Boolean,
-            Decimal = data.Decimal,
-            Integer = data.Integer,
-            String = data.String
+            PrimitiveEntity.ContentOneofCase.Boolean => new Entity { Boolean = data.Boolean },
+            PrimitiveEntity.ContentOneofCase.Decimal => new Entity { Decimal = data.Decimal },
+            PrimitiveEntity.ContentOneofCase.Integer => new Entity { Integer = data.Integer },
+            PrimitiveEntity.ContentOneofCase.String => new Entity { String = data.String },
+            _ => throw new ApiRuntimeException("Unexpected primitive content case " + data.ContentCase)
         };
         
         switch (spec.Type)
@@ -612,7 +633,4 @@ public partial class RequestResponseFilter
                 throw new ApiConfigException("Unsupported schema type " + spec.Type + ", expected primitive type");
         }
     }
-
-    [GeneratedRegex("^[a-zA-Z0-9\\+/]*={0,2}$")]
-    private static partial Regex Base64Regex();
 }
