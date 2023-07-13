@@ -256,7 +256,7 @@ public partial class RequestResponseFilter
                     }
                     break;
                 case "date-time":
-                    if (!DateOnly.TryParse(value, out _))
+                    if (!DateTime.TryParse(value, out _))
                     {
                         throw new ParamValidationException("String " + value + " cannot be parsed to a date!");
                     }
@@ -497,11 +497,29 @@ public partial class RequestResponseFilter
         return result;
     }
 
-    public PrimitiveOrListObjectEntity FilterHeaders(IDictionary<string, OpenApiHeader> spec, PrimitiveOrListObjectEntity headers)
+    public PrimitiveOrListObjectEntity? FilterHeaders(IDictionary<string, OpenApiHeader>? spec, 
+        PrimitiveOrListObjectEntity? headers)
     {
+        if (spec == null && headers == null)
+        {
+            return null;
+        }
+        if (spec == null)
+        {
+            return new PrimitiveOrListObjectEntity();
+        }
         var requiredHeaders = spec
             .Where(header => header.Value.Required)
-            .Select(header => header.Key);
+            .Select(header => header.Key)
+            .ToList();
+        if (headers == null && requiredHeaders.Any())
+        {
+            throw new ParamValidationException("There are required headers, but none are provided");
+        }
+        if (headers == null)
+        {
+            return new PrimitiveOrListObjectEntity();
+        }
         var missingHeaders = requiredHeaders.Except(headers.Properties.Keys);
         if (missingHeaders.Any())
         {

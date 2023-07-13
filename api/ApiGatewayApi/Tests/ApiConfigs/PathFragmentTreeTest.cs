@@ -30,7 +30,7 @@ public class PathFragmentTreeTest
     public void GivenBasicPath_WhenResolving_ReturnCorrectPathItem()
     {
         var resolved = _pathSegmentTree.ResolvePath("test/path/1");
-        Assert.Equal("1", resolved?.Description);
+        Assert.Equal("1", resolved?.Item.Description);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class PathFragmentTreeTest
     public void GivenPathWhichMatchesWildcard_WhenResolving_ReturnCorrectPathItem()
     {
         var resolved = _pathSegmentTree.ResolvePath("wildcard/anything");
-        Assert.Equal("3", resolved?.Description);
+        Assert.Equal("3", resolved?.Item.Description);
     }
 
     [Fact]
@@ -58,14 +58,14 @@ public class PathFragmentTreeTest
     public void GivenPathWhichMatchesPathWithWildcard_WhenResolving_ReturnCorrectPathItem()
     {
         var resolved = _pathSegmentTree.ResolvePath("wildcard/anything/something");
-        Assert.Equal("4", resolved?.Description);
+        Assert.Equal("4", resolved?.Item.Description);
     }
 
     [Fact]
     public void GivenPathWhichMatchesMultiplePaths_WhenResolving_ReturnMostSpecificPathItem()
     {
         var resolved = _pathSegmentTree.ResolvePath("wildcard/specific/something");
-        Assert.Equal("5", resolved?.Description);
+        Assert.Equal("5", resolved?.Item.Description);
     }
 
     [Fact]

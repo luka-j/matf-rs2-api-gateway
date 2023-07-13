@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Globalization;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using ApiGatewayApi.Exceptions;
 
@@ -120,5 +122,53 @@ public class EntityMapper
         }
 
         return arr;
+    }
+    
+    // not sure why are there 5 different ways to represent HTTP headers in C#/ASP.NET
+    // this should cover most of them
+    public void MapToPrimitiveOrListObjectEntity(IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers, 
+        PrimitiveOrListObjectEntity result)
+    {
+        foreach (var header in headers)
+        {
+            var headerEntity = new PrimitiveOrList();
+            var value = header.Value.ToList();
+            if (value.Count > 1)
+            {
+                var list = new PrimitiveList();
+                foreach (var singleVal in value)
+                {
+                    var primitiveEntity = new PrimitiveEntity();
+                    primitiveEntity.String = singleVal;
+                    list.Value.Add(primitiveEntity);
+                }
+
+                headerEntity.List = list;
+            }
+            else
+            {
+                var stringEntity = new PrimitiveEntity();
+                stringEntity.String = value.Single();
+                headerEntity.Primitive = stringEntity;
+            }
+            result.Properties[header.Key] = headerEntity;
+        }
+    }
+    
+    public string? PrimitiveEntityToString(PrimitiveEntity entity)
+    {
+        switch (entity.ContentCase)
+        {
+            case PrimitiveEntity.ContentOneofCase.Boolean:
+                return entity.Boolean.ToString();
+            case PrimitiveEntity.ContentOneofCase.Decimal:
+                return entity.Decimal.ToDecimal().ToString(CultureInfo.InvariantCulture);
+            case PrimitiveEntity.ContentOneofCase.Integer:
+                return entity.Integer.ToString();
+            case PrimitiveEntity.ContentOneofCase.String:
+                return entity.String;
+            default: 
+                return null;
+        }
     }
 }

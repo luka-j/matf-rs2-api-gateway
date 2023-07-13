@@ -28,7 +28,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
                 return new ConfigData
                 {
                     Data = configData?.GetSpecString(),
-                    ValidFrom = configData?.ValidFrom.ToString(CultureInfo.InvariantCulture)
+                    ValidFrom = configData?.ValidFrom.ToString("O")
                 };
             }
             catch (Exception ex) when(ex is KeyNotFoundException or InvalidOperationException) 
@@ -56,9 +56,9 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("UpdateBackendConfig request: {Request}", request);
+            _logger.Information("UpdateBackendConfig, ValidFrom: {ValidFrom}", request.ValidFrom);
             try {
-                _repository.Backends.AddConfig(new ApiSpec(request.Data, DateTime.Parse(request.ValidFrom)));
+                _repository.Backends.AddConfig(new ApiSpec(request.Data, DateTime.Parse(request.ValidFrom, null, DateTimeStyles.RoundtripKind)));
                 return new Empty();
             }
             catch (ApiConfigException ex)
@@ -81,7 +81,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
                 return new ConfigData
                 {
                     Data = configData?.GetSpecString(),
-                    ValidFrom = configData?.ValidFrom.ToString(CultureInfo.InvariantCulture)
+                    ValidFrom = configData?.ValidFrom.ToString("O")
                 };
             }
             catch (Exception ex) when(ex is KeyNotFoundException or InvalidOperationException) 
@@ -108,10 +108,10 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("UpdateFrontendConfig request: {Request}", request);
+            _logger.Information("UpdateFrontendConfig ValidFrom: {ValidFrom}", request.ValidFrom);
             try
             {
-                _repository.Frontends.AddConfig(new ApiSpec(request.Data, DateTime.Parse(request.ValidFrom)));
+                _repository.Frontends.AddConfig(new ApiSpec(request.Data, DateTime.Parse(request.ValidFrom, null, DateTimeStyles.RoundtripKind)));
                 return new Empty();
             }
             catch (ApiConfigException ex)

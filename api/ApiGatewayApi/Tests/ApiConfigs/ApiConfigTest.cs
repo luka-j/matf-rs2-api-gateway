@@ -106,8 +106,9 @@ public class ApiConfigTest
 
         var openApiOperation = apiConfig.ResolveOperation("Get", GOOD_API_PATH);
         
-        Assert.NotNull(openApiOperation);
-        Assert.Equal(GOOD_API_PATH_OP_SUMMARY, openApiOperation.Summary);
+        Assert.True(openApiOperation.HasValue);
+        Assert.NotNull(openApiOperation.Value.Value);
+        Assert.Equal(GOOD_API_PATH_OP_SUMMARY, openApiOperation.Value.Value.Summary);
     }
 
     [Fact]

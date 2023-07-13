@@ -1,8 +1,8 @@
 ﻿namespace ApiGatewayApi.Exceptions;
 
-public class ParamValidationException : Exception
+public class ParamValidationException : HttpResponseException
 {
-    public ParamValidationException(string? message) : base(message)
+    public ParamValidationException(string message) : base("PARAM_VALIDATION_ERROR", message, 400)
     {
     }
 }

@@ -1,6 +1,8 @@
 using System.Text.Json;
 using ApiGatewayApi.ApiConfigs;
 using ApiGatewayApi.Exceptions;
+using ApiGatewayApi.Processing;
+using Grpc.Reflection.V1Alpha;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using ILogger = Serilog.ILogger;
@@ -11,54 +13,35 @@ namespace ApiGatewayApi.Controllers;
 public class ExposedApisController : ControllerBase
 {
     private readonly ILogger _logger = Serilog.Log.Logger;
-    
-    private readonly ApiRepository apis;
+    private readonly RequestExecutor _requestExecutor;
 
-    public ExposedApisController(ApiRepository apis)
+    public ExposedApisController(RequestExecutor requestExecutor)
     {
-        this.apis = apis;
+        _requestExecutor = requestExecutor;
     }
 
     [Route("/{*path}")]
-    public void Get(string path)
+    public async ValueTask Get(string path)
     {
         var response = HttpContext.Response;
         try
         {
             var now = DateTime.Now;
-            var operation = ResolveOperation(path, now);
-            HttpContext.Response.Headers["Operation-Id"] = operation.OperationId;
-            HttpContext.Response.StatusCode = 200;
-            HttpContext.Response.StartAsync();
+            await _requestExecutor.ExecuteRequest(path, now, HttpContext);
         }
         catch (HttpResponseException e)
         {
             response.StatusCode = e.ResponseCode;
-            response.WriteAsJsonAsync(e.ResponseBody);
+            await response.WriteAsJsonAsync(e.ResponseBody);
+            await response.CompleteAsync();
         }
-    }
-
-    private OpenApiOperation ResolveOperation(string path, DateTime now)
-    {
-        var pathSegments = path.Split('/', 3);
-        if (pathSegments.Length < 3)
+        catch (Exception e)
         {
-            throw new PathNotFound("API not found");
+            _logger.Error(e, "An unexpected exception occurred");
+            response.StatusCode = 500;
+            await response.WriteAsJsonAsync(new HttpResponseException.ErrorResponse("INTERNAL_SERVER_ERROR",
+                "An unexpected error has occured. Please try again later."));
+            await response.CompleteAsync();
         }
-
-        var apiName = pathSegments[0];
-        var apiVersion = pathSegments[1];
-        var currentConfig = apis.Frontends.GetCurrentConfig(new ApiIdentifier(apiName, apiVersion), now);
-        if (currentConfig == null)
-        {
-            throw new PathNotFound("API " + apiName + "/" + apiVersion + " not found");
-        }
-
-        var oasOperation = currentConfig.ResolveOperation(HttpContext.Request.Method, pathSegments[3]);
-        if (oasOperation == null)
-        {
-            throw new PathNotFound("Could not find route for path " + path);
-        }
-        return oasOperation;
     }
 }
