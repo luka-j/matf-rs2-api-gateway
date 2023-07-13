@@ -25,7 +25,7 @@ public class RequestExecutor
         _requestProcessorGateway = requestProcessorGateway;
     }
 
-    public async void ExecuteRequest(string path, DateTime now, HttpContext httpContext)
+    public async ValueTask ExecuteRequest(string path, DateTime now, HttpContext httpContext)
     {
         var (specPath, apiConfig, operation) = ResolveOperation(path, now, httpContext.Request);
         var executionRequest = await MakeExecutionRequest(apiConfig, path, specPath, operation, 

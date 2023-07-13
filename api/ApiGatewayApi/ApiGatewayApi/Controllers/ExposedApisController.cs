@@ -21,29 +21,29 @@ public class ExposedApisController : ControllerBase
     }
 
     [Route("/{*path}")]
-    public void Get(string path)
+    public async ValueTask Get(string path)
     {
         var response = HttpContext.Response;
         try
         {
             var now = DateTime.Now;
-            _requestExecutor.ExecuteRequest(path, now, HttpContext);
+            await _requestExecutor.ExecuteRequest(path, now, HttpContext);
         }
         catch (HttpResponseException e)
         {
             response.StatusCode = e.ResponseCode;
-            response.StartAsync();
-            response.WriteAsJsonAsync(e.ResponseBody);
-            response.CompleteAsync();
+            await response.StartAsync();
+            await response.WriteAsJsonAsync(e.ResponseBody);
+            await response.CompleteAsync();
         }
         catch (Exception e)
         {
             _logger.Error(e, "An unexpected exception occurred");
             response.StatusCode = 500;
-            response.StartAsync();
-            response.WriteAsJsonAsync(new HttpResponseException.ErrorResponse("INTERNAL_SERVER_ERROR",
+            await response.StartAsync();
+            await response.WriteAsJsonAsync(new HttpResponseException.ErrorResponse("INTERNAL_SERVER_ERROR",
                 "An unexpected error has occured. Please try again later."));
-            response.CompleteAsync();
+            await response.CompleteAsync();
         }
     }
 }
