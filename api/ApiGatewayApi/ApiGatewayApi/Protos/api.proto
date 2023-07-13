@@ -85,7 +85,6 @@ message RequestMetadata {
   string ipAddress = 2;
   string startTime = 3;
   optional AuthData authData = 4;
-  // todo metadata ?
 }
 
 message ExecutionRequest {

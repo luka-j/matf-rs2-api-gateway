@@ -16,7 +16,7 @@ public class RequestExecutor
     private readonly ApiRepository _apis;
     private readonly EntityMapper _entityMapper;
     private readonly RequestResponseFilter _filter;
-    private RequestProcessorGateway _requestProcessorGateway;
+    private readonly RequestProcessorGateway _requestProcessorGateway;
 
     public RequestExecutor(ApiRepository apis, EntityMapper entityMapper, RequestResponseFilter filter, RequestProcessorGateway requestProcessorGateway)
     {
@@ -26,11 +26,11 @@ public class RequestExecutor
         _requestProcessorGateway = requestProcessorGateway;
     }
 
-    public async ValueTask ExecuteRequest(string path, DateTime now, HttpContext httpContext)
+    public async ValueTask ExecuteRequest(string path, DateTime now, RequestMetadata requestMetadata, HttpContext httpContext)
     {
         var (specPath, apiConfig, operation) = ResolveOperation(path, now, httpContext.Request);
         var executionRequest = await MakeExecutionRequest(apiConfig, path, specPath, operation, 
-            httpContext.Request, now);
+            httpContext.Request, requestMetadata);
         var executionResponse = await _requestProcessorGateway.ProcessRequest(executionRequest);
         await PopulateHttpResponse(executionResponse, operation, httpContext.Response);
     }
@@ -82,7 +82,7 @@ public class RequestExecutor
     }
     
     private async Task<ExecutionRequest> MakeExecutionRequest(ApiConfig config, string path, string specPath, 
-        OpenApiOperation operation, HttpRequest httpRequest, DateTime now)
+        OpenApiOperation operation, HttpRequest httpRequest, RequestMetadata requestMetadata)
     {
         var headers = httpRequest.Headers;
         var query = httpRequest.Query;
@@ -125,10 +125,7 @@ public class RequestExecutor
             HeaderParameters = filteredHeaders,
             QueryParameters = filteredQuery,
             RequestBody = filteredBody,
-            RequestMetadata = new RequestMetadata
-            {
-                StartTime = now.ToString("O")
-            }
+            RequestMetadata = requestMetadata,
         };
     }
 
