@@ -32,7 +32,6 @@ public class ExposedApisController : ControllerBase
         catch (HttpResponseException e)
         {
             response.StatusCode = e.ResponseCode;
-            await response.StartAsync();
             await response.WriteAsJsonAsync(e.ResponseBody);
             await response.CompleteAsync();
         }
@@ -40,7 +39,6 @@ public class ExposedApisController : ControllerBase
         {
             _logger.Error(e, "An unexpected exception occurred");
             response.StatusCode = 500;
-            await response.StartAsync();
             await response.WriteAsJsonAsync(new HttpResponseException.ErrorResponse("INTERNAL_SERVER_ERROR",
                 "An unexpected error has occured. Please try again later."));
             await response.CompleteAsync();

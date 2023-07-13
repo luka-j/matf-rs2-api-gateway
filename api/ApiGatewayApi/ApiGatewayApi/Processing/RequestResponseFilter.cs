@@ -256,7 +256,7 @@ public partial class RequestResponseFilter
                     }
                     break;
                 case "date-time":
-                    if (!DateOnly.TryParse(value, out _))
+                    if (!DateTime.TryParse(value, out _))
                     {
                         throw new ParamValidationException("String " + value + " cannot be parsed to a date!");
                     }

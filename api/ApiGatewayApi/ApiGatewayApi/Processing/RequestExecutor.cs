@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Buffers;
+using System.Globalization;
 using System.Text;
 using System.Text.Json.Nodes;
 using ApiGatewayApi.ApiConfigs;
@@ -91,7 +92,7 @@ public class RequestExecutor
             var body = await httpRequest.BodyReader.ReadAsync();
             if (body.IsCompleted)
             {
-                bodyEntity = _entityMapper.MapToEntity(JsonNode.Parse(body.Buffer.ToString())!);
+                bodyEntity = _entityMapper.MapToEntity(JsonNode.Parse(Encoding.UTF8.GetString(body.Buffer))!);
             }
             else
             {
@@ -126,7 +127,7 @@ public class RequestExecutor
             RequestBody = filteredBody,
             RequestMetadata = new RequestMetadata
             {
-                StartTime = now.ToString(CultureInfo.InvariantCulture)
+                StartTime = now.ToString("O")
             }
         };
     }

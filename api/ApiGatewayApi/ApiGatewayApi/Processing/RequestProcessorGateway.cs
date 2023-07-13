@@ -3,7 +3,14 @@ using Grpc.Core;
 using Grpc.Net.Client;
 
 namespace ApiGatewayApi.Processing;
-
+ 
+/// <summary>
+/// Make requests to request processor microservice.
+///
+/// If MOCK_GRPC environment variable is set, it bypasses the RP microservice and instead
+/// routes requests directly to backend (it invokes itself via gRPC), acting essentially
+/// as a reverse proxy if backends and frontends are identical.
+/// </summary>
 public class RequestProcessorGateway
 {
     private readonly Serilog.ILogger _logger = Serilog.Log.Logger;

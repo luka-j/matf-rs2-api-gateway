@@ -33,7 +33,7 @@ public class HttpRequester
     {
         var apiConfig = _apiRepository.Backends.GetCurrentConfig(
             new ApiIdentifier(request.ApiName, request.ApiVersion), 
-            DateTime.Parse(request.RequestMetadata.StartTime));
+            DateTime.Parse(request.RequestMetadata.StartTime, null, DateTimeStyles.RoundtripKind));
         if (apiConfig == null)
         {
             throw new PathNotFound("API not found");
