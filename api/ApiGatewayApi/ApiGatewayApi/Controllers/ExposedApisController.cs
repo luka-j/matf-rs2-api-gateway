@@ -1,10 +1,6 @@
-using System.Text.Json;
-using ApiGatewayApi.ApiConfigs;
 using ApiGatewayApi.Exceptions;
 using ApiGatewayApi.Processing;
-using Grpc.Reflection.V1Alpha;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
 using ILogger = Serilog.ILogger;
 
 namespace ApiGatewayApi.Controllers;
@@ -13,11 +9,14 @@ namespace ApiGatewayApi.Controllers;
 public class ExposedApisController : ControllerBase
 {
     private readonly ILogger _logger = Serilog.Log.Logger;
+    
     private readonly RequestExecutor _requestExecutor;
+    private readonly ControllerUtils _utils;
 
-    public ExposedApisController(RequestExecutor requestExecutor)
+    public ExposedApisController(RequestExecutor requestExecutor, ControllerUtils utils)
     {
         _requestExecutor = requestExecutor;
+        _utils = utils;
     }
 
     [Route("/{*path}")]
@@ -27,7 +26,12 @@ public class ExposedApisController : ControllerBase
         try
         {
             var now = DateTime.Now;
-            await _requestExecutor.ExecuteRequest(path, now, HttpContext);
+            await _requestExecutor.ExecuteRequest(path, now, new RequestMetadata
+            {
+                IpAddress = _utils.GetIp(HttpContext.Request),
+                RequestId = _utils.GenerateRequestId(),
+                StartTime = now.ToString("O"),
+            }, HttpContext);
         }
         catch (HttpResponseException e)
         {
