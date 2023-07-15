@@ -1,5 +1,6 @@
 ﻿using Configurator.Entities;
-using System.Diagnostics;
+using LibGit2Sharp;
+using Microsoft.Alm.Authentication;
 
 namespace Configurator.Repositories
 {
@@ -11,133 +12,97 @@ namespace Configurator.Repositories
 
         private readonly string _repositoryName;
         private readonly string _repositoryURL;
+        private readonly string _gitUserName;
+        private readonly string _gitEmail;
 
         public GitHubConfigRepository(IConfiguration configuration)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _repositoryName = _configuration["GitHubSettings:GitHubRepoName"];
             _repositoryURL = _configuration["GithubSettings:GitHubRepoURL"];
+            _gitUserName = _configuration["GithubSettings:GitUserName"];
+            _gitEmail = _configuration["GithubSettings:GitEmail"];
 
+            var options = new CloneOptions
+            {
+                CredentialsProvider = GetCredentialsHandler(),
+            };
             RootDir = REPO_DIR + "\\" + _repositoryName;
+            if (!Repository.IsValid(RootDir))
+                Repository.Clone(_repositoryURL, RootDir, options);
         }
 
         public override async Task DeleteConfigs(IEnumerable<Config> configs)
         {
-            await CloneOrPull();
+            Pull();
             await base.DeleteConfigs(configs);
-            await CommitAndPush();
+            CommitAndPush();
         }
 
         public override async Task<IEnumerable<Config>> GetAllConfigs()
         {
-            await CloneOrPull();
+            Pull();
             return await base.GetAllConfigs();
         }
 
         public override async Task<IEnumerable<Config>> ModifyConfigs(IEnumerable<Config> configs)
         {
-            await CloneOrPull();
+            Pull();
             var result = await base.ModifyConfigs(configs);
-            await CommitAndPush();
+            CommitAndPush();
             return result;
         }
 
-        private async Task CommitAndPush()
+        private static Credential GetCredentials()
         {
-            ProcessStartInfo add = new()
-            {
-                WorkingDirectory = RootDir,
-                FileName = "git",
-                Arguments = "add ."
-            };
-            Process pAdd = new()
-            {
-                StartInfo = add
-            };
-
-            pAdd.Start();
-            await pAdd.WaitForExitAsync();
-
-            ProcessStartInfo commit = new()
-            {
-                WorkingDirectory = RootDir,
-                FileName = "git",
-                Arguments = "commit -m \"config-" + DateTime.Now.ToString() + "\""
-            };
-            Process pCommit = new()
-            {
-                StartInfo = commit
-            };
-
-            pCommit.Start();
-            await pCommit.WaitForExitAsync();
-
-            ProcessStartInfo push = new()
-            {
-                WorkingDirectory = RootDir,
-                FileName = "git",
-                Arguments = "push"
-            };
-            Process pPush = new()
-            {
-                StartInfo = push
-            };
-
-            pPush.Start();
-            await pPush.WaitForExitAsync();
+            var secrets = new SecretStore("git");
+            var auth = new BasicAuthentication(secrets);
+            return auth.GetCredentials(new TargetUri("https://github.com"));
         }
 
-        private async Task CloneOrPull()
+        private LibGit2Sharp.Handlers.CredentialsHandler GetCredentialsHandler()
         {
-            if (!Directory.Exists(REPO_DIR))
-            {
-                Directory.CreateDirectory(REPO_DIR);
-            }
+            var creds = GetCredentials();
 
-            if (!Directory.Exists(RootDir))
+            return (_url, _user, _cred) => new UsernamePasswordCredentials
             {
+                Username = creds.Username,
+                Password = creds.Password
+            };
+        }
+        private void CommitAndPush()
+        {
+            using Repository repo = new(RootDir);
+            RepositoryStatus status = repo.RetrieveStatus();
+            List<string> filePaths = status.Modified.Select(entry => entry.FilePath).ToList();
+            Commands.Stage(repo, filePaths);
 
-                ProcessStartInfo clone = new()
-                {
-                    WorkingDirectory = REPO_DIR,
-                    FileName = "git",
-                    Arguments = "clone " + _repositoryURL
-                };
-                Process pClone = new()
-                {
-                    StartInfo = clone
-                };
-                pClone.Start();
-                await pClone.WaitForExitAsync();
-            } else
+            var sig = new Signature(_gitUserName, _gitEmail, DateTimeOffset.Now);
+            repo.Commit("config-" + DateTime.Now.ToString(), sig, sig);
+
+            PushOptions options = new()
             {
-                ProcessStartInfo reset = new()
-                {
-                    WorkingDirectory = RootDir,
-                    FileName = "git",
-                    Arguments = "reset --hard HEAD"
-                };
-                Process pReset = new()
-                {
-                    StartInfo = reset
-                };
-                pReset.Start();
-                await pReset.WaitForExitAsync();
+                CredentialsProvider = GetCredentialsHandler()
+            };
+            repo.Network.Push(repo.Head, options);
+        }
 
-                ProcessStartInfo pull = new()
+        private void Pull()
+        {
+            using Repository repo = new(RootDir);
+            PullOptions pullOptions = new()
+            {
+                MergeOptions = new MergeOptions
                 {
-                    WorkingDirectory = RootDir,
-                    FileName = "git",
-                    Arguments = "pull"
-                };
-                Process pPull = new()
+                    FileConflictStrategy = CheckoutFileConflictStrategy.Theirs
+                },
+                FetchOptions = new FetchOptions
                 {
-                    StartInfo = pull
-                };
-                pPull.Start();
-                await pPull.WaitForExitAsync();
-            }
-            
+                    CredentialsProvider = GetCredentialsHandler()
+                }
+            };
+
+            Commands.Pull(repo, new Signature(_gitUserName, _gitEmail, DateTimeOffset.Now), pullOptions);
             InitDirectories();
         }
     }
