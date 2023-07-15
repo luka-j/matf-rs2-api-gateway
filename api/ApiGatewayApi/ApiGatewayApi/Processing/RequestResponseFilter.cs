@@ -564,25 +564,25 @@ public partial class RequestResponseFilter
                 if (data.ContentCase != PrimitiveOrList.ContentOneofCase.Primitive)
                     throw new ParamValidationException("Cannot parse list " + data.List + " to primitive type");
 
-                var validated = ValidateString(spec, primitiveEntityRepresentation);
+                var validated = ValidateString(spec, primitiveEntityRepresentation!);
                 return new PrimitiveOrList { Primitive = new PrimitiveEntity { String = validated.String } };
             case "integer":
                 if (data.ContentCase != PrimitiveOrList.ContentOneofCase.Primitive)
                     throw new ParamValidationException("Cannot parse list " + data.List + " to primitive type");
 
-                validated = ValidateInteger(spec, primitiveEntityRepresentation);
+                validated = ValidateInteger(spec, primitiveEntityRepresentation!);
                 return new PrimitiveOrList { Primitive = new PrimitiveEntity { Integer = validated.Integer } };
             case "number":
                 if (data.ContentCase != PrimitiveOrList.ContentOneofCase.Primitive)
                     throw new ParamValidationException("Cannot parse list " + data.List + " to primitive type");
 
-                validated = ValidateNumber(spec, primitiveEntityRepresentation);
+                validated = ValidateNumber(spec, primitiveEntityRepresentation!);
                 return new PrimitiveOrList { Primitive = new PrimitiveEntity { Decimal = validated.Decimal } };
             case "boolean":
                 if (data.ContentCase != PrimitiveOrList.ContentOneofCase.Primitive)
                     throw new ParamValidationException("Cannot parse list " + data.List + " to primitive type");
 
-                validated = ValidateBoolean(spec, primitiveEntityRepresentation);
+                validated = ValidateBoolean(spec, primitiveEntityRepresentation!);
                 return new PrimitiveOrList { Primitive = new PrimitiveEntity { Boolean = validated.Boolean } };
             case "array":
                 if (data.ContentCase == PrimitiveOrList.ContentOneofCase.Primitive)

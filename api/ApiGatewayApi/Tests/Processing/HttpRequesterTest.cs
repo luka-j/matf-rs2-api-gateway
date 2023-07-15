@@ -8,7 +8,9 @@ namespace Tests.Processing;
 public class HttpRequesterTest
 {
     private readonly ApiGatewayApi.Processing.HttpRequester _requester = new(new RequestResponseFilter(), new EntityMapper(), 
+#pragma warning disable CS8625
         null, null);
+#pragma warning restore CS8625
     
     [Fact]
     public void GivenSimpleGetRequest_WhenMakingRequestMessage_MakeProperMessage()
