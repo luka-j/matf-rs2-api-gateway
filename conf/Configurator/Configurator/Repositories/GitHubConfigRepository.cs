@@ -32,11 +32,12 @@ namespace Configurator.Repositories
                 Repository.Clone(_repositoryURL, RootDir, options);
         }
 
-        public override async Task DeleteConfigs(IEnumerable<Config> configs)
+        public override async Task<IEnumerable<ConfigId>> DeleteConfigs(IEnumerable<ConfigId> configs)
         {
             Pull();
-            await base.DeleteConfigs(configs);
+            var deletedConfigs = await base.DeleteConfigs(configs);
             CommitAndPush();
+            return deletedConfigs;
         }
 
         public override async Task<IEnumerable<Config>> GetAllConfigs()
@@ -73,9 +74,11 @@ namespace Configurator.Repositories
         private void CommitAndPush()
         {
             using Repository repo = new(RootDir);
-            RepositoryStatus status = repo.RetrieveStatus();
-            List<string> filePaths = status.Modified.Select(entry => entry.FilePath).ToList();
-            Commands.Stage(repo, filePaths);
+
+            var status = repo.RetrieveStatus();
+            if (!status.IsDirty) { return; }
+
+            Commands.Stage(repo, "*");
 
             var sig = new Signature(_gitUserName, _gitEmail, DateTimeOffset.Now);
             repo.Commit("config-" + DateTime.Now.ToString(), sig, sig);

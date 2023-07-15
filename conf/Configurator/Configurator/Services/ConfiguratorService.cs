@@ -1,6 +1,7 @@
 ﻿using Configurator.Entities;
 using Configurator.GrpcServices;
 using Configurator.Repositories;
+using System.Threading.Tasks;
 
 namespace Configurator.Services
 {
@@ -76,6 +77,35 @@ namespace Configurator.Services
 
             return await Update(newConfigs);
         }
+
+        public async Task<bool> DeleteConfigs(IEnumerable<ConfigId> configs)
+        {
+            try
+            {
+                var deletedConfigs = await _configRepository.DeleteConfigs(configs);
+
+                foreach (var config in deletedConfigs)
+                {
+                    switch (config.Category)
+                    {
+                        case "frontends":
+                            await _apiService.DeleteFrontend(config.ApiName, config.ApiVersion);
+                            break;
+                        case "backends":
+                            await _apiService.DeleteBackend(config.ApiName, config.ApiVersion);
+                            break;
+                        case "middlewares": //TODO
+                        case "datasources": //TODO
+                        default:
+                            break;
+                    }
+                }
+
+            } catch { return false; }
+
+            return true;
+        }
+            
 
         private static async Task<bool> WaitWithTimeout(Task task, DateTime timeout)
         {

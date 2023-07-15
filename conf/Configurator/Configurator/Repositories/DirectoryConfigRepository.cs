@@ -28,25 +28,27 @@ namespace Configurator.Repositories
             }
         }
 
-        public virtual Task DeleteConfigs(IEnumerable<Config> configs)
+        public virtual async Task<IEnumerable<ConfigId>> DeleteConfigs(IEnumerable<ConfigId> configs)
         {
+            List<ConfigId> deletedConfigs = new();
+
             try
             {
                 foreach (var config in configs)
                 {
-                    string filePath = RootDir + "\\" + config.Category + "\\" + config.Name;
+                    string filePath = RootDir + "\\" + config.Category + "\\" + config.ApiName + "-" + config.ApiVersion + ".yaml";
 
                     if (File.Exists(filePath))
                     {
                         File.Delete(filePath);
+                        deletedConfigs.Add(config);
                     }
                 }
             } catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
-            
-            return Task.CompletedTask;
+            return deletedConfigs;
         }
 
         private async Task<IEnumerable<Config>> GetConfigs() {
@@ -63,7 +65,10 @@ namespace Configurator.Repositories
                     {
                         string data = await File.ReadAllTextAsync(file);
                         string fileName = Path.GetFileName(file);
-                        configs.Add(new(category, fileName, data));
+                        string[] splitFileName = fileName.Split("-");
+                        string apiName = splitFileName[0];
+                        string apiVersion = splitFileName[1].Split(".")[0];
+                        configs.Add(new(category, apiName, apiVersion, data));
                     }
                 }
             }
@@ -85,7 +90,7 @@ namespace Configurator.Repositories
             {
                 foreach (var config in configs)
                 {
-                    string filePath = RootDir + "\\" + config.Category + "\\" + config.Name;
+                    string filePath = RootDir + "\\" + config.Category + "\\" + config.ApiName + "-" + config.ApiVersion + ".yaml";
 
                     await File.WriteAllTextAsync(filePath, config.Data);
                 }

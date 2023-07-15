@@ -1,5 +1,4 @@
 ﻿using Configurator.Entities;
-using Configurator.Repositories;
 using Configurator.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,9 +23,16 @@ namespace Configurator.Controllers
 
         [HttpPost("modify")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> ModifyAndUpdateConfig([FromBody] IEnumerable<Config> configs)
+        public async Task<ActionResult<bool>> ModifyAndUpdateConfigs([FromBody] IEnumerable<Config> configs)
         {
             return Ok(await _configuratorService.ModifyAndUpdate(configs));
+        }
+
+        [HttpDelete("delete")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public async Task<ActionResult<bool>> DeleteConfigs([FromBody] IEnumerable<ConfigId> configs)
+        {
+            return Ok(await _configuratorService.DeleteConfigs(configs));
         }
     }
 }
