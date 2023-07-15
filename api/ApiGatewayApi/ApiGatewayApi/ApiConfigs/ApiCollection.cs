@@ -90,7 +90,7 @@ public class ApiCollection
         {
             return eligibleConfigs.First(config => config.IsActive(now));
         }
-        catch (InvalidOperationException e)
+        catch (InvalidOperationException)
         {
             return null;
         }

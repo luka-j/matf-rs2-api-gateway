@@ -1,4 +1,6 @@
-﻿namespace ApiGatewayApi.Controllers;
+﻿using ApiGatewayApi.ApiConfigs;
+
+namespace ApiGatewayApi.Controllers;
 
 public class ControllerUtils
 {
@@ -28,7 +30,27 @@ public class ControllerUtils
             idChars[i] = idChars[_random.Next(idChars.Length)];
         }
 
-        return new String(idChars);
+        return new string(idChars);
+    }
+
+    public void AddCorsHeadersToResponse(HttpContext httpContext, ApiConfig config)
+    {
+        var requestOrigin = httpContext.Request.Headers.Origin;
+        if (requestOrigin.Count == 0 || requestOrigin[0] == "null") return;
+        var originUri = new Uri(requestOrigin[0]!); // Browsers always send a single origin header
+        
+        foreach (var openApiServer in config.Spec.Servers)
+        {
+            if (!Uri.TryCreate(openApiServer.Url, UriKind.Absolute, out var uri)) continue;
+            
+            if (uri.Scheme == originUri.Scheme && uri.Host == originUri.Host && uri.Port == originUri.Port)
+            { 
+                httpContext.Response.Headers.AccessControlAllowOrigin = requestOrigin;
+                httpContext.Response.Headers.AccessControlAllowHeaders = "*";
+                httpContext.Response.Headers.AccessControlAllowMethods = "*";
+                break;
+            }
+        }
     }
 
     private bool TryGetHeaderValue(HttpRequest httpRequest, string header, out string? value)

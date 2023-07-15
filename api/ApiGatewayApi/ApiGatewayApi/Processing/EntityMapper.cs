@@ -43,7 +43,7 @@ public class EntityMapper
             case Entity.ContentOneofCase.Integer:
                 return JsonValue.Create(entity.Integer);
             case Entity.ContentOneofCase.String:
-                return JsonValue.Create(entity.String);
+                return JsonValue.Create(entity.String)!;
         }
         _logger.Error("Cannot parse entity {Entity}. Invalid ContentCase: {ContentCase}", 
             entity, entity.ContentCase);
