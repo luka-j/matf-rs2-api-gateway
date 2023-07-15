@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json.Nodes;
 using ApiGatewayApi.ApiConfigs;
+using ApiGatewayApi.Controllers;
 using ApiGatewayApi.Exceptions;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Models;
@@ -15,18 +16,27 @@ public class RequestExecutor
     private readonly EntityMapper _entityMapper;
     private readonly RequestResponseFilter _filter;
     private readonly RequestProcessorGateway _requestProcessorGateway;
+    private readonly ControllerUtils _controllerUtils;
 
-    public RequestExecutor(ApiRepository apis, EntityMapper entityMapper, RequestResponseFilter filter, RequestProcessorGateway requestProcessorGateway)
+    public RequestExecutor(ApiRepository apis, EntityMapper entityMapper, RequestResponseFilter filter, 
+        RequestProcessorGateway requestProcessorGateway, ControllerUtils controllerUtils)
     {
         _apis = apis;
         _entityMapper = entityMapper;
         _filter = filter;
         _requestProcessorGateway = requestProcessorGateway;
+        _controllerUtils = controllerUtils;
     }
 
     public async ValueTask ExecuteRequest(string path, DateTime now, RequestMetadata requestMetadata, HttpContext httpContext)
     {
         var (specPath, apiConfig, operation) = ResolveOperation(path, now, httpContext.Request);
+        _controllerUtils.AddCorsHeadersToResponse(httpContext, apiConfig);
+        if (operation == null && httpContext.Request.Method.ToUpper() == "OPTIONS") // if this was a CORS preflight
+        {
+            await httpContext.Response.CompleteAsync();
+            return;
+        }
         var executionRequest = await MakeExecutionRequest(apiConfig, path, specPath, operation, 
             httpContext.Request, requestMetadata);
         var executionResponse = await _requestProcessorGateway.ProcessRequest(executionRequest);
@@ -127,7 +137,7 @@ public class RequestExecutor
         };
     }
 
-    private Tuple<string, ApiConfig, OpenApiOperation> ResolveOperation(string path, DateTime now, HttpRequest request)
+    private Tuple<string, ApiConfig, OpenApiOperation?> ResolveOperation(string path, DateTime now, HttpRequest request)
     {
         var pathSegments = path.Split('/', 3);
         if (pathSegments.Length < 3)
@@ -146,10 +156,19 @@ public class RequestExecutor
         var oasOperation = currentConfig.ResolveOperation(request.Method, pathSegments[2]);
         if (!oasOperation.HasValue)
         {
-            throw new PathNotFound("Could not find route for path " + path);
+            if (request.Method.ToUpper() != "OPTIONS") throw new PathNotFound("Could not find route for path " + path);
+            
+            // OPTIONS might be a preflight POST request, so we still need to resolve at least the path item
+            var pathItem = currentConfig.ResolvePath(pathSegments[2]);
+            if (pathItem == null)
+            {
+                throw new PathNotFound("Could not find route for path " + path);
+            }
+
+            return new Tuple<string, ApiConfig, OpenApiOperation?>(pathItem.SpecPath, currentConfig, null);
         }
 
-        return new Tuple<string, ApiConfig, OpenApiOperation>(oasOperation.Value.Key, currentConfig,
+        return new Tuple<string, ApiConfig, OpenApiOperation?>(oasOperation.Value.Key, currentConfig,
             oasOperation.Value.Value);
     }
 

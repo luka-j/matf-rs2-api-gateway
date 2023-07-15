@@ -76,7 +76,8 @@ public class ApiConfig
     /// </summary>
     /// <param name="method">HTTP method of the request.</param>
     /// <param name="path">Path part of the URL (excluding query params and fragment).</param>
-    /// <returns>OpenApiOperation if it exists, null if it doesn't.</returns>
+    /// <returns>KeyValuePair containing spec path (which can contain path variables) and OpenApiOperation if it exists,
+    /// null if it doesn't.</returns>
     /// <exception cref="ApiRuntimeException">If passed method isn't a HTTP request method.</exception>
     public KeyValuePair<string, OpenApiOperation>? ResolveOperation(string method, string path)
     {
@@ -91,6 +92,11 @@ public class ApiConfig
 
         if (!pathItem.Item.Operations.ContainsKey(op)) return null;
         return new KeyValuePair<string, OpenApiOperation>(pathItem.SpecPath, pathItem.Item.Operations[op]);
+    }
+
+    public PathSegmentTree.OasPathItemWithPath? ResolvePath(string path)
+    {
+        return _pathTree.ResolvePath(path);
     }
 
     /// <summary>
