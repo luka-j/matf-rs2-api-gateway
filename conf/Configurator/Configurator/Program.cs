@@ -1,6 +1,8 @@
 using Configurator.GrpcServices;
 using Configurator.Repositories;
 using Configurator.Services;
+using k8s;
+using k8s.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,20 +15,42 @@ builder.Services.AddControllers();
 
 if (bool.Parse(builder.Configuration["GitHubSettings:UseGitHub"]))
 {
-    builder.Services.AddSingleton<IConfigRepository, GitHubConfigRepository>();
+    builder.Services.AddScoped<IConfigRepository, GitHubConfigRepository>();
 } else
 {
-    builder.Services.AddSingleton<IConfigRepository, DirectoryConfigRepository>();
+    builder.Services.AddScoped<IConfigRepository, DirectoryConfigRepository>();
 }
 
-builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>(
+if (bool.Parse(builder.Configuration["UseKubernetes"]))
+{
+    var config = KubernetesClientConfiguration.InClusterConfig();
+    var client = new Kubernetes(config);
+    builder.Services.AddScoped<IClientNameService, KubernetesClientNameService>();
+    var APIPods = await client.ListNamespacedPodAsync("api-gateway");
+    var APIPort = builder.Configuration["APIPort"];
+
+    // TODO: pods for other microservices
+    foreach (var pod in APIPods)
+    {
+        var name = pod.Metadata.Name;
+        var URI = pod.Status.PodIP + ":" + APIPort;
+        builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>(name, op => op.Address = new Uri(URI));
+    }
+}
+else
+{
+    builder.Services.AddScoped<IClientNameService, DefaultClientNameService>();
+    builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>("API",
                 options => options.Address = new Uri(builder.Configuration["GrpcSettings:APIURL"]));
-builder.Services.AddSingleton<APIGrpcService>();
-builder.Services.AddSingleton<ConfiguratorService>();
+}
+
+builder.Services.AddScoped<APIGrpcService>();
+builder.Services.AddScoped<ConfiguratorService>();
+builder.Services.AddSingleton<SchedulerService>();
 
 var app = builder.Build();
 
-app.Services.GetService<ConfiguratorService>();
+app.Services.GetService<SchedulerService>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

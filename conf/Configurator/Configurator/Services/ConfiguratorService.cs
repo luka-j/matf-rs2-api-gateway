@@ -10,7 +10,6 @@ namespace Configurator.Services
         private const int VALIDFROM_SECONDS = 10;
         private const int TIMEOUT_SECONDS = 5;
 
-        private const int PERIOD_SECONDS = 60;
 
         private readonly IConfigRepository _configRepository;
 
@@ -21,8 +20,6 @@ namespace Configurator.Services
         {
             _configRepository = configRepository ?? throw new ArgumentNullException(nameof(configRepository));
             _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
-
-            _ = UpdatePeriodically();
         }
 
         public async Task<bool> Update(IEnumerable<Config> configs)
@@ -125,11 +122,6 @@ namespace Configurator.Services
             return false;
         }
 
-        private async Task UpdatePeriodically()
-        {
-            var timer = new PeriodicTimer(TimeSpan.FromSeconds(PERIOD_SECONDS));
 
-            while (await timer.WaitForNextTickAsync()) { await UpdateConfigs(); }
-        }
     }
 }
