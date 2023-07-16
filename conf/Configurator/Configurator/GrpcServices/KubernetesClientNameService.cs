@@ -14,10 +14,14 @@ namespace Configurator.GrpcServices
         public IEnumerable<string> GetAPIClientNames()
         {
             List<string> names = new();
-            var APIPods = _client.ListNamespacedPod("api-gateway");
-            foreach(var pod in APIPods)
+            var pods = _client.ListNamespacedPod("api-gateway");
+
+            foreach(var pod in pods)
             {
-                names.Add(pod.Metadata.Name);
+                if (pod.Metadata.Labels["app"] == "api")
+                {
+                    names.Add(pod.Metadata.Name);
+                }
             }
             return names;
         }
