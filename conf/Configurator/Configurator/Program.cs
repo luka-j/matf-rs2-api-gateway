@@ -1,6 +1,7 @@
 using Configurator.GrpcServices;
 using Configurator.Repositories;
 using Configurator.Services;
+using k8s;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,20 +14,36 @@ builder.Services.AddControllers();
 
 if (bool.Parse(builder.Configuration["GitHubSettings:UseGitHub"]))
 {
-    builder.Services.AddSingleton<IConfigRepository, GitHubConfigRepository>();
+    builder.Services.AddScoped<IConfigRepository, GitHubConfigRepository>();
 } else
 {
-    builder.Services.AddSingleton<IConfigRepository, DirectoryConfigRepository>();
+    builder.Services.AddScoped<IConfigRepository, DirectoryConfigRepository>();
 }
 
-builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>(
+if (bool.Parse(builder.Configuration["UseKubernetes"]))
+{
+    var config = KubernetesClientConfiguration.InClusterConfig();
+    var client = new Kubernetes(config);
+    builder.Services.AddSingleton(client);
+    builder.Services.AddSingleton<IClientNameService, KubernetesClientNameService>();
+    // get client names and URIs here 
+    // use names to create gRPC clients
+
+}
+else
+{
+    builder.Services.AddSingleton<IClientNameService, DefaultClientNameService>();
+    builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>("API",
                 options => options.Address = new Uri(builder.Configuration["GrpcSettings:APIURL"]));
-builder.Services.AddSingleton<APIGrpcService>();
-builder.Services.AddSingleton<ConfiguratorService>();
+}
+
+builder.Services.AddScoped<APIGrpcService>();
+builder.Services.AddScoped<ConfiguratorService>();
+builder.Services.AddSingleton<SchedulerService>();
 
 var app = builder.Build();
 
-app.Services.GetService<ConfiguratorService>();
+app.Services.GetService<SchedulerService>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,64 +1,96 @@
 ﻿using ApiGatewayApi;
+using Grpc.Net.ClientFactory;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Configurator.GrpcServices
 {
     public class APIGrpcService
     {
-        private readonly ConfigManagement.ConfigManagementClient _configManagementClient;
+        private readonly IClientNameService _clientNameService;
+        private readonly IEnumerable<ConfigManagement.ConfigManagementClient> _configManagementClients;
 
-        public APIGrpcService(ConfigManagement.ConfigManagementClient configManagementClient)
+        public APIGrpcService(IClientNameService clientNameService, GrpcClientFactory clientFactory)
         {
-            _configManagementClient = configManagementClient ?? throw new ArgumentNullException(nameof(configManagementClient));
-        }
+            _clientNameService = clientNameService ?? throw new ArgumentNullException(nameof(clientNameService));
+            var clients = new List<ConfigManagement.ConfigManagementClient>();
 
-        public async Task<Empty> UpdateFrontend(string data, string validFrom)
+            foreach (var clientName in _clientNameService.GetAPIClientNames())
+            {
+                clients.Add(clientFactory.CreateClient<ConfigManagement.ConfigManagementClient>(clientName));
+            }
+
+            _configManagementClients = clients;
+            if (_configManagementClients.IsNullOrEmpty()) throw new ArgumentNullException(nameof(clientFactory));
+
+        }
+        public async Task UpdateFrontend(string data, string validFrom)
         {
             ConfigData updateRequest = new()
             {
                 Data = data,
                 ValidFrom = validFrom
             };
-            return await _configManagementClient.UpdateFrontendConfigAsync(updateRequest);
+
+            foreach (var client in _configManagementClients)
+            {
+                await client.UpdateFrontendConfigAsync(updateRequest);
+            }
         }
 
-        public async Task<Empty> DeleteFrontend(string apiName, string apiVersion)
+        public async Task DeleteFrontend(string apiName, string apiVersion)
         {
             ConfigId deleteRequest = new()
             {
                 ApiName = apiName,
                 ApiVersion = apiVersion
             };
-            return await _configManagementClient.DeleteFrontendConfigAsync(deleteRequest);
+            foreach (var client in _configManagementClients)
+            {
+                await client.DeleteFrontendConfigAsync(deleteRequest);
+            }
         }
 
-        public async Task<Empty> UpdateBackend(string data, string validFrom)
+        public async Task UpdateBackend(string data, string validFrom)
         {
             ConfigData updateRequest = new()
             {
                 Data = data,
                 ValidFrom = validFrom
             };
-            return await _configManagementClient.UpdateBackendConfigAsync(updateRequest);
+            foreach (var client in _configManagementClients)
+            {
+                await client.UpdateBackendConfigAsync(updateRequest);
+            }
         }
 
-        public async Task<Empty> DeleteBackend(string apiName, string apiVersion)
+        public async Task DeleteBackend(string apiName, string apiVersion)
         {
             ConfigId deleteRequest = new()
             {
                 ApiName = apiName,
                 ApiVersion = apiVersion
             };
-            return await _configManagementClient.DeleteBackendConfigAsync(deleteRequest);
+            foreach (var client in _configManagementClients)
+            {
+                await client.DeleteBackendConfigAsync(deleteRequest);
+            }
         }
 
-        public async Task<RevertChangesResponse> RevertPendingChanges()
+        public async Task RevertPendingChanges()
         {
-            return await _configManagementClient.RevertPendingUpdatesAsync(new Empty());
+            // TODO: check if responses are the same
+            foreach (var client in _configManagementClients)
+            {
+                await client.RevertPendingUpdatesAsync(new Empty());
+            }
         }
 
         public async Task<ConfigList> GetAllFrontend()
         {
-            return await _configManagementClient.GetAllFrontendConfigsAsync(new Empty());
+            // take from first?
+            // take from all and compare?
+            var client = _configManagementClients.First();
+            return await client.GetAllFrontendConfigsAsync(new Empty());
         }
 
         public async Task<ConfigData> GetFrontend(string apiName, string apiVersion)
@@ -68,12 +100,14 @@ namespace Configurator.GrpcServices
                 ApiName = apiName,
                 ApiVersion = apiVersion
             };
-            return await _configManagementClient.GetFrontendConfigAsync(getRequest);
+            var client = _configManagementClients.First();
+            return await client.GetFrontendConfigAsync(getRequest);
         } 
 
         public async Task<ConfigList> GetAllBackend()
         {
-            return await _configManagementClient.GetAllBackendConfigsAsync(new Empty());
+            var client = _configManagementClients.First();
+            return await client.GetAllBackendConfigsAsync(new Empty());
         }
 
         public async Task<ConfigData> GetBackend(string apiName, string apiVersion)
@@ -82,8 +116,10 @@ namespace Configurator.GrpcServices
             {
                 ApiName = apiName,
                 ApiVersion = apiVersion
+
             };
-            return await _configManagementClient.GetBackendConfigAsync(getRequest);
+            var client = _configManagementClients.First();
+            return await client.GetBackendConfigAsync(getRequest);
         }
     }
 }
