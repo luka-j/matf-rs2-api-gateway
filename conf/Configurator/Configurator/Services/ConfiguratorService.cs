@@ -64,6 +64,14 @@ namespace Configurator.Services
 
             return true;
         }
+        public async Task<IEnumerable<Config>> GetAllConfigs()
+        {
+            return await _configRepository.GetAllConfigs();
+        }
+        public async Task<IEnumerable<Config>> GetConfigsByCategory(string category)
+        {
+            return await _configRepository.GetConfigsByCategory(category);
+        }
         public async Task<bool> UpdateConfigs()
         {
             var configs = await _configRepository.GetAllConfigs();

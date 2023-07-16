@@ -45,7 +45,11 @@ namespace Configurator.Repositories
             Pull();
             return await base.GetAllConfigs();
         }
-
+        public override async Task<IEnumerable<Config>> GetConfigsByCategory(string category)
+        {
+            Pull();
+            return await base.GetConfigsByCategory(category);
+        }
         public override async Task<IEnumerable<Config>> ModifyConfigs(IEnumerable<Config> configs)
         {
             Pull();
@@ -61,7 +65,7 @@ namespace Configurator.Repositories
             return auth.GetCredentials(new TargetUri("https://github.com"));
         }
 
-        private LibGit2Sharp.Handlers.CredentialsHandler GetCredentialsHandler()
+        private static LibGit2Sharp.Handlers.CredentialsHandler GetCredentialsHandler()
         {
             var creds = GetCredentials();
 

@@ -12,5 +12,7 @@ namespace Configurator.Repositories
 
         Task<IEnumerable<Config>> GetAllConfigs();
 
+        Task<IEnumerable<Config>> GetConfigsByCategory(string category);
+
     }
 }
