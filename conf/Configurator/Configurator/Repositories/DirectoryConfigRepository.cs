@@ -1,4 +1,5 @@
 ﻿using Configurator.Entities;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Configurator.Repositories
 {
@@ -28,43 +29,70 @@ namespace Configurator.Repositories
             }
         }
 
-        public virtual Task DeleteConfigs(IEnumerable<Config> configs)
+        public virtual async Task<IEnumerable<ConfigId>> DeleteConfigs(IEnumerable<ConfigId> configs)
         {
+            List<ConfigId> deletedConfigs = new();
+
             try
             {
                 foreach (var config in configs)
                 {
-                    string filePath = RootDir + "\\" + config.Category + "\\" + config.Name;
+                    string filePath = RootDir + "\\" + config.Category + "\\" + config.ApiName + "-" + config.ApiVersion + ".yaml";
 
                     if (File.Exists(filePath))
                     {
                         File.Delete(filePath);
+                        deletedConfigs.Add(config);
                     }
                 }
             } catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
-            
-            return Task.CompletedTask;
+            return deletedConfigs;
+        }
+        private async Task<IEnumerable<Config>> GetCategoryConfigs(string category)
+        {
+            var configs = new List<Config>();
+
+            if (!Enum.IsDefined(typeof(IConfigRepository.CATEGORIES), category))
+            {
+                return configs;
+            }
+
+            try
+            {
+                var files = Directory.GetFiles(RootDir + "\\" + category, "*.yaml");
+
+                foreach (var file in files)
+                {
+                    string data = await File.ReadAllTextAsync(file);
+                    string fileName = Path.GetFileName(file);
+                    string[] splitFileName = fileName.Split("-");
+                    string apiName = splitFileName[0];
+                    string apiVersion = splitFileName[1].Split(".")[0];
+                    configs.Add(new(category, apiName, apiVersion, data));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return configs;
         }
 
         private async Task<IEnumerable<Config>> GetConfigs() {
             var configs = new List<Config>();
+
             try
             {
                 foreach (int i in Enum.GetValues(typeof(IConfigRepository.CATEGORIES)))
                 {
                     var category = Enum.GetName(typeof(IConfigRepository.CATEGORIES), i);
 
-                    var files = Directory.GetFiles(RootDir + "\\" + category, "*.yaml");
+                    if (category == null) continue;
 
-                    foreach (var file in files)
-                    {
-                        string data = await File.ReadAllTextAsync(file);
-                        string fileName = Path.GetFileName(file);
-                        configs.Add(new(category, fileName, data));
-                    }
+                    configs = configs.Concat(await GetCategoryConfigs(category)).ToList();
                 }
             }
             catch (Exception e)
@@ -79,13 +107,18 @@ namespace Configurator.Repositories
             return await GetConfigs();
         }
 
+        public virtual async Task<IEnumerable<Config>> GetConfigsByCategory(string category)
+        {
+            return await GetCategoryConfigs(category);
+        }
+
         public virtual async Task<IEnumerable<Config>> ModifyConfigs(IEnumerable<Config> configs)
         {
             try
             {
                 foreach (var config in configs)
                 {
-                    string filePath = RootDir + "\\" + config.Category + "\\" + config.Name;
+                    string filePath = RootDir + "\\" + config.Category + "\\" + config.ApiName + "-" + config.ApiVersion + ".yaml";
 
                     await File.WriteAllTextAsync(filePath, config.Data);
                 }
@@ -95,5 +128,7 @@ namespace Configurator.Repositories
             }
             return await GetConfigs();
         }
+
+
     }
 }

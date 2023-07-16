@@ -1,16 +1,27 @@
 ﻿namespace Configurator.Entities
 {
-    public class Config
+    public class Config : ConfigId
     {
-        public string Category { get; set; }
-        public string Name { get; set; }
         public string Data { get; set; }
 
-        public Config(string category, string name, string data)
+        public Config(string category, string apiName, string apiVersion, string data) 
+            :base(category, apiName, apiVersion)
+        {
+            Data = data;
+        }
+    }
+
+    public class ConfigId
+    {
+        public string Category { get; set; }
+        public string ApiName { get; set; }
+        public string ApiVersion { get; set; }
+
+        public ConfigId(string category, string apiName, string apiVersion)
         {
             Category = category;
-            Name = name;
-            Data = data;
+            ApiName = apiName;
+            ApiVersion = apiVersion;
         }
     }
 }

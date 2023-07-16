@@ -1,5 +1,7 @@
 ﻿using ApiGatewayApi;
+using Configurator.Entities;
 using Configurator.GrpcServices;
+using Configurator.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Configurator.Controllers
@@ -9,10 +11,12 @@ namespace Configurator.Controllers
     public class APIConfigController : ControllerBase
     {
         private readonly APIGrpcService _apiService;
+        private readonly IConfigRepository _configRepository;
 
-        public APIConfigController(APIGrpcService apiService)
+        public APIConfigController(APIGrpcService apiService, IConfigRepository configRepository)
         {
             _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
+            _configRepository = configRepository ?? throw new ArgumentNullException(nameof(configRepository));
         }
 
         [HttpGet("frontend")]
@@ -51,6 +55,8 @@ namespace Configurator.Controllers
         {
             try
             {
+                var config = new Config("frontends", apiName, apiVersion, "");
+                await _configRepository.DeleteConfigs(new[] { config });
                 await _apiService.DeleteFrontend(apiName, apiVersion);
                 return Ok(true);
             }
@@ -93,6 +99,8 @@ namespace Configurator.Controllers
         {
             try
             {
+                var config = new Config("backends", apiName, apiVersion, "");
+                await _configRepository.DeleteConfigs(new[] { config });
                 await _apiService.DeleteBackend(apiName, apiVersion);
                 return Ok(true);
             }
