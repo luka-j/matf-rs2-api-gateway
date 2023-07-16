@@ -1,12 +1,25 @@
-﻿namespace Configurator.GrpcServices
+﻿using k8s;
+
+namespace Configurator.GrpcServices
 {
     public class KubernetesClientNameService : IClientNameService
     {
-        // return the names from kubernetes
+        private readonly Kubernetes _client;
+        public KubernetesClientNameService() {
+            var config = KubernetesClientConfiguration.InClusterConfig();
+            _client = new Kubernetes(config);
+
+        }
 
         public IEnumerable<string> GetAPIClientNames()
         {
-            throw new NotImplementedException();
+            List<string> names = new();
+            var APIPods = _client.ListNamespacedPod("api-gateway");
+            foreach(var pod in APIPods)
+            {
+                names.Add(pod.Metadata.Name);
+            }
+            return names;
         }
 
         public IEnumerable<string> GetRPClientNames()

@@ -16,9 +16,12 @@ namespace Configurator.GrpcServices
 
             foreach (var clientName in _clientNameService.GetAPIClientNames())
             {
-                clients.Add(clientFactory.CreateClient<ConfigManagement.ConfigManagementClient>(clientName));
+                try
+                {
+                    clients.Add(clientFactory.CreateClient<ConfigManagement.ConfigManagementClient>(clientName));
+                }
+                catch {}
             }
-
             _configManagementClients = clients;
             if (_configManagementClients.IsNullOrEmpty()) throw new ArgumentNullException(nameof(clientFactory));
 

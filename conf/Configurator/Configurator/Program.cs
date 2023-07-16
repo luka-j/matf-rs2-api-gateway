@@ -2,6 +2,7 @@ using Configurator.GrpcServices;
 using Configurator.Repositories;
 using Configurator.Services;
 using k8s;
+using k8s.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,15 +25,21 @@ if (bool.Parse(builder.Configuration["UseKubernetes"]))
 {
     var config = KubernetesClientConfiguration.InClusterConfig();
     var client = new Kubernetes(config);
-    builder.Services.AddSingleton(client);
-    builder.Services.AddSingleton<IClientNameService, KubernetesClientNameService>();
-    // get client names and URIs here 
-    // use names to create gRPC clients
+    builder.Services.AddScoped<IClientNameService, KubernetesClientNameService>();
+    var APIPods = await client.ListNamespacedPodAsync("api-gateway");
+    var APIPort = builder.Configuration["APIPort"];
 
+    // TODO: pods for other microservices
+    foreach (var pod in APIPods)
+    {
+        var name = pod.Metadata.Name;
+        var URI = pod.Status.PodIP + ":" + APIPort;
+        builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>(name, op => op.Address = new Uri(URI));
+    }
 }
 else
 {
-    builder.Services.AddSingleton<IClientNameService, DefaultClientNameService>();
+    builder.Services.AddScoped<IClientNameService, DefaultClientNameService>();
     builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>("API",
                 options => options.Address = new Uri(builder.Configuration["GrpcSettings:APIURL"]));
 }
