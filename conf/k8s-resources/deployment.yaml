@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,21 +18,21 @@ spec:
         app: conf
     spec:
       containers:
-      - name: conf
-        image: ghcr.io/luka-j/matf-rs2-api-gateway-conf:sha-6f5adb31bd9fd8ed7e818e10574e7cc37802482b
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 5001
-        env:
-        - name: UseKubernetes
-          value: true
-        - name: GitHubSettings__UseGitHub
-          value: true
-        - name: GitHubSettings__GitHubRepoURL
-          value: https://github.com/vita-ride/rs2-config-repo.git
-        - name: GitHubSettings__GitHubRepoName
-          value: rs2-config-repo
-        - name: GitHubSettings__GitUserName
-          value: Configurator
-        - name: GitHubSettings__GitEmail
-          value: "****@****.***"
+        - name: conf
+          image: ghcr.io/luka-j/matf-rs2-api-gateway-conf:sha-6f5adb31bd9fd8ed7e818e10574e7cc37802482b
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5001
+          env:
+            - name: UseKubernetes
+              value: true
+            - name: GitHubSettings__UseGitHub
+              value: true
+            - name: GitHubSettings__GitHubRepoURL
+              value: https://github.com/vita-ride/rs2-config-repo.git
+            - name: GitHubSettings__GitHubRepoName
+              value: rs2-config-repo
+            - name: GitHubSettings__GitUserName
+              value: Configurator
+            - name: GitHubSettings__GitEmail
+              value: "****@****.***"

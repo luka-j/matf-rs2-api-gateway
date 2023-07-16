@@ -26,15 +26,18 @@ if (bool.Parse(builder.Configuration["UseKubernetes"]))
     var config = KubernetesClientConfiguration.InClusterConfig();
     var client = new Kubernetes(config);
     builder.Services.AddScoped<IClientNameService, KubernetesClientNameService>();
-    var APIPods = await client.ListNamespacedPodAsync("api-gateway");
+    var pods = await client.ListNamespacedPodAsync("api-gateway");
     var APIPort = builder.Configuration["APIPort"];
 
     // TODO: pods for other microservices
-    foreach (var pod in APIPods)
+    foreach (var pod in pods)
     {
-        var name = pod.Metadata.Name;
-        var URI = pod.Status.PodIP + ":" + APIPort;
-        builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>(name, op => op.Address = new Uri(URI));
+        if (pod.Metadata.Labels["app"] == "api")
+        {
+            var name = pod.Metadata.Name;
+            var URI = pod.Status.PodIP + ":" + APIPort;
+            builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>(name, op => op.Address = new Uri(URI));
+        }
     }
 }
 else
