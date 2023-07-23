@@ -2,7 +2,6 @@ using Configurator.GrpcServices;
 using Configurator.Repositories;
 using Configurator.Services;
 using k8s;
-using k8s.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +15,8 @@ builder.Services.AddControllers();
 if (bool.Parse(builder.Configuration["GitHubSettings:UseGitHub"]))
 {
     builder.Services.AddScoped<IConfigRepository, GitHubConfigRepository>();
-} else
+}
+else
 {
     builder.Services.AddScoped<IConfigRepository, DirectoryConfigRepository>();
 }
@@ -60,8 +60,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000"));
 }
 
 app.MapControllers();
+
 
 app.Run();
