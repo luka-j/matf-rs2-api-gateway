@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 builder.Services.AddControllers();
 
 if (bool.Parse(builder.Configuration["GitHubSettings:UseGitHub"]))
@@ -64,6 +65,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
-
 
 app.Run();
