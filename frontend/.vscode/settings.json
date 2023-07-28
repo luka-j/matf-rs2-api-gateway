@@ -11,5 +11,8 @@
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+  },
+  "[nginx]": {
+    "editor.defaultFormatter": "raynigon.nginx-formatter"
   }
 }
