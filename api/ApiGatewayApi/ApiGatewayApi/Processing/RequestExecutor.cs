@@ -3,6 +3,7 @@ using System.Text.Json.Nodes;
 using ApiGatewayApi.ApiConfigs;
 using ApiGatewayApi.Controllers;
 using ApiGatewayApi.Exceptions;
+using ApiGatewayApi.Services;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Models;
 
@@ -17,15 +18,17 @@ public class RequestExecutor
     private readonly RequestResponseFilter _filter;
     private readonly RequestProcessorGateway _requestProcessorGateway;
     private readonly ControllerUtils _controllerUtils;
+    private readonly MetricsService _metrics;
 
     public RequestExecutor(ApiRepository apis, EntityMapper entityMapper, RequestResponseFilter filter, 
-        RequestProcessorGateway requestProcessorGateway, ControllerUtils controllerUtils)
+        RequestProcessorGateway requestProcessorGateway, ControllerUtils controllerUtils, MetricsService metrics)
     {
         _apis = apis;
         _entityMapper = entityMapper;
         _filter = filter;
         _requestProcessorGateway = requestProcessorGateway;
         _controllerUtils = controllerUtils;
+        _metrics = metrics;
     }
 
     public async ValueTask ExecuteRequest(string path, DateTime now, RequestMetadata requestMetadata, HttpContext httpContext)
@@ -35,12 +38,14 @@ public class RequestExecutor
         if (operation == null && httpContext.Request.Method.ToUpper() == "OPTIONS") // if this was a CORS preflight
         {
             await httpContext.Response.CompleteAsync();
+            _metrics.RecordApiCorsRequestTime(apiConfig, specPath, httpContext.Request.Method.ToUpper(), DateTime.Now - now);
             return;
         }
         var executionRequest = await MakeExecutionRequest(apiConfig, path, specPath, operation, 
             httpContext.Request, requestMetadata);
         var executionResponse = await _requestProcessorGateway.ProcessRequest(executionRequest);
         await PopulateHttpResponse(executionResponse, operation, httpContext.Response);
+        _metrics.RecordApiRequestTime(MetricsService.ApiRequestTime, executionRequest, executionResponse, DateTime.Now - now);
     }
 
     private async ValueTask PopulateHttpResponse(ExecutionResponse response, OpenApiOperation spec, HttpResponse httpResponse)
