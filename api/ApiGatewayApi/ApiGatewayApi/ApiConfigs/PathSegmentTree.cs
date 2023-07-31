@@ -88,6 +88,7 @@ public class PathSegmentTree
     /// the most specific and will be matched first if they exist.</returns>
     public OasPathItemWithPath? ResolvePath(string path)
     {
+        if (path.StartsWith('/')) path = path[1..];
         var fragments = ImmutableQueue.Create(path.Split('/'));
         return ResolvePathInternal(fragments);
     }

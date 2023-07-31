@@ -2,6 +2,7 @@
 using System.Text.Json.Nodes;
 using ApiGatewayApi;
 using ApiGatewayApi.Processing;
+using ApiGatewayApi.Services;
 
 namespace Tests.Processing;
 
@@ -9,7 +10,7 @@ public class HttpRequesterTest
 {
     private readonly ApiGatewayApi.Processing.HttpRequester _requester = new(new RequestResponseFilter(), new EntityMapper(), 
 #pragma warning disable CS8625
-        null, null);
+        null, null, new MetricsService());
 #pragma warning restore CS8625
     
     [Fact]
