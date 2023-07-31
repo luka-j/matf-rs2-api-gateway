@@ -2,6 +2,7 @@ using ApiGatewayApi.ApiConfigs;
 using ApiGatewayApi.Controllers;
 using ApiGatewayApi.Processing;
 using ApiGatewayApi.Services;
+using Prometheus;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,7 @@ builder.Services.AddSingleton<EntityMapper>();
 builder.Services.AddSingleton<RequestExecutor>();
 builder.Services.AddSingleton<RequestProcessorGateway>();
 builder.Services.AddSingleton<ControllerUtils>();
+builder.Services.AddSingleton<MetricsService>();
 
 Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
     .WriteTo.Console()
@@ -33,5 +35,8 @@ app.MapGrpcReflectionService();
 app.MapGrpcService<HttpRequesterService>();
 app.MapGrpcService<ConfigManagementService>();
 app.MapControllers();
+
+app.UseHttpMetrics();
+app.MapMetrics();
 
 app.Run();

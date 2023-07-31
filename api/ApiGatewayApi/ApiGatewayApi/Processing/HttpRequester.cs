@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using ApiGatewayApi.ApiConfigs;
 using ApiGatewayApi.Exceptions;
+using ApiGatewayApi.Services;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Models;
@@ -19,18 +20,21 @@ public class HttpRequester
     private readonly RequestResponseFilter _filter;
     private readonly EntityMapper _entityMapper;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly MetricsService _metrics;
 
     public HttpRequester(RequestResponseFilter filter, EntityMapper entityMapper, 
-        ApiRepository apiRepository, IHttpClientFactory httpClientFactory)
+        ApiRepository apiRepository, IHttpClientFactory httpClientFactory, MetricsService metrics)
     {
         _filter = filter;
         _entityMapper = entityMapper;
         _apiRepository = apiRepository;
         _httpClientFactory = httpClientFactory;
+        _metrics = metrics;
     }
     
     public async Task<ExecutionResponse> MakeRequest(ExecutionRequest request)
     {
+        var requestStart = DateTime.Now;
         var apiConfig = _apiRepository.Backends.GetCurrentConfig(
             new ApiIdentifier(request.ApiName, request.ApiVersion), 
             DateTime.Parse(request.RequestMetadata.StartTime, null, DateTimeStyles.RoundtripKind));
@@ -86,6 +90,7 @@ public class HttpRequester
         }
 
         _logger.Debug("Returning execution response: {ExecutionResponse}", executionResponse);
+        _metrics.RecordApiRequestTime(MetricsService.BackendRequestTime, request, executionResponse, DateTime.Now - requestStart);
         return executionResponse;
     }
 
