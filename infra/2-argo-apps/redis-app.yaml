@@ -12,6 +12,12 @@ spec:
     helm:
       releaseName: redis
       values: |
+          master:
+            persistence:
+              enabled: false
+          replica:
+            persistence:
+              enabled: false
           metrics:
             serviceMonitor:
               enabled: true
