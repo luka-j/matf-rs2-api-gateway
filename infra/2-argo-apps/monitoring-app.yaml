@@ -44,6 +44,6 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-        - CreateNamespace=true
+    - CreateNamespace=true
     - PrunePropagationPolicy=foreground
     - PruneLast=true
