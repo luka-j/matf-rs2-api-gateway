@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keydb
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: keydb
+    repoURL: https://enapter.github.io/charts/
+    targetRevision: 0.40.1
+    helm:
+      releaseName: keydb
+      values: |
+          imageTag: arm64_v6.3.2
+          persistentVolume:
+            enabled: false
+            emptyDir:
+              sizeLimit: 500Mi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: keydb
+  syncPolicy:
+    automated: 
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground
+    - PruneLast=true
+    - ServerSideApply=true
