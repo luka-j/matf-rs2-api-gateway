@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: redis
+    repoURL: oci://registry-1.docker.io/bitnamicharts
+    targetRevision: 17.14.4
+    helm:
+      releaseName: redis
+      values: |
+          metrics:
+            serviceMonitor:
+              enabled: true
+              namespace: monitoring
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: redis
+  syncPolicy:
+    automated: 
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground
+    - PruneLast=true
+    - ServerSideApply=true
