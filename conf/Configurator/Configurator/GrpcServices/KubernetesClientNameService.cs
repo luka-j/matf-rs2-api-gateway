@@ -1,4 +1,6 @@
 ﻿using k8s;
+using k8s.Models;
+using Zitadel.Api;
 
 namespace Configurator.GrpcServices
 {
@@ -14,9 +16,15 @@ namespace Configurator.GrpcServices
         public IEnumerable<string> GetAPIClientNames()
         {
             List<string> names = new();
-            var pods = _client.ListNamespacedPod("api-gateway");
+            string namespaceName = "api-gateway";
+            string serviceName = "api-service";
 
-            foreach(var pod in pods)
+            V1Service service = _client.ReadNamespacedService(serviceName, namespaceName);
+
+            var selectorLabels = service.Spec.Selector;
+            V1PodList podList = _client.ListNamespacedPod(namespaceName, labelSelector: string.Join(",", selectorLabels));
+
+            foreach (var pod in podList.Items)
             {
                 if (pod.Metadata.Labels["app"] == "api")
                 {

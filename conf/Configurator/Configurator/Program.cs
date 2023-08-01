@@ -2,6 +2,8 @@ using Configurator.GrpcServices;
 using Configurator.Repositories;
 using Configurator.Services;
 using k8s;
+using k8s.Models;
+using Org.BouncyCastle.Tls;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 
 
 builder.Services.AddControllers();
@@ -27,11 +31,16 @@ if (bool.Parse(builder.Configuration["UseKubernetes"]))
     var config = KubernetesClientConfiguration.InClusterConfig();
     var client = new Kubernetes(config);
     builder.Services.AddScoped<IClientNameService, KubernetesClientNameService>();
-    var pods = await client.ListNamespacedPodAsync("api-gateway");
     var APIPort = builder.Configuration["APIPort"];
 
-    // TODO: pods for other microservices
-    foreach (var pod in pods)
+    string namespaceName = "api-gateway";
+    string serviceName = "api-service";
+
+    V1Service service = client.ReadNamespacedService(serviceName, namespaceName);
+
+    var selectorLabels = service.Spec.Selector;
+    V1PodList podList = client.ListNamespacedPod(namespaceName, labelSelector: string.Join(",", selectorLabels));
+    foreach (V1Pod pod in podList.Items)
     {
         if (pod.Metadata.Labels["app"] == "api")
         {
