@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rabbitmq
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: rabbitmq
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 12.0.9
+    helm:
+      releaseName: rabbitmq
+      values: |
+          persistence:
+            enabled: false
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            hostname: rabbitmq-rs2.luka-j.rocks
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-prod
+            tls: true
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+              namespace: monitoring
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: rabbitmq
+  syncPolicy:
+    automated: 
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground
+    - PruneLast=true
+    - ServerSideApply=true
