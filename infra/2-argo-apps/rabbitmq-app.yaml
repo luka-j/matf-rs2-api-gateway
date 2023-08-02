@@ -12,6 +12,8 @@ spec:
     helm:
       releaseName: rabbitmq
       values: |
+          auth:
+            username: apigtw
           persistence:
             enabled: false
           ingress:
