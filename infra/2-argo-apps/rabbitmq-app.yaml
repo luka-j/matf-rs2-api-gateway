@@ -23,9 +23,6 @@ spec:
             tls: true
           metrics:
             enabled: true
-            serviceMonitor:
-              enabled: true
-              namespace: monitoring
   destination:
     server: https://kubernetes.default.svc
     namespace: rabbitmq
