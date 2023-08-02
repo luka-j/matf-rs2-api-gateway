@@ -1,6 +1,5 @@
 ﻿using k8s;
 using k8s.Models;
-using Zitadel.Api;
 
 namespace Configurator.GrpcServices
 {

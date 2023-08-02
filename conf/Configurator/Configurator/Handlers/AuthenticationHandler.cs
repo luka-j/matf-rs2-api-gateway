@@ -2,34 +2,45 @@
 
 namespace Configurator.Handlers
 {
-    public class AuthenticationHandler : DelegatingHandler
+    public class AuthenticationHandler
     {
         private readonly string apiUrl;
+        private readonly RequestDelegate next;
+        private readonly string relm;
 
-        public AuthenticationHandler(string _apiUrl)
+        public AuthenticationHandler(RequestDelegate _next, string _relm, string _apiUrl)
         {
+            next = _next;
+            relm = _relm;
             apiUrl = _apiUrl;
         }
 
-        protected async override Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request, CancellationToken cancellationToken)
+        public async Task InvokeAsync(HttpContext context)
         {
-            var unauthResponse = new HttpResponseMessage(System.Net.HttpStatusCode.Unauthorized);
-
-            if (request.Headers.Authorization == null) {
-                return unauthResponse;
-            }
-            string token = request.Headers.Authorization.ToString();
-            try
+            if (context.Request.Headers.ContainsKey("Authorization"))
             {
-                var client = Clients.AuthService(new(apiUrl, ITokenProvider.Static(token)));
-                var result = await client.GetMyUserAsync(new(), cancellationToken: cancellationToken);
+                try
+                {
+                    string token = context.Request.Headers.Authorization.ToString();
 
-                var response = await base.SendAsync(request, cancellationToken);
-                return response;
-            } catch {
-                return unauthResponse;
+                    var client = Clients.AuthService(new(apiUrl, ITokenProvider.Static(token)));
+                    var result = await client.GetMyUserAsync(new());
+                    if (result != null)
+                    {
+                        await next(context);
+                        return;
+                    }
+                } catch
+                {
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync("Unauthorized");
+                    return;
+                }
+
             }
+            context.Response.StatusCode = 401;
+            await context.Response.WriteAsync("Unauthorized");
+            return;
         }
     }
 }

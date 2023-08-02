@@ -1,9 +1,9 @@
 using Configurator.GrpcServices;
+using Configurator.Handlers;
 using Configurator.Repositories;
 using Configurator.Services;
 using k8s;
 using k8s.Models;
-using Org.BouncyCastle.Tls;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +72,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000"));
 }
+
+app.UseMiddleware<AuthenticationHandler>("test", builder.Configuration["AuthSettings:AuthUrl"]);
 
 app.MapControllers();
 
