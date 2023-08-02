@@ -35,3 +35,7 @@ spec:
           value: "Configurator"
         - name: "GitHubSettings__GitEmail"
           value: "****@****.***"
+        - name: "AuthSettings__UseAuth"
+          value: "true"
+        - name: "AuthSettings__AuthUrl"
+          value: "https://github.com/vita-ride/rs2-config-repo.git"
