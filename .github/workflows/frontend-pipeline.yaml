@@ -13,6 +13,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}-frontend
   DOCKERFILE_DIR: frontend
   DEPLOYMENT_PATH: frontend/k8s-resources/deployment.yaml
+  DOCKER_DEFAULT_PLATFORM: linux/arm64
 
 jobs:
   build-and-push-image:
