@@ -17,7 +17,7 @@ COPY . .
 
 RUN pnpm run build
 
-FROM nginxinc/nginx-unprivileged:1.23-alpine-perl
+FROM --platform=linux/arm64 nginxinc/nginx-unprivileged:1.23-alpine-perl
 
 COPY --link nginx.conf /etc/nginx/conf.d/default.conf
 
