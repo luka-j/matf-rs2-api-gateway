@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  namespace: api-gateway
+  labels:
+    app: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  revisionHistoryLimit: 1
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: conf
+        image: ghcr.io/luka-j/matf-rs2-api-gateway-frontend:sha-6f5adb31bd9fd8ed7e818e10574e7cc37802482b
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
