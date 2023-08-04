@@ -5,7 +5,7 @@ on:
     branches: ['master']
     paths:
       - 'frontend/**'
-      - '.github/workflows/conf-pipeline.yaml'
+      - '.github/workflows/frontend-pipeline.yaml'
     paths-ignore:
       - 'frontend/k8s-resources/**' 
 
