@@ -16,7 +16,7 @@ public class ApiCollection
     private static readonly TimeSpan VALIDITY_MIN_OFFSET = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan PRUNE_AFTER = TimeSpan.FromMinutes(1);
 
-    private readonly object _pruningLock = new object();
+    private readonly object _pruningLock = new();
 
     private class ApiConfigValidityStartComparer : IComparer<ApiConfig?>
     {
@@ -168,14 +168,14 @@ public class ApiCollection
         var doc = reader.Read(spec, out var diagnostic);
         if (diagnostic.Errors.Count > 0)
         {
-            _logger.Error("Errors occurred while parsing spec: {errors}. Warnings: {warnings}", 
+            _logger.Error("Errors occurred while parsing spec: {Errors}. Warnings: {Warnings}", 
                 diagnostic.Errors, diagnostic.Warnings);
             throw new ApiConfigException("Failed to parse API spec. Check log for details");
         }
 
         if (diagnostic.Warnings.Count > 0)
         {
-            _logger.Warning("Warnings encountered while parsing spec {metadata}: {warnings}", 
+            _logger.Warning("Warnings encountered while parsing spec {@Metadata}: {Warnings}", 
                 doc.Info, diagnostic.Warnings);
         }
 
