@@ -17,7 +17,8 @@ public class ApiSpec
             { "if", typeof(IfStep) },
             { "foreach", typeof(ForeachStep) },
             { "return", typeof(ReturnStep) },
-            { "http", typeof(HttpStep) }
+            { "http", typeof(HttpStep) },
+            { "log", typeof(LogStep) }
         };
         o.AddUniqueKeyTypeDiscriminator<Step>(keyMappings);
     };
