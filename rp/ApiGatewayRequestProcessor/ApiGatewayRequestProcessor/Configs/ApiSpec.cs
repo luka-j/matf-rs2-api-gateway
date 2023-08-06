@@ -1,13 +1,30 @@
 ﻿using ApiGatewayRequestProcessor.ApiConfigs;
+using ApiGatewayRequestProcessor.Steps;
 using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.BufferedDeserialization;
 using YamlDotNet.Serialization.NamingConventions;
 
 namespace ApiGatewayRequestProcessor.Configs;
 
 public class ApiSpec
 {
+    private static readonly Action<ITypeDiscriminatingNodeDeserializerOptions> TypeDiscriminator = o =>
+    {
+        var keyMappings = new Dictionary<string, Type>
+        {
+            { "copy", typeof(CopyStep) },
+            { "delete", typeof(DeleteStep) },
+            { "if", typeof(IfStep) },
+            { "foreach", typeof(ForeachStep) },
+            { "return", typeof(ReturnStep) },
+            { "http", typeof(HttpStep) }
+        };
+        o.AddUniqueKeyTypeDiscriminator<Step>(keyMappings);
+    };
+    
     private static readonly IDeserializer YamlDeserializer = new DeserializerBuilder()
-        .WithNamingConvention(CamelCaseNamingConvention.Instance)  // see height_in_inches in sample yml 
+        .WithNamingConvention(CamelCaseNamingConvention.Instance)
+        .WithTypeDiscriminatingNodeDeserializer(TypeDiscriminator)
         .Build();
     
     public DateTime ValidFrom { get; }
