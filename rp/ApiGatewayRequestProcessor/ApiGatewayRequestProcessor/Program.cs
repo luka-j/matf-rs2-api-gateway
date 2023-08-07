@@ -1,4 +1,5 @@
 using ApiGatewayRequestProcessor.Configs;
+using ApiGatewayRequestProcessor.Gateways;
 using ApiGatewayRequestProcessor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,11 +11,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
 builder.Services.AddSingleton<ConfigRepository>();
+builder.Services.AddSingleton<ApiGateway>();
 
 var app = builder.Build();
 
 app.MapGrpcReflectionService();
 app.MapGrpcService<ConfigManagementService>();
+app.MapGrpcService<RequestProcessorService>();
 app.MapGet("/",
     () =>
         "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");

@@ -23,10 +23,10 @@ public class CopyStep : Step
 
                 var from = fromTo[0];
                 string? def = null;
-                if (fromTo[0].Contains("/"))
+                if (fromTo[0].Contains('/'))
                 {
                     var fromParts = fromTo[0].Split("/");
-                    from = fromParts[0].Trim();
+                    from = fromParts[0];
                     def = fromParts[1].Trim();
                 }
                 _copyPairs.Add(new FromToPair

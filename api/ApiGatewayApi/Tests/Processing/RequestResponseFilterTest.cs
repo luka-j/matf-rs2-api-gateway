@@ -9,26 +9,22 @@ public class RequestResponseFilterTest
 {
     private readonly RequestResponseFilter _filter = new();
     
-    private readonly Entity _complexEntity;
-
-    public RequestResponseFilterTest()
-    {
-        _complexEntity = new Entity { Object = new ObjectEntity
+    private readonly Entity _complexEntity = new()
+    { Object = new ObjectEntity
+        {
+            Properties = 
             {
-                Properties = 
-                {
-                    { "test", new Entity { Decimal = 5 } },
-                    { "parse", new Entity { String = "1" }},
-                    { "array", new Entity { List = new ListEntity {
-                                Value = { new[] { new Entity
-                                        {
-                                            Object = new ObjectEntity {
-                                                Properties =
-                                                {
-                                                    { "value", new Entity { String = "how are you?" } },
-                                                    { "number", new Entity { Integer = 2 }},
-                                                    { "flag", new Entity { Boolean = false } }
-                                                }
+                { "test", new Entity { Decimal = 5 } },
+                { "parse", new Entity { String = "1" }},
+                { "array", new Entity { List = new ListEntity {
+                            Value = { new[] { new Entity
+                                    {
+                                        Object = new ObjectEntity {
+                                            Properties =
+                                            {
+                                                { "value", new Entity { String = "how are you?" } },
+                                                { "number", new Entity { Integer = 2 }},
+                                                { "flag", new Entity { Boolean = false } }
                                             }
                                         }
                                     }
@@ -38,8 +34,8 @@ public class RequestResponseFilterTest
                     }
                 }
             }
-        };
-    }
+        }
+    };
 
     [Fact]
     public void GivenComplexEntityAndPartiallyMatchingSpec_WhenFilteringBody_ReturnBodyMatchingSchema()
