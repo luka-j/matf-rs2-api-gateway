@@ -130,8 +130,8 @@ public static class EntityUtils
             Entity.ContentOneofCase.Boolean => entity.Boolean.ToString(),
             Entity.ContentOneofCase.Decimal => entity.Decimal.ToDecimal().ToString(CultureInfo.InvariantCulture),
             Entity.ContentOneofCase.Integer => entity.Integer.ToString(),
-            Entity.ContentOneofCase.List => entity.List.Value.ToList().ToString()!,
-            Entity.ContentOneofCase.Object => entity.Object.Properties.Select(e => e.Key + "=>" + e.Value).ToString()!,
+            Entity.ContentOneofCase.List => "[" + entity.List.Value.Select(c => c.AsString() + ",") + "]",
+            Entity.ContentOneofCase.Object => entity.Object.Properties.Select(e => e.Key + "=>" + e.Value.AsString()).ToString()!,
             Entity.ContentOneofCase.None => "",
             _ => ""
         };
@@ -178,7 +178,7 @@ public static class EntityUtils
                     return null;
                 }
 
-                if (child.List.Value.Count >= index)
+                if (child.List.Value.Count <= index)
                 {
                     return null;
                 }
@@ -200,14 +200,119 @@ public static class EntityUtils
         return current;
     }
 
-    public static void Insert(this ObjectEntity parent, Entity entity, string location)
+    public static void Delete(this ObjectEntity entity, string target)
     {
-        if (location.StartsWith("${") && location.EndsWith("}"))
+        if (target.StartsWith("${") && target.EndsWith("}"))
         {
-            location = location[2..^1];
+            target = target[2..^1];
         }
 
-        var fullPath = location.Split(".");
+        var fullPath = target.Split(".");
+        var path = fullPath[..^1];
+        
+        var current = new Entity { Object = entity };
+        foreach (var el in path)
+        {
+            if (current.ContentCase != Entity.ContentOneofCase.Object)
+            {
+                return;
+            }
+
+            var obj = current.Object;
+
+            if (el.Contains('[') && el.Contains(']'))
+            {
+                var fieldName = el[..el.IndexOf('[')];
+                if (!int.TryParse(el[(el.IndexOf('[') + 1) .. el.IndexOf(']')], out var index))
+                {
+                    Log.Warning("Invalid index {Index} in expression {FieldName}", index, fieldName);
+                }
+
+                if (!obj.Properties.ContainsKey(fieldName))
+                {
+                    Log.Warning("Object doesn't contain field {FieldName}, not deleting anything",
+                        fieldName);
+                    return;
+                }
+
+                var child = obj.Properties[fieldName];
+                if (child.ContentCase != Entity.ContentOneofCase.List)
+                {
+                    Log.Warning("Expected field {Field} to be a list, got {ContentCase} instead, not " +
+                                "deleting anything", fieldName, child.ContentCase);
+                    return;
+                }
+
+                if (child.List.Value.Count <= index)
+                {
+                    return;
+                }
+
+                current = child.List.Value[index];
+            }
+            else
+            {
+                if (!obj.Properties.ContainsKey(el))
+                {
+                    Log.Warning("Object doesn't contain field {FieldName}, not deleting anything", el);
+                    return;
+                }
+
+                current = obj.Properties[el];
+            }
+        }
+
+        var destination = fullPath.Last();
+        var lastObj= current.Object;
+        if (destination.Contains('[') && destination.Contains(']'))
+        {
+            var fieldName = destination[..destination.IndexOf('[')];
+            var indexStr = destination[(destination.IndexOf('[') + 1) .. destination.IndexOf(']')];
+            if (!int.TryParse(indexStr, out var index))
+            {
+                Log.Warning("Invalid index {Index} in expression {FieldName}", index, fieldName);
+                throw new ApiRuntimeException("Index is not a valid number (" + target + ")!");
+            }
+
+            if (!lastObj.Properties.ContainsKey(fieldName))
+            {
+                Log.Warning("Attempted to delete entity (list) that doesn't exist: {@Target}",
+                    target);
+                return;
+            }
+            
+            var destObj = lastObj.Properties[fieldName];
+            if (destObj.ContentCase != Entity.ContentOneofCase.List)
+            {
+                Log.Warning("Attempted to delete {@Target} in {@Entity}, " +
+                            "but location isn't a list!", target, entity);
+                return;
+            }
+
+            var destList = destObj.List;
+            if (destList.Value.Count <= index)
+            {
+                Log.Warning("Attempted to delete entity {@Target}, but list is shorter than location",
+                    target);
+                return;
+            }
+            
+            destList.Value.RemoveAt(index);
+        }
+        else
+        {
+            lastObj.Properties.Remove(destination);
+        }
+    }
+
+    public static void Insert(this ObjectEntity parent, Entity entity, string target)
+    {
+        if (target.StartsWith("${") && target.EndsWith("}"))
+        {
+            target = target[2..^1];
+        }
+
+        var fullPath = target.Split(".");
         var path = fullPath[..^1];
 
         var current = new Entity { Object = parent };
@@ -216,7 +321,7 @@ public static class EntityUtils
             if (current.ContentCase != Entity.ContentOneofCase.Object)
             {
                 Log.Warning("Attempted to insert entity {@Entity} to parent {@Parent}, but location " +
-                            "${Location} is invalid", entity, parent, location);
+                            "${Location} is invalid", entity, parent, target);
                 throw new ApiRuntimeException("Cannot insert to non-object entity!");
             }
 
@@ -229,8 +334,9 @@ public static class EntityUtils
                 
                 if (!obj.Properties.ContainsKey(fieldName))
                 {
-                    current = new Entity { List = new ListEntity() };
-                    obj.Properties.Add(fieldName, current);
+                    current = new Entity{ Object = new ObjectEntity() };
+                    var newList = new Entity { List = new ListEntity { Value = { current }} };
+                    obj.Properties.Add(fieldName, newList);
                     continue;
                 }
 
@@ -244,7 +350,7 @@ public static class EntityUtils
                 {
                     Log.Warning("Expected field {Field} in object {@Parent} (location {@Location}) to be " +
                                 "a list, got {ContentCase} instead",
-                        fieldName, parent, location, child.ContentCase);
+                        fieldName, parent, target, child.ContentCase);
                     throw new ApiRuntimeException("Cannot insert to non-object entity!");
                 }
 
@@ -280,7 +386,7 @@ public static class EntityUtils
             if (destObj.ContentCase != Entity.ContentOneofCase.List)
             {
                 Log.Warning("Attempted to insert {@Entity} to {@Parent} on location {@Location}, " +
-                            "but location isn't a list!", entity, parent, location);
+                            "but location isn't a list!", entity, parent, target);
                 throw new ApiRuntimeException("Cannot insert to an indexed location of non-indexable entity");
             }
 
@@ -293,13 +399,14 @@ public static class EntityUtils
                 if (!int.TryParse(indexStr, out var index))
                 {
                     Log.Warning("Invalid index {Index} in expression {FieldName}", index, fieldName);
+                    throw new ApiRuntimeException("Index is not a valid number (" + target + ")!");
                 }
 
                 if (destObj.List.Value.Count <= index)
                 {
                     Log.Warning("Attempted to insert {@Entity} to {@Parent} on location {@Location}, " +
-                                "but location is out of bounds!", entity, parent, location);
-                    throw new ApiRuntimeException("Index is out of bounds (" + location + ")!");
+                                "but location is out of bounds!", entity, parent, target);
+                    throw new ApiRuntimeException("Index is out of bounds (" + target + ")!");
                 }
 
                 destObj.List.Value[index] = entity;
@@ -307,6 +414,10 @@ public static class EntityUtils
         }
         else
         {
+            if (lastObj == null)
+            {
+                lastObj = new ObjectEntity();
+            }
             lastObj.Properties[destination] = entity;
         }
     }

@@ -77,6 +77,28 @@ public class EntityUtilsTest
     }
 
     [Fact]
+    public void GivenEmptyObject_WhenInsertingValue_InsertProperValues()
+    {
+        var obj = new ObjectEntity();
+        var value = new Entity{ Object = new ObjectEntity
+            {
+                Properties =
+                {
+                    { "test", new Entity { String = "value" } }
+                }
+            }
+        };
+
+        obj.Insert(value, "some.random[*].path");
+        
+        Assert.Equal("value", obj.Properties["some"].Object
+            .Properties["random"].List
+            .Value[0].Object
+            .Properties["path"].Object
+            .Properties["test"].String);
+    }
+
+    [Fact]
     public void GivenComplexObject_WhenDoingNestedInsert_CreateObjectsAndInsertToProperPlace()
     {
         var e = new Entity { String = "success" };
@@ -126,5 +148,33 @@ public class EntityUtilsTest
     {
         var result = _complexEntity.Object.Substitute("Hi ${test}, ${array[0].value}");
         Assert.Equal("Hi 5, how are you?", result);
+    }
+
+    [Fact]
+    public void GivenComplexObject_WhenDeletingSimpleProperty_RemoveItFromObject()
+    {
+        _complexEntity.Object.Delete("test");
+        Assert.False(_complexEntity.Object.Properties.ContainsKey("test"));
+    }
+    
+    [Fact]
+    public void GivenComplexObject_WhenDeletingWholeList_RemoveItFromObject()
+    {
+        _complexEntity.Object.Delete("array");
+        Assert.False(_complexEntity.Object.Properties.ContainsKey("array"));
+    }
+
+    [Fact]
+    public void GivenComplexObject_WhenDeletingItemFromList_RemoveItFromList()
+    {
+        _complexEntity.Object.Delete("array[0]");
+        Assert.Empty(_complexEntity.Object.Properties["array"].List.Value);
+    }
+
+    [Fact]
+    public void GivenComplexObject_WhenDeletingANestedField_RemoveIt()
+    {
+        _complexEntity.Object.Delete("array[0].number");
+        Assert.False(_complexEntity.Object.Properties["array"].List.Value[0].Object.Properties.ContainsKey("number"));
     }
 }
