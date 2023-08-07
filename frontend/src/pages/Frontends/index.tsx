@@ -1,58 +1,56 @@
-import { AiFillPlusCircle } from "react-icons/ai";
+import { PlusCircle, RefreshCcw, Trash } from "lucide-react";
 
-import FrontendCard from "./components/FrontendCard";
-
-const frontends = [
-  {
-    id: 1,
-    name: "API 1, v1",
-    url: "address.com/api/v1",
-    endpoints: 10,
-  },
-  {
-    id: 2,
-    name: "API 1, v2",
-    url: "address.com/api/v2",
-    endpoints: 7,
-  },
-  {
-    id: 3,
-    name: "API 2, v1",
-    url: "address.com/api2/v1",
-    endpoints: 5,
-  },
-  {
-    id: 4,
-    name: "API 2, v2",
-    url: "address.com/api2/v2",
-    endpoints: 3,
-  },
-  {
-    id: 5,
-    name: "API 3, v1",
-    url: "address.com/api3/v1",
-    endpoints: 2,
-  },
-];
+import { frontends } from "@/mock/frontends";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Typography } from "@/components/ui/typography";
 
 const Frontends = () => {
   return (
-    <main className="mt-8 mx-auto max-w-7xl pb-8">
-      <h1 className="text-4xl text-center font-bold items-center justify-between inline-flex gap-4 w-full">
-        Frontends
-        <div className="mt-1 hover:bg-gray-600 rounded-full p-1 cursor-pointer transition-all duration-300 active:bg-transparent">
-          <AiFillPlusCircle />
-        </div>
-      </h1>
-
-      <div className="mt-8 block w-full p-6 pt-0  border  rounded-lg shadow  bg-gray-800 border-gray-700">
-        <div className="flex justify-between items-center flex-col md:flex-row flex-wrap">
-          {frontends.map((frontend) => (
-            <FrontendCard key={frontend.id} {...frontend} />
-          ))}
-        </div>
+    <div className="container mt-8 flex flex-col gap-8">
+      <div className="flex items-center justify-between">
+        <Typography variant="h1">Frontends</Typography>
+        <Button variant="ghost" size="icon">
+          <PlusCircle size={60} />
+        </Button>
       </div>
-    </main>
+
+      <Card>
+        <CardContent className="flex flex-wrap justify-center gap-5 p-5 md:justify-between md:gap-10 md:p-10">
+          {frontends.map((frontend) => (
+            <Card key={frontend.id} className="w-96">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <Button variant="ghost" size="icon">
+                  <RefreshCcw />
+                </Button>
+                <CardTitle>{frontend.name}</CardTitle>
+                <Button variant="destructive" size="icon">
+                  <Trash />
+                </Button>
+              </CardHeader>
+
+              <CardContent className="flex flex-col justify-center gap-4">
+                <Typography variant="large" className="text-center">
+                  {frontend.url}
+                </Typography>
+                <Typography variant="small" className="text-center">
+                  {frontend.endpoints} endpoints
+                </Typography>
+              </CardContent>
+
+              <CardFooter className="flex flex-row items-center justify-between">
+                <Button asChild variant="secondary">
+                  <a href="/">View spec</a>
+                </Button>
+                <Button asChild variant="secondary">
+                  <a href="/">View middleware</a>
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
