@@ -13,6 +13,7 @@ public class ApiSpec
         var keyMappings = new Dictionary<string, Type>
         {
             { "copy", typeof(CopyStep) },
+            { "insert", typeof(InsertStep) },
             { "delete", typeof(DeleteStep) },
             { "if", typeof(IfStep) },
             { "foreach", typeof(ForeachStep) },

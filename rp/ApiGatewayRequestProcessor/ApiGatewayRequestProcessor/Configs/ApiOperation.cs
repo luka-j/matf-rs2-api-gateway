@@ -11,6 +11,8 @@ public class ApiOperation
     public List<Step>? Steps { get; set; }
     public bool? Pass { get; set; }
 
+    public const string FinalStateMarkLocation = "${__internal.finished}";
+
     public async Task<ExecutionResponse> Execute(ExecutionRequest request, ApiGateway gateway)
     {
         if (Pass == true)
@@ -24,13 +26,20 @@ public class ApiOperation
         }
 
         var state = PackExecutionRequest(request);
-        foreach (var step in Steps)
+        state = Execute(Steps, state);
+
+        return UnpackExecutionResponse(state);
+    }
+
+    public static ObjectEntity Execute(List<Step> steps, ObjectEntity state)
+    {
+        foreach (var step in steps)
         {
             state = step.Execute(state);
             if (IsFinalState(state)) break;
         }
 
-        return UnpackExecutionResponse(state);
+        return state;
     }
 
     private static ObjectEntity PackExecutionRequest(ExecutionRequest request)
@@ -109,10 +118,10 @@ public class ApiOperation
         };
     }
 
-    private bool IsFinalState(ObjectEntity entity)
+    private static bool IsFinalState(ObjectEntity entity)
     {
-        return false;
-        // todo entity traversing
+        var finalStateMark = entity.Find(FinalStateMarkLocation);
+        return finalStateMark != null;
     }
 
 }
