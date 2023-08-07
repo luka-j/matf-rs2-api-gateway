@@ -1,8 +1,8 @@
 import { useEffect } from "react";
+import { useUserStore } from "@/stores/user-store";
 import { useNavigate } from "react-router-dom";
 
-import Loader from "@/components/Loader";
-import { useUserStore } from "@/stores/userStore";
+import PageLoader from "@/components/page-loader";
 
 const Callback = () => {
   const { currentUser, loginAndSetUser } = useUserStore((state) => state);
@@ -11,15 +11,11 @@ const Callback = () => {
 
   useEffect(() => {
     if (!currentUser) {
-      loginAndSetUser().then(() => navigate("/dashboard"));
+      loginAndSetUser().then(() => navigate("/dashboard/overview"));
     }
   }, [currentUser, loginAndSetUser, navigate]);
 
-  return (
-    <div className="w-screen h-screen flex items-center justify-center bg-gray-900">
-      <Loader className="w-24 h-24" />
-    </div>
-  );
+  return <PageLoader />;
 };
 
 export default Callback;

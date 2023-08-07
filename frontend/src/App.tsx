@@ -1,16 +1,20 @@
 import { Suspense } from "react";
 import { RouterProvider } from "react-router-dom";
 
-import { router } from "./lib/siteRoutes";
+import PageLoader from "./components/page-loader";
+import { router } from "./configs/routes-config";
+import { ThemeProvider } from "./lib/theme-provider";
 
-const App = () => {
+function App() {
   return (
     <>
-      <Suspense fallback={<div>Loading...</div>}>
-        <RouterProvider router={router} />
-      </Suspense>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <Suspense fallback={<PageLoader />}>
+          <RouterProvider router={router} />
+        </Suspense>
+      </ThemeProvider>
     </>
   );
-};
+}
 
 export default App;
