@@ -30,9 +30,9 @@ public class LogStep : Step
         }
     }
     
-    public override ObjectEntity Execute(ObjectEntity state)
+    public override Task<ObjectEntity> Execute(ObjectEntity state)
     {
         _logger.Write(_level, "{Message}", _message);
-        return state;
+        return Task.FromResult(state);
     }
 }

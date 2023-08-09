@@ -13,13 +13,13 @@ public class ApiSpec
         var keyMappings = new Dictionary<string, Type>
         {
             { "copy", typeof(CopyStep) },
-            { "insert", typeof(InsertStep) },
             { "delete", typeof(DeleteStep) },
-            { "if", typeof(IfStep) },
             { "foreach", typeof(ForeachStep) },
-            { "return", typeof(ReturnStep) },
             { "http", typeof(HttpStep) },
-            { "log", typeof(LogStep) }
+            { "if", typeof(IfStep) },
+            { "insert", typeof(InsertStep) },
+            { "log", typeof(LogStep) },
+            { "return", typeof(ReturnStep) },
         };
         o.AddUniqueKeyTypeDiscriminator<Step>(keyMappings);
     };

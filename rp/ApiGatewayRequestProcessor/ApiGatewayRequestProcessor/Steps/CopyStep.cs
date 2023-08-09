@@ -44,7 +44,7 @@ public class CopyStep : Step
         }
     }
 
-    public override ObjectEntity Execute(ObjectEntity state)
+    public override Task<ObjectEntity> Execute(ObjectEntity state)
     {
         foreach (var pair in _copyPairs)
         {
@@ -86,6 +86,6 @@ public class CopyStep : Step
             }
         }
 
-        return state;
+        return Task.FromResult(state);
     }
 }

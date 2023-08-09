@@ -11,7 +11,7 @@ public class ApiGateway
     
     private readonly GrpcChannel _channel;
     
-    private readonly ApiGatewayApi.HttpRequester.HttpRequesterClient _client;
+    private readonly HttpRequester.HttpRequesterClient _client;
 
     public ApiGateway()
     {

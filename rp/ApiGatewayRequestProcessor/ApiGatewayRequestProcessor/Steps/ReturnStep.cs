@@ -13,10 +13,10 @@ public class ReturnStep : Step
 
     private string _status;
     
-    public override ObjectEntity Execute(ObjectEntity state)
+    public override Task<ObjectEntity> Execute(ObjectEntity state)
     {
-        state.Properties.Add("status", new Entity { String = _status });
+        state.Properties.Add("status", new Entity { String = state.Substitute(_status) });
         state.Insert(new Entity { Boolean = true }, ApiOperation.FinalStateMarkLocation);
-        return state;
+        return Task.FromResult(state);
     }
 }

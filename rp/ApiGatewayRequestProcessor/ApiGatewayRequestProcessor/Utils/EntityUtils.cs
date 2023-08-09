@@ -45,6 +45,17 @@ public static class EntityUtils
 
         return result;
     }
+    
+    public static PrimitiveObjectEntity ConvertToPrimitiveObjectEntity(this ObjectEntity e)
+    {
+        var result = new PrimitiveObjectEntity();
+        foreach (var (key, value) in e.Properties)
+        {
+            result.Properties.Add(key, value.ConvertToPrimitive());
+        }
+
+        return result;
+    }
 
     private static PrimitiveEntity ConvertToPrimitive(this Entity value)
     {

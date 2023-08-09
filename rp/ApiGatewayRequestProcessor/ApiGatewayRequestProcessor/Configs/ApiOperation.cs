@@ -26,16 +26,16 @@ public class ApiOperation
         }
 
         var state = PackExecutionRequest(request);
-        state = Execute(Steps, state);
+        state = await Execute(Steps, state);
 
-        return UnpackExecutionResponse(state);
+        return UnpackToExecutionResponse(state);
     }
 
-    public static ObjectEntity Execute(List<Step> steps, ObjectEntity state)
+    public static async Task<ObjectEntity> Execute(List<Step> steps, ObjectEntity state)
     {
         foreach (var step in steps)
         {
-            state = step.Execute(state);
+            state = await step.Execute(state);
             if (IsFinalState(state)) break;
         }
 
@@ -85,7 +85,7 @@ public class ApiOperation
         };
     }
 
-    private static ExecutionResponse UnpackExecutionResponse(ObjectEntity entity)
+    private static ExecutionResponse UnpackToExecutionResponse(ObjectEntity entity)
     {
         int status = 200;
         if (entity.Properties.TryGetValue("status", out var statusEntity))

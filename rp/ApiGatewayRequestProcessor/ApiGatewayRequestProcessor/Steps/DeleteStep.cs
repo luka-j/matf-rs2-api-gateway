@@ -12,14 +12,14 @@ public class DeleteStep : Step
         set => _resources = value.Split(",").ToList();
     }
 
-    public override ObjectEntity Execute(ObjectEntity state)
+    public override Task<ObjectEntity> Execute(ObjectEntity state)
     {
         foreach (var res in _resources)
         {
             state.Delete(res);
         }
 
-        return state;
+        return Task.FromResult(state);
     }
     
 }
