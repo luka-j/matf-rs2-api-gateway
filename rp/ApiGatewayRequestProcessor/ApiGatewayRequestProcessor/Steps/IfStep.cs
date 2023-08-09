@@ -51,14 +51,14 @@ public class IfStep : Step
         {
             if (Then != null)
             {
-                state = await ApiOperation.Execute(Then, state);
+                state = await ApiOperation.ExecuteSteps(Then, state);
             }
         }
         else
         {
             if (Else != null)
             {
-                state = await ApiOperation.Execute(Else, state);
+                state = await ApiOperation.ExecuteSteps(Else, state);
             }
         }
 

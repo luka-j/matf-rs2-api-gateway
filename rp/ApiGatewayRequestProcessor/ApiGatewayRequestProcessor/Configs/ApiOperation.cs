@@ -26,12 +26,12 @@ public class ApiOperation
         }
 
         var state = PackExecutionRequest(request);
-        state = await Execute(Steps, state);
+        state = await ExecuteSteps(Steps, state);
 
         return UnpackToExecutionResponse(state);
     }
 
-    public static async Task<ObjectEntity> Execute(List<Step> steps, ObjectEntity state)
+    public static async Task<ObjectEntity> ExecuteSteps(List<Step> steps, ObjectEntity state)
     {
         foreach (var step in steps)
         {

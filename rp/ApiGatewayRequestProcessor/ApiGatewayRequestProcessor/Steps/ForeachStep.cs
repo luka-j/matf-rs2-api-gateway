@@ -40,7 +40,7 @@ public class ForeachStep : Step
         foreach (var element in list)
         {
             state.Insert(element, _element);
-            state = await ApiOperation.Execute(Do, state);
+            state = await ApiOperation.ExecuteSteps(Do, state);
         }
         state.Delete(_element);
 
