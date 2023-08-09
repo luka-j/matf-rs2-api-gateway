@@ -44,7 +44,7 @@ public class CopyStep : Step
         }
     }
 
-    public override Task<ObjectEntity> Execute(ObjectEntity state)
+    public override Task<ObjectEntity> Execute(ObjectEntity state, Dictionary<string, List<Step>>? stepRepository)
     {
         foreach (var pair in _copyPairs)
         {

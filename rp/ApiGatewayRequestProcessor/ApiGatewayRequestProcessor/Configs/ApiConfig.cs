@@ -1,4 +1,8 @@
-﻿namespace ApiGatewayRequestProcessor.Configs;
+﻿using ApiGatewayApi;
+using ApiGatewayRequestProcessor.Gateways;
+using ApiGatewayRequestProcessor.Steps;
+
+namespace ApiGatewayRequestProcessor.Configs;
 
 public class ApiConfig
 {
@@ -6,19 +10,17 @@ public class ApiConfig
     public string Version { get; set; }
     
     public Dictionary<string, ApiEndpoint> Endpoints { get; set; }
+    
+    public Dictionary<string, List<Step>> Steps { get; set; }
 
-    public ApiOperation? ResolveOperation(string path, string method)
+    public bool HasOperation(string path, string method)
     {
-        if (!Endpoints.TryGetValue(path, out var endpoint))
-        {
-            return null;
-        }
-
-        if (!endpoint.Operations.TryGetValue(method, out var operation))
-        {
-            return null;
-        }
-
-        return operation;
+        return Endpoints.TryGetValue(path, out var endpoint) && endpoint.Operations.ContainsKey(method);
+    }
+    
+    public Task<ExecutionResponse> Execute(string path, string method, 
+        ExecutionRequest request, ApiGateway apiGateway)
+    {
+        return Endpoints[path].Operations[method].Execute(request, apiGateway, Steps);
     }
 }

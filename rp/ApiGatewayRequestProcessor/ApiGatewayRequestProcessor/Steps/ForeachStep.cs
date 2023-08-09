@@ -27,7 +27,7 @@ public class ForeachStep : Step
     
     public List<Step> Do { get; set; }
     
-    public override async Task<ObjectEntity> Execute(ObjectEntity state)
+    public override async Task<ObjectEntity> Execute(ObjectEntity state, Dictionary<string, List<Step>>? stepRepository)
     {
         var entity = state.Find(_list);
         if (entity is not { ContentCase: Entity.ContentOneofCase.List })
@@ -40,7 +40,7 @@ public class ForeachStep : Step
         foreach (var element in list)
         {
             state.Insert(element, _element);
-            state = await ApiOperation.ExecuteSteps(Do, state);
+            state = await ApiOperation.ExecuteSteps(Do, state, stepRepository);
         }
         state.Delete(_element);
 

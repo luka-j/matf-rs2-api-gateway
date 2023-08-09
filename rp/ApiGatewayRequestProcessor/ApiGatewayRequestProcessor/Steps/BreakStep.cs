@@ -8,7 +8,7 @@ public class BreakStep : Step
 {
     public string? Break { get; set; }
     
-    public override Task<ObjectEntity> Execute(ObjectEntity state)
+    public override Task<ObjectEntity> Execute(ObjectEntity state, Dictionary<string, List<Step>>? stepRepository)
     {
         if (Break != null && Break.Trim().Length > 0)
         {

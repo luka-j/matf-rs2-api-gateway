@@ -16,7 +16,8 @@ public class ApiOperation
     
     public const string StatusLocation = "${status}";
 
-    public async Task<ExecutionResponse> Execute(ExecutionRequest request, ApiGateway gateway)
+    public async Task<ExecutionResponse> Execute(ExecutionRequest request, ApiGateway gateway, 
+        Dictionary<string, List<Step>> stepRepository)
     {
         if (Pass == true)
         {
@@ -29,16 +30,17 @@ public class ApiOperation
         }
 
         var state = PackExecutionRequest(request);
-        state = await ExecuteSteps(Steps, state);
+        state = await ExecuteSteps(Steps, state, stepRepository);
 
         return UnpackToExecutionResponse(state);
     }
 
-    public static async Task<ObjectEntity> ExecuteSteps(List<Step> steps, ObjectEntity state)
+    public static async Task<ObjectEntity> ExecuteSteps(List<Step> steps, ObjectEntity state,
+        Dictionary<string, List<Step>>? stepRepository)
     {
         foreach (var step in steps)
         {
-            state = await step.Execute(state);
+            state = await step.Execute(state, stepRepository);
             if (IsBreakState(state))
             {
                 state.Delete(BreakMarkLocation);

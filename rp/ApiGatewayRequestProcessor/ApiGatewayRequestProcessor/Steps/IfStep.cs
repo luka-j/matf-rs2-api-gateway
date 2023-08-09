@@ -45,20 +45,20 @@ public class IfStep : Step
     public List<Step>? Then { get; set; }
     public List<Step>? Else { get; set; }
     
-    public override async Task<ObjectEntity> Execute(ObjectEntity state)
+    public override async Task<ObjectEntity> Execute(ObjectEntity state, Dictionary<string, List<Step>>? stepRepository)
     {
         if (Evaluate(state))
         {
             if (Then != null)
             {
-                state = await ApiOperation.ExecuteSteps(Then, state);
+                state = await ApiOperation.ExecuteSteps(Then, state, stepRepository);
             }
         }
         else
         {
             if (Else != null)
             {
-                state = await ApiOperation.ExecuteSteps(Else, state);
+                state = await ApiOperation.ExecuteSteps(Else, state, stepRepository);
             }
         }
 

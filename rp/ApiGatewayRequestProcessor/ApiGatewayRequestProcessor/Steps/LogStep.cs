@@ -31,7 +31,7 @@ public class LogStep : Step
         }
     }
     
-    public override Task<ObjectEntity> Execute(ObjectEntity state)
+    public override Task<ObjectEntity> Execute(ObjectEntity state, Dictionary<string, List<Step>>? stepRepository)
     {
         _logger.Write(_level, "{Message}", state.Substitute(_message));
         return Task.FromResult(state);

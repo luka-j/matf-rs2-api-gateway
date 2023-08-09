@@ -19,6 +19,7 @@ public class ApiSpec
             { "http", typeof(HttpStep) },
             { "if", typeof(IfStep) },
             { "insert", typeof(InsertStep) },
+            { "invoke", typeof(InvokeStep) },
             { "log", typeof(LogStep) },
             { "return", typeof(ReturnStep) },
         };

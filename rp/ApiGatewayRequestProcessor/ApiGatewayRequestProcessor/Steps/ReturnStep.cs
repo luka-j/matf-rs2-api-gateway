@@ -13,7 +13,7 @@ public class ReturnStep : Step
 
     private string _status;
     
-    public override Task<ObjectEntity> Execute(ObjectEntity state)
+    public override Task<ObjectEntity> Execute(ObjectEntity state, Dictionary<string, List<Step>>? stepRepository)
     {
         state.Insert(new Entity { String = state.Substitute(_status) }, ApiOperation.StatusLocation);
         state.Insert(new Entity { Boolean = true }, ApiOperation.FinalStateMarkLocation);

@@ -12,7 +12,7 @@ public class DeleteStep : Step
         set => _resources = value.Split(",").ToList();
     }
 
-    public override Task<ObjectEntity> Execute(ObjectEntity state)
+    public override Task<ObjectEntity> Execute(ObjectEntity state, Dictionary<string, List<Step>>? stepRepository)
     {
         foreach (var res in _resources)
         {

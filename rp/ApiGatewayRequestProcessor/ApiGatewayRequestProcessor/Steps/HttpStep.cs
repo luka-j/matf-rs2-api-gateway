@@ -41,7 +41,7 @@ public class HttpStep : Step
     public string? Result { get; set; }
 
 
-    public override async Task<ObjectEntity> Execute(ObjectEntity state)
+    public override async Task<ObjectEntity> Execute(ObjectEntity state, Dictionary<string, List<Step>>? stepRepository)
     {
         var executionRequest = PackToExecutionRequest(state);
         var response = await _apiGateway.InvokeRequest(executionRequest);
