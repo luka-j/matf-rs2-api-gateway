@@ -48,11 +48,11 @@ public class CopyStep : Step
     {
         foreach (var pair in _copyPairs)
         {
-            if (!pair.From.StartsWith("${") || !pair.From.StartsWith("}"))
+            if (!pair.From.StartsWith("${") || !pair.From.EndsWith("}"))
             {
                 pair.From = "${" + pair.From + "}";
             }
-            if (!pair.To.StartsWith("${") || !pair.To.StartsWith("}"))
+            if (!pair.To.StartsWith("${") || !pair.To.EndsWith("}"))
             {
                 pair.To = "${" + pair.To + "}";
             }

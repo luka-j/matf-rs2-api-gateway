@@ -3,6 +3,7 @@ using System.Text;
 using ApiGatewayApi;
 using ApiGatewayRequestProcessor.Exceptions;
 using Google.Protobuf.Collections;
+using Microsoft.Extensions.Primitives;
 using Serilog;
 
 namespace ApiGatewayRequestProcessor.Utils;
@@ -141,18 +142,48 @@ public static class EntityUtils
             Entity.ContentOneofCase.Boolean => entity.Boolean.ToString(),
             Entity.ContentOneofCase.Decimal => entity.Decimal.ToDecimal().ToString(CultureInfo.InvariantCulture),
             Entity.ContentOneofCase.Integer => entity.Integer.ToString(),
-            Entity.ContentOneofCase.List => "[" + entity.List.Value.Select(c => c.AsString() + ",") + "]",
-            Entity.ContentOneofCase.Object => entity.Object.Properties.Select(e => e.Key + "=>" + e.Value.AsString()).ToString()!,
+            Entity.ContentOneofCase.List => entity.List.AsString(),
+            Entity.ContentOneofCase.Object => entity.Object.AsString(),
             Entity.ContentOneofCase.None => "",
             _ => ""
         };
+    }
+
+    public static string AsString(this ObjectEntity entity)
+    {
+        var result = new StringBuilder();
+        result.Append('{');
+        foreach (var (key, value) in entity.Properties)
+        {
+            result.Append(key).Append(" => ").Append(value.AsString()).Append(", ");
+        }
+
+        result.Remove(result.Length - 2, 2);
+        result.Append('}');
+
+        return result.ToString();
+    }
+
+    public static string AsString(this ListEntity entity)
+    {
+        var result = new StringBuilder();
+        result.Append('[');
+        foreach (var el in entity.Value)
+        {
+            result.Append(el.AsString()).Append(", ");
+        }
+        result.Remove(result.Length - 2, 2);
+        
+        result.Append(']');
+
+        return result.ToString();
     }
 
     public static Entity? Find(this ObjectEntity entity, string target)
     {
         if (!target.StartsWith("${") && !target.EndsWith("}"))
         {
-            throw new ApiRuntimeException("Invalid target to search for: " + target);
+            return null;
         }
 
         var path = target[2..^1].Split(".");
@@ -200,7 +231,7 @@ public static class EntityUtils
             {
                 if (!obj.Properties.ContainsKey(el))
                 {
-                    Log.Warning("Object doesn't contain field {FieldName}. Returning null from find", el);
+                    Log.Debug("Object doesn't contain field {FieldName}. Returning null from find", el);
                     return null;
                 }
 

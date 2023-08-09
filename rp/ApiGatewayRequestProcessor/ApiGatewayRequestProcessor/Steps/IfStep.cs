@@ -33,7 +33,7 @@ public class IfStep : Step
 
             if (_comparisonOperator != ComparisonOperator.Exists)
             {
-                if (parts.Length != 2)
+                if (parts.Length != 3)
                 {
                     throw new ApiConfigException("IfStep condition should have 3 values (comparand1 operator comparand2)");
                 }

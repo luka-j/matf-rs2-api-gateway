@@ -44,7 +44,7 @@ public class ApiOperation
 
     private static ObjectEntity PackExecutionRequest(ExecutionRequest request)
     {
-        return new ObjectEntity
+        var obj = new ObjectEntity
         {
             Properties =
             {
@@ -77,28 +77,57 @@ public class ApiOperation
                         }
                     }
                 },
-                { "body", request.RequestBody },
-                { "headers", request.HeaderParameters.ConvertToObject() },
-                { "query", request.QueryParameters.ConvertToObject() },
-                { "path", request.PathParameters.ConvertToObject() }
             }
         };
+        if (request.RequestBody != null)
+        {
+            obj.Properties.Add("body", request.RequestBody);
+        }
+        if (request.HeaderParameters != null)
+        {
+            obj.Properties.Add("headers", request.HeaderParameters.ConvertToObject());
+        }
+        if (request.QueryParameters != null)
+        {
+            obj.Properties.Add("query", request.QueryParameters.ConvertToObject());
+        }
+        if (request.PathParameters != null)
+        {
+            obj.Properties.Add("path", request.PathParameters.ConvertToObject());
+        }
+
+        return obj;
     }
 
     private static ExecutionResponse UnpackToExecutionResponse(ObjectEntity entity)
     {
-        int status = 200;
+        var response = new ExecutionResponse();
+        var status = 200;
         if (entity.Properties.TryGetValue("status", out var statusEntity))
         {
-            if (statusEntity.ContentCase != Entity.ContentOneofCase.Integer)
+            if (statusEntity.ContentCase == Entity.ContentOneofCase.Integer)
+            {
+                status = (int) statusEntity.Integer;
+            }
+            else if (statusEntity.ContentCase == Entity.ContentOneofCase.String)
+            {
+                if (!int.TryParse(statusEntity.String, out status))
+                {
+                    throw new ApiRuntimeException("Invalid value for status " + statusEntity.String);
+                }
+            }
+            else if (statusEntity.ContentCase == Entity.ContentOneofCase.Boolean)
+            {
+                status = statusEntity.Boolean ? 200 : 500;
+            }
+            else
             {
                 throw new ApiRuntimeException("Invalid type for status " + statusEntity.ContentCase);
             }
-
-            status = (int) statusEntity.Integer;
         }
 
-        PrimitiveOrListObjectEntity? headers = null;
+        response.Status = status;
+
         if (entity.Properties.TryGetValue("headers", out var headersEntity))
         {
             if (headersEntity.ContentCase != Entity.ContentOneofCase.Object)
@@ -107,15 +136,15 @@ public class ApiOperation
                                               ", expected object!");
             }
 
-            headers = headersEntity.Object.ConvertToPrimitiveOrListObjectEntity();
+            response.Headers = headersEntity.Object.ConvertToPrimitiveOrListObjectEntity();
         }
 
-        return new ExecutionResponse
+        if (entity.Properties.TryGetValue("body", out var bodyEntity))
         {
-            Status = status,
-            ResponseBody = entity.Properties["body"],
-            Headers = headers
-        };
+            response.ResponseBody = bodyEntity;
+        }
+
+        return response;
     }
 
     private static bool IsFinalState(ObjectEntity entity)

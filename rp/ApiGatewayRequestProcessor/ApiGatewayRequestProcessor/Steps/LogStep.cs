@@ -1,5 +1,6 @@
 ﻿using ApiGatewayApi;
 using ApiGatewayRequestProcessor.Exceptions;
+using ApiGatewayRequestProcessor.Utils;
 using Serilog.Events;
 using ILogger = Serilog.ILogger;
 
@@ -10,7 +11,7 @@ public class LogStep : Step
     private readonly ILogger _logger = Serilog.Log.Logger;
     
     private LogEventLevel _level;
-    private string? _message;
+    private string _message;
     
     public string Log
     {
@@ -32,7 +33,7 @@ public class LogStep : Step
     
     public override Task<ObjectEntity> Execute(ObjectEntity state)
     {
-        _logger.Write(_level, "{Message}", _message);
+        _logger.Write(_level, "{Message}", state.Substitute(_message));
         return Task.FromResult(state);
     }
 }

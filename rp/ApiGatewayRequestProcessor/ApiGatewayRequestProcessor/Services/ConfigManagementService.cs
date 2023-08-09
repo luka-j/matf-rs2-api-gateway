@@ -22,7 +22,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("DeleteBackendConfig request: {Request}", request);
+            _logger.Information("DeleteConfig request: {Request}", request);
             var status = _repository.DeleteConfig(new ApiIdentifier(request.ApiName, request.ApiVersion));
             if (!status)
             {
@@ -36,7 +36,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("UpdateBackendConfig, ValidFrom: {ValidFrom}", request.ValidFrom);
+            _logger.Information("UpdateConfig, ValidFrom: {ValidFrom}", request.ValidFrom);
             try {
                 _repository.UpdateConfig(request.Data, DateTime.Parse(request.ValidFrom, null, DateTimeStyles.RoundtripKind));
                 return new Empty();
@@ -53,7 +53,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("GetFrontendConfig request: {Request}", request);
+            _logger.Information("GetConfig request: {Request}", request);
             try
             {
                 var configData = _repository.GetCurrentConfig(
@@ -90,7 +90,7 @@ public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         return Task.Run(() =>
         {
-            _logger.Information("GetAllBackendConfigs request: {Request}", request);
+            _logger.Information("GetAllConfigs request: {Request}", request);
             var configMetadata = _repository.GetAllConfigs(DateTime.Now)
                 .Select(metadata => new ConfigMetadata
                 {

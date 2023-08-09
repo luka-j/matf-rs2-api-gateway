@@ -1,6 +1,7 @@
 using ApiGatewayRequestProcessor.Configs;
 using ApiGatewayRequestProcessor.Gateways;
 using ApiGatewayRequestProcessor.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,10 @@ builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
 builder.Services.AddSingleton<ConfigRepository>();
 builder.Services.AddSingleton<ApiGateway>();
+
+Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
+    .WriteTo.Console()
+    .CreateLogger();
 
 var app = builder.Build();
 
