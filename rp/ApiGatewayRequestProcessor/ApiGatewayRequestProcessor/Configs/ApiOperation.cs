@@ -12,6 +12,9 @@ public class ApiOperation
     public bool? Pass { get; set; }
 
     public const string FinalStateMarkLocation = "${__internal.finished}";
+    public const string BreakMarkLocation = "${__internal.break}";
+    
+    public const string StatusLocation = "${status}";
 
     public async Task<ExecutionResponse> Execute(ExecutionRequest request, ApiGateway gateway)
     {
@@ -36,6 +39,12 @@ public class ApiOperation
         foreach (var step in steps)
         {
             state = await step.Execute(state);
+            if (IsBreakState(state))
+            {
+                state.Delete(BreakMarkLocation);
+                break;
+            }
+            
             if (IsFinalState(state)) break;
         }
 
@@ -151,6 +160,12 @@ public class ApiOperation
     {
         var finalStateMark = entity.Find(FinalStateMarkLocation);
         return finalStateMark != null;
+    }
+
+    private static bool IsBreakState(ObjectEntity entity)
+    {
+        var breakStateMark = entity.Find(BreakMarkLocation);
+        return breakStateMark != null;
     }
 
 }
