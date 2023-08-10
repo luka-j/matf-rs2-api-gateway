@@ -2,7 +2,7 @@ using ApiGatewayApi;
 using ApiGatewayRequestProcessor.Exceptions;
 using ApiGatewayRequestProcessor.Utils;
 
-namespace Tests;
+namespace Tests.Utils;
 
 public class EntityUtilsTest
 {

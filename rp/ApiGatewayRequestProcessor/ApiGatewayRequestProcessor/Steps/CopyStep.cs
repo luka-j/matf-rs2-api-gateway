@@ -22,13 +22,22 @@ public class CopyStep : Step
                     throw new ApiConfigException("Invalid copy value: " + fromTo + ". Expected -> symbol somewhere.");
                 }
 
-                var from = fromTo[0];
+                var from = fromTo[0].Trim();
+                var to = fromTo[1].Trim();
                 string? def = null;
                 if (fromTo[0].Contains('/'))
                 {
                     var fromParts = fromTo[0].Split("/");
-                    from = fromParts[0];
+                    from = fromParts[0].Trim();
                     def = fromParts[1].Trim();
+                }
+                if (!from.StartsWith("${") || !from.EndsWith("}"))
+                {
+                    from = "${" + from + "}";
+                }
+                if (!to.StartsWith("${") || !to.EndsWith("}"))
+                {
+                    to = "${" + to + "}";
                 }
                 _copyPairs.Add(new FromToPair
                 {
@@ -36,8 +45,8 @@ public class CopyStep : Step
                         .Replace("\\s", "/")
                         .Replace("\\c", ",")
                         .Replace("\\arr", "->")
-                        .Replace("\\b", "\\").Trim(),
-                    To = fromTo[1].Trim(),
+                        .Replace("\\b", "\\"),
+                    To = to,
                     Default = def
                 });
             }
@@ -48,15 +57,6 @@ public class CopyStep : Step
     {
         foreach (var pair in _copyPairs)
         {
-            if (!pair.From.StartsWith("${") || !pair.From.EndsWith("}"))
-            {
-                pair.From = "${" + pair.From + "}";
-            }
-            if (!pair.To.StartsWith("${") || !pair.To.EndsWith("}"))
-            {
-                pair.To = "${" + pair.To + "}";
-            }
-
             var entity = state.Find(pair.From);
             if (entity != null)
             {
@@ -83,6 +83,10 @@ public class CopyStep : Step
                     entity = new Entity { String = state.Substitute(pair.Default) };
                     state.Insert(entity, pair.To);
                 }
+            }
+            else
+            {
+                throw new ApiRuntimeException("Attempted to copy from non-existing path " + pair.From);
             }
         }
 
