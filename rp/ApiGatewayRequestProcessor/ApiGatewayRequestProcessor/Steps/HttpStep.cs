@@ -1,4 +1,5 @@
 ﻿using ApiGatewayApi;
+using ApiGatewayRequestProcessor.Configs;
 using ApiGatewayRequestProcessor.Exceptions;
 using ApiGatewayRequestProcessor.Gateways;
 using ApiGatewayRequestProcessor.Utils;
@@ -45,7 +46,7 @@ public class HttpStep : Step
     {
         var executionRequest = PackToExecutionRequest(state);
         var response = await _apiGateway.InvokeRequest(executionRequest);
-        var responseEntity = UnpackFromExecutionResponse(response);
+        var responseEntity = ApiOperation.UnpackFromExecutionResponse(response);
         if (Result != null)
         {
             state.Insert(new Entity { Object = responseEntity }, Result);
@@ -118,18 +119,5 @@ public class HttpStep : Step
         }
 
         return executionRequest;
-    }
-
-    private ObjectEntity UnpackFromExecutionResponse(ExecutionResponse response)
-    {
-        return new ObjectEntity
-        {
-            Properties =
-            {
-                { "body", response.ResponseBody },
-                { "headers", response.Headers.ConvertToObject() },
-                { "status", new Entity { Integer = response.Status } }
-            }
-        };
     }
 }

@@ -8,8 +8,10 @@ namespace ApiGatewayRequestProcessor.Configs;
 
 public class ApiOperation
 {
+    public string? Prepare { get; set; }
     public List<Step>? Steps { get; set; }
     public bool? Pass { get; set; }
+    public string? Finalize { get; set; }
 
     public const string FinalStateMarkLocation = "${__internal.finished}";
     public const string BreakMarkLocation = "${__internal.break}";
@@ -19,20 +21,55 @@ public class ApiOperation
     public async Task<ExecutionResponse> Execute(ExecutionRequest request, ApiGateway gateway, 
         Dictionary<string, List<Step>> stepRepository)
     {
+        ExecutionResponse? response = null;
+        var state = PackExecutionRequest(request);
+        if (Prepare != null)
+        {
+            if (!stepRepository.TryGetValue(Prepare, out var prepareSteps))
+            {
+                throw new ApiRuntimeException("Cannot find Prepare steps " + Prepare);
+            }
+            state = await ExecuteSteps(prepareSteps, state, stepRepository);
+            if (IsFinalState(state))
+            {
+                return UnpackToExecutionResponse(state);
+            }
+        }
+
         if (Pass == true)
         {
-            return await gateway.InvokeRequest(request);
+            response = await gateway.InvokeRequest(request);
         }
-
-        if (Steps == null || Steps.Count == 0)
+        else if(Steps != null)
         {
-            throw new ApiRuntimeException("ApiOperation has undefined steps!");
+            state = await ExecuteSteps(Steps, state, stepRepository);
+            if (IsFinalState(state))
+            {
+                return UnpackToExecutionResponse(state);
+            }
         }
 
-        var state = PackExecutionRequest(request);
-        state = await ExecuteSteps(Steps, state, stepRepository);
+        if (Finalize != null)
+        {
+            if (!stepRepository.TryGetValue(Finalize, out var finalizeSteps))
+            {
+                throw new ApiRuntimeException("Cannot find Prepare steps " + Prepare);
+            }
+            if (response != null)
+            {
+                state.Insert(new Entity { Object = UnpackFromExecutionResponse(response) }, "response");
+            }
+            state = await ExecuteSteps(finalizeSteps, state, stepRepository);
+        }
 
-        return UnpackToExecutionResponse(state);
+        if (Pass == true && Steps == null && Finalize == null)
+        {
+            return response!;
+        }
+        else
+        {
+            return UnpackToExecutionResponse(state);
+        }
     }
 
     public static async Task<ObjectEntity> ExecuteSteps(List<Step> steps, ObjectEntity state,
@@ -156,6 +193,19 @@ public class ApiOperation
         }
 
         return response;
+    }
+    
+    public static ObjectEntity UnpackFromExecutionResponse(ExecutionResponse response)
+    {
+        return new ObjectEntity
+        {
+            Properties =
+            {
+                { "body", response.ResponseBody },
+                { "headers", response.Headers.ConvertToObject() },
+                { "status", new Entity { Integer = response.Status } }
+            }
+        };
     }
 
     private static bool IsFinalState(ObjectEntity entity)
