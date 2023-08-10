@@ -32,7 +32,7 @@ public class RequestProcessorService : RequestProcessor.RequestProcessorBase
             throw new RpcException(new Status(StatusCode.NotFound, "API not found"));
         }
 
-        if (!spec.Config.HasOperation(request.Path, request.Method))
+        if (!spec.HasOperation(request.Path, request.Method))
         {
             _logger.Warning("Cannot find operation {Method} {Path} defined in API {ApiName}/{ApiVersion}",
                 request.Method, request.Path, request.ApiName, request.ApiVersion);
@@ -41,7 +41,7 @@ public class RequestProcessorService : RequestProcessor.RequestProcessorBase
 
         try
         {
-            return await spec.Config.Execute(request.Path, request.Method, request, _apiGateway);
+            return await spec.Execute(request.Path, request.Method, request, _apiGateway, _repository, now);
         }
         catch (ApiRuntimeException e)
         {

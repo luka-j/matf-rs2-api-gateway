@@ -1,4 +1,6 @@
-﻿using ApiGatewayRequestProcessor.ApiConfigs;
+﻿using ApiGatewayApi;
+using ApiGatewayRequestProcessor.ApiConfigs;
+using ApiGatewayRequestProcessor.Gateways;
 using ApiGatewayRequestProcessor.Steps;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.BufferedDeserialization;
@@ -33,7 +35,7 @@ public class ApiSpec
     
     public DateTime ValidFrom { get; }
     public string Data { get; }
-    public ApiConfig Config { get;  }
+    internal ApiConfig Config { get; }
 
     public ApiIdentifier Id { get;  }
     
@@ -45,6 +47,18 @@ public class ApiSpec
         Id = new ApiIdentifier(Config.Name, Config.Version);
     }
 
+    public bool HasOperation(string path, string method)
+    {
+        return Config.HasOperation(path, method);
+    }
+
+    public Task<ExecutionResponse> Execute(string path, string method, ExecutionRequest request, ApiGateway apiGateway,
+        ConfigRepository repository, DateTime now)
+    {
+        Config.ResolveIncludes(repository, now);
+        return Config.Execute(path, method, request, apiGateway);
+    }
+    
     public ApiMetadata GetMetadata()
     {
         return new ApiMetadata(Id.Name, Id.Version);
@@ -52,5 +66,23 @@ public class ApiSpec
     public bool IsActive(DateTime now)
     {
         return now >= ValidFrom;
+    }
+
+    protected bool Equals(ApiSpec other)
+    {
+        return ValidFrom.Equals(other.ValidFrom) && Id.Equals(other.Id);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != this.GetType()) return false;
+        return Equals((ApiSpec)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(ValidFrom, Id);
     }
 }

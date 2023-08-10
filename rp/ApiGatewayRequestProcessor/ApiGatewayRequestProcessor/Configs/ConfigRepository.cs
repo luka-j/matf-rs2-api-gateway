@@ -37,6 +37,7 @@ public class ConfigRepository
 
         _configs[id].Add(parsedConfig);
         Prune(now);
+        parsedConfig.Config.ResolveIncludes(this, validFrom);
     }
 
     public bool HasConfig(ApiIdentifier id)
