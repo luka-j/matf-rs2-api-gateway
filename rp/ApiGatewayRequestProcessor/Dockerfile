@@ -3,16 +3,16 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0.102-bullseye-slim-amd64 AS build
 WORKDIR /src
-COPY ["ApiGatewayApi/ApiGatewayApi.csproj", "ApiGatewayApi/"]
-RUN dotnet restore "ApiGatewayApi/ApiGatewayApi.csproj"
+COPY ["ApiGatewayRequestProcessor/ApiGatewayRequestProcessor.csproj", "ApiGatewayRequestProcessor/"]
+RUN dotnet restore "ApiGatewayRequestProcessor/ApiGatewayRequestProcessor.csproj"
 COPY . .
-WORKDIR "/src/ApiGatewayApi"
-RUN dotnet build "ApiGatewayApi.csproj" -r linux-arm64 -c Release -o /app/build --self-contained
+WORKDIR "/src/ApiGatewayRequestProcessor"
+RUN dotnet build "ApiGatewayRequestProcessor.csproj" -r linux-arm64 -c Release -o /app/build --self-contained
 
 FROM build AS publish
-RUN dotnet publish "ApiGatewayApi.csproj" -r linux-arm64 -c Release -o /app/publish --self-contained
+RUN dotnet publish "ApiGatewayRequestProcessor.csproj" -r linux-arm64 -c Release -o /app/publish --self-contained
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ApiGatewayApi.dll"]
+ENTRYPOINT ["dotnet", "ApiGatewayRequestProcessor.dll"]
