@@ -118,7 +118,7 @@ public class HttpRequester
 
     private void PopulateContent(HttpRequestMessage message, Entity? body, PrimitiveOrListObjectEntity? headers)
     {
-        if (body != null)
+        if (body != null && body.ContentCase != Entity.ContentOneofCase.None)
         {
             var requestBody = _entityMapper.MapToJsonNode(body);
             var content = JsonContent.Create(requestBody);

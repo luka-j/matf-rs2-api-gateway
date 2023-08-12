@@ -24,7 +24,7 @@ public class RequestProcessorGateway
     {
         if (Environment.GetEnvironmentVariable("MOCK_GRPC") == null)
         {
-            _channel = GrpcChannel.ForAddress("http://request-processor-svc:5000");
+            _channel = GrpcChannel.ForAddress("http://localhost:5001");
             _client = new RequestProcessor.RequestProcessorClient(_channel);
         }
         else

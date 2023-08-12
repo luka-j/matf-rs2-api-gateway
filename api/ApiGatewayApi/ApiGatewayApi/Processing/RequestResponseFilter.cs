@@ -429,26 +429,29 @@ public partial class RequestResponseFilter
         PrimitiveOrListObjectEntity queryParams)
     {
         var paramGroups = spec.GroupBy(param => param.In);
+        var filteredPath = new PrimitiveObjectEntity();
+        var filteredHeaders = new PrimitiveOrListObjectEntity();
+        var filteredQuery = new PrimitiveOrListObjectEntity();
         foreach (var group in paramGroups)
         {
             switch (group.Key)
             {
-                case ParameterLocation.Query:
-                    queryParams = FilterPrimitiveOrListObject(group, queryParams);
-                    break;
                 case ParameterLocation.Path:
-                    pathParams = FilterPrimitiveObject(group, pathParams);
+                    filteredPath = FilterPrimitiveObject(group, pathParams);
                     break;
                 case ParameterLocation.Header:
-                    headerParams = FilterPrimitiveOrListObject(group, headerParams);
+                    filteredHeaders = FilterPrimitiveOrListObject(group, headerParams);
+                    break;
+                case ParameterLocation.Query:
+                    filteredQuery = FilterPrimitiveOrListObject(group, queryParams);
                     break;
                 case ParameterLocation.Cookie:
                     _logger.Warning("Cookie parameters are not currently supported, ignoring");
                     break;
             }
         }
-        return new Tuple<PrimitiveObjectEntity, PrimitiveOrListObjectEntity, PrimitiveOrListObjectEntity>(pathParams,
-            headerParams, queryParams);
+        return new Tuple<PrimitiveObjectEntity, PrimitiveOrListObjectEntity, PrimitiveOrListObjectEntity>(filteredPath,
+            filteredHeaders, filteredQuery);
     }
 
     public PrimitiveOrListObjectEntity FilterPrimitiveOrListObject(

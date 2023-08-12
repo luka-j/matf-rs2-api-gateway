@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO.Pipelines;
+using System.Text;
 using System.Text.Json.Nodes;
 using ApiGatewayApi.ApiConfigs;
 using ApiGatewayApi.Controllers;
@@ -11,7 +12,7 @@ namespace ApiGatewayApi.Processing;
 
 public class RequestExecutor
 {
-    private readonly Serilog.ILogger _logger = Serilog.Log.Logger;
+    private static readonly Serilog.ILogger Logger = Serilog.Log.Logger;
     
     private readonly ApiRepository _apis;
     private readonly EntityMapper _entityMapper;
@@ -50,6 +51,7 @@ public class RequestExecutor
 
     private async ValueTask PopulateHttpResponse(ExecutionResponse response, OpenApiOperation spec, HttpResponse httpResponse)
     {
+        Logger.Debug("Populating HttpResponse from ExecutionResponse {ExecutionResponse}", response);
         if (!spec.Responses.TryGetValue(response.Status.ToString(), out var responseSpec))
         {
             throw new ApiRuntimeException("Undefined response status " + response.Status);
@@ -58,23 +60,32 @@ public class RequestExecutor
         var filteredHeaders = _filter.FilterHeaders(responseSpec.Headers, response.Headers);
         if (filteredHeaders != null)
         {
+            Logger.Debug("Populating headers from entity {FilteredHeaders}", filteredHeaders);
             PopulateHttpHeaders(filteredHeaders, httpResponse.Headers);
         }
 
         httpResponse.Headers.ContentType = "application/json";
-        
         httpResponse.StatusCode = response.Status;
-        await httpResponse.StartAsync();
         
         var filteredResponse = _filter.FilterBody(responseSpec, response.ResponseBody);
+        string? responseString = null;
         if (filteredResponse != null)
         {
             var parsedResponse = _entityMapper.MapToJsonNode(filteredResponse);
-            var responseString = parsedResponse.ToJsonString();
-            await httpResponse.Body.WriteAsync(Encoding.UTF8.GetBytes(responseString));
+            responseString = parsedResponse.ToJsonString();
+            httpResponse.ContentLength = responseString.Length;
+        }
+        
+        Logger.Debug("Sending response (body: {Body}) to caller", responseString);
+
+        await httpResponse.StartAsync();
+        if (responseString != null)
+        {
+            await httpResponse.BodyWriter.WriteAsync(Encoding.UTF8.GetBytes(responseString));
         }
 
         await httpResponse.CompleteAsync();
+        Logger.Debug("Finished sending off http response");
     }
 
     private void PopulateHttpHeaders(PrimitiveOrListObjectEntity data, IHeaderDictionary headers)
@@ -92,26 +103,21 @@ public class RequestExecutor
                     break;
             }
         }
+        Logger.Debug("Finished populating headers, result is {Headers}", headers);
     }
     
     private async Task<ExecutionRequest> MakeExecutionRequest(ApiConfig config, string path, string specPath, 
         OpenApiOperation operation, HttpRequest httpRequest, RequestMetadata requestMetadata)
     {
+        Logger.Debug("Making ExecutionRequest for {Path} (spec: {SpecPath}), resolved operation {@Operation}",
+            path, specPath, operation);
         var headers = httpRequest.Headers;
         var query = httpRequest.Query;
         Entity? bodyEntity = null;
-        if (httpRequest.ContentLength != null)
+        if (httpRequest.ContentLength is > 0)
         {
-            var body = await httpRequest.BodyReader.ReadAsync();
-            if (body.IsCompleted)
-            {
-                bodyEntity = _entityMapper.MapToEntity(JsonNode.Parse(Encoding.UTF8.GetString(body.Buffer))!);
-            }
-            else
-            {
-                _logger.Error("Failed to read body, content: ${Body}", body);
-                throw new ApiRuntimeException("Failed to read request body");
-            }
+            var bodyString = await ReadBody(httpRequest);
+            bodyEntity = _entityMapper.MapToEntity(JsonNode.Parse(bodyString)!);
         }
 
         var headersEntity = new PrimitiveOrListObjectEntity();
@@ -127,8 +133,8 @@ public class RequestExecutor
         var (filteredPath, filteredQuery, filteredHeaders) = 
             _filter.FilterParams(operation.Parameters, pathEntity, headersEntity, queryEntity);
         var filteredBody = _filter.FilterBody(operation.RequestBody, bodyEntity);
-
-        return new ExecutionRequest
+        
+        var ret = new ExecutionRequest
         {
             ApiName = config.Id.Name,
             ApiVersion = config.Id.Version,
@@ -140,10 +146,31 @@ public class RequestExecutor
             RequestBody = filteredBody,
             RequestMetadata = requestMetadata,
         };
+        Logger.Debug("Made execution request: {ExecutionRequest}", ret);
+        return ret;
+    }
+
+    private async Task<string> ReadBody(HttpRequest request)
+    {
+        var body = new StringBuilder();
+        ReadResult readResult;
+        do
+        {
+            readResult = await request.BodyReader.ReadAsync();
+            body.Append(Encoding.UTF8.GetString(readResult.Buffer));
+            request.BodyReader.AdvanceTo(readResult.Buffer.Start, readResult.Buffer.End);
+        } while (readResult is { IsCompleted: false, IsCanceled: false });
+
+        await request.BodyReader.CompleteAsync();
+
+        var bodyString = body.ToString();
+        Logger.Debug("Read request body: {BodyString}", bodyString);
+        return bodyString;
     }
 
     private Tuple<string, ApiConfig, OpenApiOperation?> ResolveOperation(string path, DateTime now, HttpRequest request)
     {
+        Logger.Debug("Resolving operation for path {Path}, now is {Now}", path, now);
         var pathSegments = path.Split('/', 3);
         if (pathSegments.Length < 3)
         {
@@ -173,12 +200,16 @@ public class RequestExecutor
             return new Tuple<string, ApiConfig, OpenApiOperation?>(pathItem.SpecPath, currentConfig, null);
         }
 
+        Logger.Debug("Resolved operation {Operation} from config {ConfigId}", oasOperation.Value, 
+            currentConfig.Id);
         return new Tuple<string, ApiConfig, OpenApiOperation?>(oasOperation.Value.Key, currentConfig,
             oasOperation.Value.Value);
     }
 
     private static PrimitiveObjectEntity ExtractPathParams(string realPath, string pathWithParams)
     {
+        Logger.Debug("Extracting path params from {PathWithParams} (template: {SpecPath})",
+            realPath, pathWithParams);
         var trimmedPathSegments = realPath.Split('/')[2..];
         if (pathWithParams.StartsWith('/'))
         {
@@ -202,6 +233,7 @@ public class RequestExecutor
             }
         }
 
+        Logger.Debug("Extracted path params: {PathParams}", pathParams);
         return pathParams;
     }
 }

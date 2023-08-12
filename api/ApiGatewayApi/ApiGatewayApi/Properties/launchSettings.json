@@ -6,8 +6,7 @@
       "launchBrowser": false,
       "applicationUrl": "http://localhost:5000;http://localhost:8080",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "MOCK_GRPC": "1"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }

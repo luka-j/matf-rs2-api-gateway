@@ -25,9 +25,9 @@ public class ControllerUtils
     public string GenerateRequestId()
     {
         var idChars = new char[12];
-        for (int i = 0; i < idChars.Length; i++)
+        for (var i = 0; i < idChars.Length; i++)
         {
-            idChars[i] = idChars[_random.Next(idChars.Length)];
+            idChars[i] = Chars[_random.Next(Chars.Length)];
         }
 
         return new string(idChars);
