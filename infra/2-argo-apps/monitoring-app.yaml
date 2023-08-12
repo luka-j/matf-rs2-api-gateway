@@ -25,6 +25,8 @@ spec:
                  hosts:
                   - grafana-rs2.luka-j.rocks
           prometheus:
+            prometheusSpec:
+              retention: 2d
             ingress:
               enabled: true
               ingressClassName: nginx
