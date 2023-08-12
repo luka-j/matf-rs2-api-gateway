@@ -1,0 +1,25 @@
+name: test
+version: v1
+endpoints:
+  testep:
+    operations:
+      get:
+        steps:
+        - insert: 'value'
+          to: 'data.list[*]'
+        - insert: 'another'
+          to: 'data.list[*]'
+        - insert: 'Request id is ${request.id}'
+          to: 'data.message'
+        - copy: '${data} -> ${out}'
+        - log: 'Information Out ${out}'
+        - if: '${out.list[0]} equals value'
+          then:
+          - log: 'Information Is!'
+          else:
+          - log: 'Error Is not!'
+        - foreach: 'element : ${out.list}'
+          do:
+          - log: 'Information List element is ${element}'
+        - return: 204
+        - log: 'Error this is unreachable!'

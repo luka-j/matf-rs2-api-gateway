@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGatewayRequestProcessor", "ApiGatewayRequestProcessor\ApiGatewayRequestProcessor.csproj", "{4957509B-F015-4917-982D-16C2C29F44E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{E7C84B6B-F623-413F-A4FD-324AEE4EE879}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4957509B-F015-4917-982D-16C2C29F44E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4957509B-F015-4917-982D-16C2C29F44E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4957509B-F015-4917-982D-16C2C29F44E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4957509B-F015-4917-982D-16C2C29F44E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7C84B6B-F623-413F-A4FD-324AEE4EE879}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7C84B6B-F623-413F-A4FD-324AEE4EE879}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7C84B6B-F623-413F-A4FD-324AEE4EE879}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7C84B6B-F623-413F-A4FD-324AEE4EE879}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
