@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}-api
+  IMAGE_NAME: ${{ github.repository }}-rp
   DOCKERFILE_DIR: rp/ApiGatewayRequestProcessor
   DEPLOYMENT_PATH: rp/k8s-resources/deployment.yaml
 
