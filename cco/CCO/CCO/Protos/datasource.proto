@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+option csharp_namespace = "CCO";
+
+package datasource;
+
+service Datasource {
+  rpc GetDatasource (GetDatasourceRequest) returns (GetDatasourceResponse);
+  rpc GetDatasources (GetDatasourcesRequest) returns (GetDatasourcesResponse);
+  rpc AddDatasource (AddDatasourceRequest) returns (AddDatasourceResponse);
+  rpc UpdateDatasource (UpdateDatasourceRequest) returns (UpdateDatasourceResponse);
+  rpc DeleteDatasource (DeleteDatasourceRequest) returns (DeleteDatasourceResponse);
+}
+
+message GetDatasourceRequest {
+  string name = 1;
+}
+
+message GetDatasourceResponse {
+  string name = 1;
+  string type = 2;
+  string url = 3;
+  string username = 4;
+  string password = 5;
+}
+
+message GetDatasourcesRequest {
+}
+
+message GetDatasourcesResponse {
+  repeated GetDatasourceResponse datasources = 1;
+}
+
+message AddDatasourceRequest {
+  string name = 1;
+  string type = 2;
+  string url = 3;
+  string username = 4;
+  string password = 5;
+}
+
+message AddDatasourceResponse {
+  string message = 1;
+}
+
+message UpdateDatasourceRequest {
+  string name = 1;
+  string type = 2;
+  string url = 3;
+  string username = 4;
+  string password = 5;
+}
+
+message UpdateDatasourceResponse {
+  string message = 1;
+}
+
+message DeleteDatasourceRequest {
+  string name = 1;
+}
+
+message DeleteDatasourceResponse {
+  string message = 1;
+}
