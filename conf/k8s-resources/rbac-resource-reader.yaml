@@ -10,4 +10,4 @@ subjects:
 roleRef:
   kind: Role
   name: resource-reader
-  apiGroup: rbac.authorization.k8s.io
+  apiGroup: ""
