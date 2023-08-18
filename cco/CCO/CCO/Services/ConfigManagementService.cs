@@ -1,11 +1,10 @@
-using CCO.CCOConfigs;
-using Google.Protobuf.WellKnownTypes;
-using Grpc.Core;
 using System.Globalization;
+using CCO.CCOConfigs;
+using Grpc.Core;
 
-namespace GrpcServer.Services
+namespace CCO.Services
 {
-    public class ConfigManagementService : ConfigManagement
+    public class ConfigManagementService : CCOConfigManagement.CCOConfigManagementBase
     {
         private readonly CCORepository _repository;
 
@@ -14,18 +13,17 @@ namespace GrpcServer.Services
             _repository = repository;
         }
 
-        public override Task<ConfigData> GetBackendConfig(ConfigId request, ServerCallContext context)
+        public override Task<ConfigData> GetConfig(ConfigId request, ServerCallContext context)
         {
             return Task.Run(() =>
             {
-                _logger.Information("GetBackendConfig request: {Request}", request);
                 try
                 {
-                    var configData = _repository.Backends.GetCurrentConfig(
-                        new ApiIdentifier(request.ApiName, request.ApiVersion), DateTime.Now);
+                    var configData = _repository.GetCurrentConfig(
+                        new CCOIdentifier(request.CcoName, request.CcoVersion), DateTime.Now);
                     return new ConfigData
                     {
-                        Data = configData?.GetSpecString(),
+                        Data = configData?.GetDataString(),
                         ValidFrom = configData?.ValidFrom.ToString("O")
                     };
                 }
@@ -36,12 +34,11 @@ namespace GrpcServer.Services
             });
         }
 
-        public override Task<Empty> DeleteBackendConfig(ConfigId request, ServerCallContext context)
+        public override Task<Empty> DeleteConfig(ConfigId request, ServerCallContext context)
         {
             return Task.Run(() =>
             {
-                _logger.Information("DeleteBackendConfig request: {Request}", request);
-                var status = _repository.Backends.DeleteConfig(new ApiIdentifier(request.ApiName, request.ApiVersion));
+                var status = _repository.DeleteConfig(new CCOIdentifier(request.CcoName, request.CcoVersion));
                 if (!status)
                 {
                     throw new RpcException(new Status(StatusCode.NotFound, "Failed to delete Config"));
@@ -50,71 +47,16 @@ namespace GrpcServer.Services
             });
         }
 
-        public override Task<Empty> UpdateBackendConfig(ConfigData request, ServerCallContext context)
+        public override Task<Empty> UpdateConfig(ConfigData request, ServerCallContext context)
         {
             return Task.Run(() =>
             {
-                _logger.Information("UpdateBackendConfig, ValidFrom: {ValidFrom}", request.ValidFrom);
                 try
                 {
-                    _repository.Backends.AddConfig(new ApiSpec(request.Data, DateTime.Parse(request.ValidFrom, null, DateTimeStyles.RoundtripKind)));
+                    _repository.AddConfig(new CCOSpec(request.Data, DateTime.Parse(request.ValidFrom, null, DateTimeStyles.RoundtripKind)));
                     return new Empty();
                 }
-                catch (ApiConfigException ex)
-                {
-                    throw new RpcException(new Status(StatusCode.InvalidArgument, ex.Message));
-                }
-            });
-        }
-
-
-        public override Task<ConfigData> GetFrontendConfig(ConfigId request, ServerCallContext context)
-        {
-            return Task.Run(() =>
-            {
-                _logger.Information("GetFrontendConfig request: {Request}", request);
-                try
-                {
-                    var configData = _repository.Frontends.GetCurrentConfig(
-                        new ApiIdentifier(request.ApiName, request.ApiVersion), DateTime.Now);
-                    return new ConfigData
-                    {
-                        Data = configData?.GetSpecString(),
-                        ValidFrom = configData?.ValidFrom.ToString("O")
-                    };
-                }
-                catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException)
-                {
-                    throw new RpcException(new Status(StatusCode.NotFound, "No active Config with such id exists"));
-                }
-            });
-        }
-
-        public override Task<Empty> DeleteFrontendConfig(ConfigId request, ServerCallContext context)
-        {
-            return Task.Run(() =>
-            {
-                _logger.Information("DeleteFrontendConfig request: {Request}", request);
-                var status = _repository.Frontends.DeleteConfig(new ApiIdentifier(request.ApiName, request.ApiVersion));
-                if (!status)
-                {
-                    throw new RpcException(new Status(StatusCode.NotFound, "Failed to delete Config"));
-                }
-                return new Empty();
-            });
-        }
-
-        public override Task<Empty> UpdateFrontendConfig(ConfigData request, ServerCallContext context)
-        {
-            return Task.Run(() =>
-            {
-                _logger.Information("UpdateFrontendConfig ValidFrom: {ValidFrom}", request.ValidFrom);
-                try
-                {
-                    _repository.Frontends.AddConfig(new ApiSpec(request.Data, DateTime.Parse(request.ValidFrom, null, DateTimeStyles.RoundtripKind)));
-                    return new Empty();
-                }
-                catch (ApiConfigException ex)
+                catch (Exception ex)
                 {
                     throw new RpcException(new Status(StatusCode.InvalidArgument, ex.Message));
                 }
@@ -126,52 +68,30 @@ namespace GrpcServer.Services
             return Task.Run(() =>
             {
                 DateTime now = DateTime.Now;
-                _logger.Information("RevertPendingUpdates, time: {Now}", now);
-                int revertedFrontends = _repository.Frontends.RevertPendingChanges(now);
-                int revertedBackends = _repository.Backends.RevertPendingChanges(now);
+                int reverted = _repository.RevertPendingChanges(now);
                 return new RevertChangesResponse
                 {
-                    RevertedFrontends = revertedFrontends,
-                    RevertedBackends = revertedBackends
+                    Reverted = reverted,
                 };
             });
         }
 
 
-        public override Task<ConfigList> GetAllBackendConfigs(Empty request, ServerCallContext context)
+        public override Task<ConfigList> GetAllConfigs(Empty request, ServerCallContext context)
         {
             return Task.Run(() =>
             {
-                _logger.Information("GetAllBackendConfigs request: {Request}", request);
-                var configMetadata = _repository.Backends.GetAllConfigsMetadata(DateTime.Now)
-                    .Select(metadata => new ConfigMetadata
+                var configIds = _repository.GetAllConfigs(DateTime.Now)
+                    .Select(id => new ConfigId
                     {
-                        ApiName = metadata.Name,
-                        ApiVersion = metadata.Version,
-                        BasePath = metadata.BasePath
+                        CcoName = id.Name,
+                        CcoVersion = id.Version,
                     });
                 var ret = new ConfigList();
-                ret.Configs.AddRange(configMetadata);
+                ret.Configs.AddRange(configIds);
                 return ret;
             });
         }
 
-        public override Task<ConfigList> GetAllFrontendConfigs(Empty request, ServerCallContext context)
-        {
-            return Task.Run(() =>
-            {
-                _logger.Information("GetAllBackendConfigs request: {Request}", request);
-                var configMetadata = _repository.Frontends.GetAllConfigsMetadata(DateTime.Now)
-                    .Select(metadata => new ConfigMetadata
-                    {
-                        ApiName = metadata.Name,
-                        ApiVersion = metadata.Version,
-                        BasePath = metadata.BasePath
-                    });
-                var ret = new ConfigList();
-                ret.Configs.AddRange(configMetadata);
-                return ret;
-            });
-        }
     }
 }
