@@ -4,10 +4,10 @@ metadata:
   name: read-pods-services
   namespace: api-gateway
 subjects:
-- kind: User
+- kind: ServiceAccount
   name: conf-sa
   apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: Role
   name: resource-reader
-  apiGroup: ""
+  apiGroup: rbac.authorization.k8s.io
