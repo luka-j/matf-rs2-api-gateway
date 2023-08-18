@@ -32,9 +32,15 @@ spec:
         - name: "GitHubSettings__GitHubRepoName"
           value: "rs2-config-repo"
         - name: "GitHubSettings__GitUserName"
-          value: "Configurator"
-        - name: "GitHubSettings__GitEmail"
-          value: "****@****.***"
+          valueFrom:
+            secretKeyRef:
+              name: conf-secret
+              key: github_username
+        - name: "GithubSettings__GitPassword"
+          valueFrom:
+             secretKeyRef:
+               name: conf-secret
+               key: github_password
         - name: "AuthSettings__UseAuth"
           value: "true"
         - name: "AuthSettings__AuthUrl"
