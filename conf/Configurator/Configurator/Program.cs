@@ -32,7 +32,7 @@ if (bool.Parse(builder.Configuration["UseKubernetes"]))
 
     string namespaceName = "api-gateway";
 
-    V1PodList podList = client.ListNamespacedPod(namespaceName, labelSelector: "app:api");
+    V1PodList podList = client.ListNamespacedPod(namespaceName, labelSelector: "app=api");
     foreach (V1Pod pod in podList.Items)
     {
         var name = pod.Metadata.Name;
