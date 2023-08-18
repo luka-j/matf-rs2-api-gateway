@@ -1,7 +1,7 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0.2-bullseye-slim-arm64v8 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.21-bullseye-slim-arm64v8 AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0.102-bullseye-slim-amd64 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0.413-bullseye-slim-amd64 AS build
 WORKDIR /src
 COPY ["Configurator/Configurator.csproj", "Configurator/"]
 RUN dotnet restore "Configurator/Configurator.csproj"
