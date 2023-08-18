@@ -12,9 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-
-
 builder.Services.AddControllers();
 
 if (bool.Parse(builder.Configuration["GitHubSettings:UseGitHub"]))

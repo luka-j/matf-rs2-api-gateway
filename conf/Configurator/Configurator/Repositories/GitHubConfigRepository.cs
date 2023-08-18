@@ -1,6 +1,5 @@
 ﻿using Configurator.Entities;
 using LibGit2Sharp;
-using Microsoft.Alm.Authentication;
 
 namespace Configurator.Repositories
 {
@@ -12,7 +11,8 @@ namespace Configurator.Repositories
 
         private readonly string _repositoryName;
         private readonly string _repositoryURL;
-        private readonly string _gitUserName;
+        private readonly string _gitUsername;
+        private readonly string _gitPassword;
         private readonly string _gitEmail;
 
         public GitHubConfigRepository(IConfiguration configuration)
@@ -20,7 +20,8 @@ namespace Configurator.Repositories
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _repositoryName = _configuration["GitHubSettings:GitHubRepoName"];
             _repositoryURL = _configuration["GithubSettings:GitHubRepoURL"];
-            _gitUserName = _configuration["GithubSettings:GitUserName"];
+            _gitUsername = _configuration["GithubSettings:GitUsername"];
+            _gitPassword = _configuration["GithubSettings:GitPassword"];
             _gitEmail = _configuration["GithubSettings:GitEmail"];
 
             var options = new CloneOptions
@@ -58,21 +59,13 @@ namespace Configurator.Repositories
             return result;
         }
 
-        private static Credential GetCredentials()
+        private LibGit2Sharp.Handlers.CredentialsHandler GetCredentialsHandler()
         {
-            var secrets = new SecretStore("git");
-            var auth = new BasicAuthentication(secrets);
-            return auth.GetCredentials(new TargetUri("https://github.com"));
-        }
-
-        private static LibGit2Sharp.Handlers.CredentialsHandler GetCredentialsHandler()
-        {
-            var creds = GetCredentials();
 
             return (_url, _user, _cred) => new UsernamePasswordCredentials
             {
-                Username = creds.Username,
-                Password = creds.Password
+                Username = _gitUsername,
+                Password = _gitPassword
             };
         }
         private void CommitAndPush()
@@ -84,7 +77,7 @@ namespace Configurator.Repositories
 
             Commands.Stage(repo, "*");
 
-            var sig = new Signature(_gitUserName, _gitEmail, DateTimeOffset.Now);
+            var sig = new Signature(_gitUsername, _gitEmail, DateTimeOffset.Now);
             repo.Commit("config-" + DateTime.Now.ToString(), sig, sig);
 
             PushOptions options = new()
@@ -109,7 +102,7 @@ namespace Configurator.Repositories
                 }
             };
 
-            Commands.Pull(repo, new Signature(_gitUserName, _gitEmail, DateTimeOffset.Now), pullOptions);
+            Commands.Pull(repo, new Signature(_gitUsername, _gitEmail, DateTimeOffset.Now), pullOptions);
             InitDirectories();
         }
     }
