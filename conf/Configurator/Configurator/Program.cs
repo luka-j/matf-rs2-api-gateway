@@ -12,9 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-
-
 builder.Services.AddControllers();
 
 if (bool.Parse(builder.Configuration["GitHubSettings:UseGitHub"]))
@@ -34,20 +31,13 @@ if (bool.Parse(builder.Configuration["UseKubernetes"]))
     var APIPort = builder.Configuration["APIPort"];
 
     string namespaceName = "api-gateway";
-    string serviceName = "api-service";
 
-    V1Service service = client.ReadNamespacedService(serviceName, namespaceName);
-
-    var selectorLabels = service.Spec.Selector;
-    V1PodList podList = client.ListNamespacedPod(namespaceName, labelSelector: string.Join(",", selectorLabels));
+    V1PodList podList = client.ListNamespacedPod(namespaceName, labelSelector: "app=api");
     foreach (V1Pod pod in podList.Items)
     {
-        if (pod.Metadata.Labels["app"] == "api")
-        {
-            var name = pod.Metadata.Name;
-            var URI = pod.Status.PodIP + ":" + APIPort;
-            builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>(name, op => op.Address = new Uri(URI));
-        }
+        var name = pod.Metadata.Name;
+        var URI = pod.Status.PodIP + ":" + APIPort;
+        builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>(name, op => op.Address = new Uri(URI));
     }
 }
 else

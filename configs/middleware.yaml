@@ -1,0 +1,7 @@
+name: petstore
+version: 1.0.11
+endpoints:
+  /store/inventory:
+    operations:
+      get:
+        pass: true
