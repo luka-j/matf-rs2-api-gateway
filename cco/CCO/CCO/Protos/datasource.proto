@@ -4,61 +4,83 @@ option csharp_namespace = "CCO";
 
 package datasource;
 
-service Datasource {
-  rpc GetDatasource (GetDatasourceRequest) returns (GetDatasourceResponse);
-  rpc GetDatasources (GetDatasourcesRequest) returns (GetDatasourcesResponse);
-  rpc AddDatasource (AddDatasourceRequest) returns (AddDatasourceResponse);
-  rpc UpdateDatasource (UpdateDatasourceRequest) returns (UpdateDatasourceResponse);
-  rpc DeleteDatasource (DeleteDatasourceRequest) returns (DeleteDatasourceResponse);
+service DatasourceOperations {
+  rpc DatabaseRead (DatabaseReadRequest) returns (DatabaseReadResponse);
+  rpc DatabaseWrite (DatabaseWriteRequest) returns (DatabaseWriteResponse);
+  rpc DatabaseDelete (DatabaseDeleteRequest) returns (DatabaseDeleteResponse);
+
+  rpc CacheRead (CacheReadRequest) returns (CacheReadResponse);
+  rpc CacheWrite (CacheWriteRequest) returns (CacheWriteResponse);
+
+  rpc QueueRead (QueueReadRequest) returns (QueueReadResponse);
+  rpc QueueWrite (QueueWriteRequest) returns (QueueWriteResponse);
 }
 
-message GetDatasourceRequest {
-  string name = 1;
+
+message Id {
+  string ccoName = 1;
+  string ccoVersion = 2;
 }
 
-message GetDatasourceResponse {
-  string name = 1;
-  string type = 2;
-  string url = 3;
-  string username = 4;
-  string password = 5;
+message DatabaseReadRequest {
+	Id id = 1;
+	// 
 }
 
-message GetDatasourcesRequest {
+message DatabaseReadResponse {
+	//
 }
 
-message GetDatasourcesResponse {
-  repeated GetDatasourceResponse datasources = 1;
+message DatabaseWriteRequest {
+	Id id = 1;
+	// 
 }
 
-message AddDatasourceRequest {
-  string name = 1;
-  string type = 2;
-  string url = 3;
-  string username = 4;
-  string password = 5;
+message DatabaseWriteResponse {
+	//
 }
 
-message AddDatasourceResponse {
-  string message = 1;
+message DatabaseDeleteRequest {
+	Id id = 1;
+	// 
 }
 
-message UpdateDatasourceRequest {
-  string name = 1;
-  string type = 2;
-  string url = 3;
-  string username = 4;
-  string password = 5;
+message DatabaseDeleteResponse {
+	//
 }
 
-message UpdateDatasourceResponse {
-  string message = 1;
+message CacheReadRequest {
+	Id id = 1;
+	// 
 }
 
-message DeleteDatasourceRequest {
-  string name = 1;
+message CacheReadResponse {
+	//
 }
 
-message DeleteDatasourceResponse {
-  string message = 1;
+message CacheWriteRequest {
+	Id id = 1;
+	// 
+}
+
+message CacheWriteResponse {
+	//
+}
+
+message QueueReadRequest {
+	Id id = 1;
+	// 
+}
+
+message QueueReadResponse {
+	//
+}
+
+message QueueWriteRequest {
+	Id id = 1;
+	// 
+}
+
+message QueueWriteResponse {
+	//
 }
