@@ -38,6 +38,17 @@ spec:
               -  secretName: prometheus-tls-secret
                  hosts:
                   - prometheus-rs2.luka-j.rocks
+            additionalServiceMonitors:
+            - name: "aspnet-metrics-sm"
+              selector:
+                matchLabels:
+                  monitoring: aspnet-metrics
+              namespaceSelector:
+                matchNames:
+                - api-gateway
+              endpoints:
+              - port: http
+                path: /metrics
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
