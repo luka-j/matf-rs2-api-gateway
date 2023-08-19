@@ -1,6 +1,6 @@
 ﻿namespace CCO.Entities
 {
-    public class YamlResponse
+    public class Spec
     {
         public string Title { get; set; }
         public string Version { get; set; }
@@ -8,7 +8,7 @@
         public IEnumerable<Datasource> Caches { get; set; }
         public IEnumerable<Datasource> Queues { get; set; }
 
-        public YamlResponse(string title, string version, IEnumerable<Datasource> databases, IEnumerable<Datasource> caches, IEnumerable<Datasource> queues)
+        public Spec(string title, string version, IEnumerable<Datasource> databases, IEnumerable<Datasource> caches, IEnumerable<Datasource> queues)
         {
             Title = title ?? throw new ArgumentNullException(nameof(title));
             Version = version ?? throw new ArgumentNullException(nameof(version));

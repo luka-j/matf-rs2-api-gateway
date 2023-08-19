@@ -8,7 +8,7 @@ namespace CCO.CCOConfigs
     {
         public DateTime ValidFrom { get; }
         public CCOIdentifier Id { get; }
-        public YamlResponse Data { get; }
+        public Spec Data { get; }
 
 
         public CCOConfig(DateTime validFrom, string yamlString)
@@ -16,8 +16,6 @@ namespace CCO.CCOConfigs
             ValidFrom = validFrom;
             Data = ParseYamlString(yamlString);
             Id = new CCOIdentifier(Data.Title, Data.Version);
-
-            Console.WriteLine($"Name: {Data.Databases.ElementAt(1).Name}");
         }
 
         public bool IsActive(DateTime now)
@@ -25,13 +23,13 @@ namespace CCO.CCOConfigs
             return now >= ValidFrom;
         }
 
-        public YamlResponse ParseYamlString(string yamlString)
+        public Spec ParseYamlString(string yamlString)
         {
             var deserializer = new DeserializerBuilder()
                 .WithNamingConvention(UnderscoredNamingConvention.Instance)
                 .Build();
 
-            return deserializer.Deserialize<YamlResponse>(yamlString);
+            return deserializer.Deserialize<Spec>(yamlString);
         }
         public string GetDataString()
         {
