@@ -32,7 +32,7 @@ public class ExposedApisController : ControllerBase
             await _requestExecutor.ExecuteRequest(path, now, new RequestMetadata
             {
                 IpAddress = _utils.GetIp(HttpContext.Request),
-                RequestId = _utils.GenerateRequestId(),
+                RequestId = _utils.GenerateRequestId(path),
                 StartTime = now.ToString("O"),
             }, HttpContext);
         }

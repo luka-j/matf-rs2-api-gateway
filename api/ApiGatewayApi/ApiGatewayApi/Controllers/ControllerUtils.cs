@@ -1,8 +1,10 @@
-﻿using ApiGatewayApi.ApiConfigs;
+﻿using System.Text.RegularExpressions;
+using ApiGatewayApi.ApiConfigs;
+using Serilog.Context;
 
 namespace ApiGatewayApi.Controllers;
 
-public class ControllerUtils
+public partial class ControllerUtils
 {
     private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     
@@ -22,15 +24,37 @@ public class ControllerUtils
         return httpConnection.RemoteIpAddress + ":" + httpConnection.RemotePort;
     }
 
-    public string GenerateRequestId()
+    public string GenerateRequestId(string path = "")
     {
+        var prefix = "";
+        if (path is not { Length: 0 })
+        {
+            if (path.Contains('_') || path.Contains(' ') || path.Contains('-'))
+            {
+                var parts = PathSplittingRegex().Split(path);
+                for (var i = 0; i < 3 && i < parts.Length; i++)
+                {
+                    prefix += parts[i].ToUpper();
+                }
+            }
+            else if (path.Length < 3)
+            {
+                prefix = path.ToUpper();
+            }
+            else
+            {
+                prefix = path[..3].ToUpper();
+            }
+        }
         var idChars = new char[12];
         for (var i = 0; i < idChars.Length; i++)
         {
             idChars[i] = Chars[_random.Next(Chars.Length)];
         }
 
-        return new string(idChars);
+        var requestId = prefix + "_" + new string(idChars);
+        LogContext.PushProperty("CorrelationId", requestId);
+        return requestId;
     }
 
     public void AddCorsHeadersToResponse(HttpContext httpContext, ApiConfig config)
@@ -69,4 +93,7 @@ public class ControllerUtils
         value = null;
         return false;
     }
+
+    [GeneratedRegex("[ -_]")]
+    private static partial Regex PathSplittingRegex();
 }

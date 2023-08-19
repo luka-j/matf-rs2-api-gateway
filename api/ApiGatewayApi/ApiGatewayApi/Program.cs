@@ -25,8 +25,12 @@ builder.Services.AddSingleton<RequestProcessorGateway>();
 builder.Services.AddSingleton<ControllerUtils>();
 builder.Services.AddSingleton<MetricsService>();
 
-Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
-    .WriteTo.Console()
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .Enrich.WithThreadId()
+    .Enrich.WithThreadName()
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {ThreadId} {ThreadName}: {CorrelationId} - {Message:lj}{NewLine}{Exception}")
     .CreateLogger();
 
 var app = builder.Build();

@@ -1,5 +1,6 @@
 using ApiGatewayApi.Exceptions;
 using Grpc.Core;
+using Serilog.Context;
 using ILogger = Serilog.ILogger;
 
 namespace ApiGatewayApi.Services;
@@ -20,6 +21,7 @@ public class HttpRequesterService : HttpRequester.HttpRequesterBase
     {
         return Task.Run(() =>
         {
+            LogContext.PushProperty("CorrelationId", request.RequestMetadata.RequestId);
             _logger.Information("MakeHttpRequest request: {Request}", request);
             try
             {
