@@ -15,7 +15,10 @@ builder.Services.AddSingleton<ConfigRepository>();
 builder.Services.AddSingleton<ApiGateway>();
 
 Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
-    .WriteTo.Console()
+    .Enrich.WithThreadId()
+    .Enrich.WithThreadName()
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {ThreadId} {ThreadName}: {CorrelationId} - {Message:lj}{NewLine}{Exception}")
     .CreateLogger();
 
 var app = builder.Build();

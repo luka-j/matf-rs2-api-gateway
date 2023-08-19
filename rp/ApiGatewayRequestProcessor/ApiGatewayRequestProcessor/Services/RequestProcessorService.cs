@@ -3,6 +3,7 @@ using ApiGatewayRequestProcessor.Configs;
 using ApiGatewayRequestProcessor.Exceptions;
 using ApiGatewayRequestProcessor.Gateways;
 using Grpc.Core;
+using Serilog.Context;
 
 namespace ApiGatewayRequestProcessor.Services;
 
@@ -21,6 +22,7 @@ public class RequestProcessorService : RequestProcessor.RequestProcessorBase
 
     public override async Task<ExecutionResponse> ProcessRequest(ExecutionRequest request, ServerCallContext context)
     {
+        LogContext.PushProperty("CorrelationId", request.RequestMetadata.RequestId);
         _logger.Information("Executing request {Request}", request);
         var now = DateTime.Parse(request.RequestMetadata.StartTime, null,
             System.Globalization.DateTimeStyles.RoundtripKind);
