@@ -55,20 +55,22 @@ message DatabaseDeleteResponse {
 
 message CacheReadRequest {
 	ConfigIdentifier identifier = 1;
-	// 
+	string key = 2;
 }
 
 message CacheReadResponse {
-	//
+	string value = 1;
 }
 
 message CacheWriteRequest {
 	ConfigIdentifier identifier = 1;
-	// 
+	string key = 2;
+	string value = 3;
+	string ttl = 4;
 }
 
 message CacheWriteResponse {
-	//
+	bool success = 1;
 }
 
 message QueueReadRequest {

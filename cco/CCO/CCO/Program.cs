@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddGrpc();
 builder.Services.AddSingleton<CCORepository>();
 builder.Services.AddScoped<DatabaseRepository>();
+builder.Services.AddScoped<CacheRepository>();
 
 var app = builder.Build();
 

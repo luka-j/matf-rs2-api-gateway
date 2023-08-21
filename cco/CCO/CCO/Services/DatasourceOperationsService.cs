@@ -8,11 +8,13 @@ namespace CCO.Services
     {
         private readonly CCORepository _repository;
         private readonly DatabaseRepository _databaseRepository;
+        private readonly CacheRepository _cacheRepository;
 
-        public DatasourceOperationsService(CCORepository repository, DatabaseRepository databaseRepository)
+        public DatasourceOperationsService(CCORepository repository, DatabaseRepository databaseRepository, CacheRepository cacheRepository)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _databaseRepository = databaseRepository ?? throw new ArgumentNullException(nameof(databaseRepository));
+            _cacheRepository = cacheRepository ?? throw new ArgumentNullException(nameof(cacheRepository));
         }
 
         public override async Task<DatabaseReadResponse> DatabaseRead (DatabaseReadRequest request, ServerCallContext context)
@@ -32,7 +34,7 @@ namespace CCO.Services
             var config = getConfig(request.Identifier);
             var database = config.Data.Databases.FirstOrDefault() ?? throw new Exception("Database not found");
 
-            var success = await _databaseRepository.CreateEntry(database, request.Amount);
+            var success = await _databaseRepository.Create(database, request.Amount);
 
             return new DatabaseWriteResponse { Success = success };
         }
@@ -42,19 +44,29 @@ namespace CCO.Services
             var config = getConfig(request.Identifier);
             var database = config.Data.Databases.FirstOrDefault() ?? throw new Exception("Database not found");
 
-            var success = await _databaseRepository.DeleteEntry(database, request.Id);
+            var success = await _databaseRepository.Delete(database, request.Id);
 
             return new DatabaseDeleteResponse { Success = success };
         }
 
-        public override Task<CacheReadResponse> CacheRead (CacheReadRequest request, ServerCallContext context)
+        public override async Task<CacheReadResponse> CacheRead (CacheReadRequest request, ServerCallContext context)
         {
-            throw new NotImplementedException();
+            var config = getConfig(request.Identifier);
+            var cache = config.Data.Caches.FirstOrDefault() ?? throw new Exception("Cache not found");
+
+            string value = await _cacheRepository.GetAsync(cache, request.Key);
+            
+            return new CacheReadResponse { Value = value };
         }
 
-        public override Task<CacheWriteResponse> CacheWrite (CacheWriteRequest request, ServerCallContext context)
+        public override async Task<CacheWriteResponse> CacheWrite (CacheWriteRequest request, ServerCallContext context)
         {
-            throw new NotImplementedException();
+            var config = getConfig(request.Identifier);
+            var cache = config.Data.Caches.FirstOrDefault() ?? throw new Exception("Cache not found");
+
+            var success = await _cacheRepository.SetAsync(cache, request.Key, request.Value, TimeSpan.Parse(request.Ttl));
+
+            return new CacheWriteResponse { Success = success };
         }
 
         public override Task<QueueReadResponse> QueueRead (QueueReadRequest request, ServerCallContext context) 

@@ -15,7 +15,7 @@ namespace CCO.Repositories
             return entries;
         }
 
-        public async Task<bool> CreateEntry (Datasource database, int amount)
+        public async Task<bool> Create (Datasource database, int amount)
         {
             using var connection = GetConnection(database.ConnectionString);
 
@@ -25,7 +25,7 @@ namespace CCO.Repositories
             return affected != 0;
         }
 
-        public async Task<bool> DeleteEntry (Datasource database, string id)
+        public async Task<bool> Delete (Datasource database, string id)
         {
             using var connection = GetConnection(database.ConnectionString);
 
