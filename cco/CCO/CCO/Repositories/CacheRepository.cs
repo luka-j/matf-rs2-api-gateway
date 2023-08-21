@@ -9,7 +9,6 @@ namespace CCO.Repositories
         public async Task<string> GetAsync(Datasource cache, string key)
         {
             using var redis = ConnectionMultiplexer.Connect(cache.ConnectionString);
-
             IDatabase database = redis.GetDatabase();
 
             var cachedValue = await database.StringGetAsync(key);

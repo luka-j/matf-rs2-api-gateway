@@ -12,6 +12,7 @@ builder.Services.AddGrpc();
 builder.Services.AddSingleton<CCORepository>();
 builder.Services.AddScoped<DatabaseRepository>();
 builder.Services.AddScoped<CacheRepository>();
+builder.Services.AddScoped<QueueRepository>();
 
 var app = builder.Build();
 

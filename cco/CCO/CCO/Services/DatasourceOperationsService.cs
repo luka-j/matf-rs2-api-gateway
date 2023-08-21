@@ -9,12 +9,14 @@ namespace CCO.Services
         private readonly CCORepository _repository;
         private readonly DatabaseRepository _databaseRepository;
         private readonly CacheRepository _cacheRepository;
+        private readonly QueueRepository _queueRepository;
 
-        public DatasourceOperationsService(CCORepository repository, DatabaseRepository databaseRepository, CacheRepository cacheRepository)
+        public DatasourceOperationsService(CCORepository repository, DatabaseRepository databaseRepository, CacheRepository cacheRepository, QueueRepository queueRepository)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _databaseRepository = databaseRepository ?? throw new ArgumentNullException(nameof(databaseRepository));
             _cacheRepository = cacheRepository ?? throw new ArgumentNullException(nameof(cacheRepository));
+            _queueRepository = queueRepository ?? throw new ArgumentNullException(nameof(queueRepository));
         }
 
         public override async Task<DatabaseReadResponse> DatabaseRead (DatabaseReadRequest request, ServerCallContext context)
@@ -69,14 +71,14 @@ namespace CCO.Services
             return new CacheWriteResponse { Success = success };
         }
 
-        public override Task<QueueReadResponse> QueueRead (QueueReadRequest request, ServerCallContext context) 
-        {
-            throw new NotImplementedException();
-        }
-
         public override Task<QueueWriteResponse> QueueWrite (QueueWriteRequest request, ServerCallContext context)
         {
-            throw new NotImplementedException();
+            var config = getConfig(request.Identifier);
+            var queue = config.Data.Queues.FirstOrDefault() ?? throw new Exception("Queue not found");
+
+            _queueRepository.Publish(queue, request.QueueName, request.Message);
+
+            return Task.FromResult(new QueueWriteResponse());
         }
 
         private CCOConfig getConfig (ConfigIdentifier id)
