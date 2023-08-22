@@ -17,8 +17,8 @@ service DatasourceOperations {
 
 
 message ConfigIdentifier {
-  string ccoName = 1;
-  string ccoVersion = 2;
+  string apiName = 1;
+  string apiVersion = 2;
 }
 
 message DatabaseReadRequest {

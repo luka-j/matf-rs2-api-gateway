@@ -4,7 +4,7 @@ option csharp_namespace = "CCO";
 
 package config;
 
-service CCOConfigManagement {
+service ConfigManagement {
   rpc UpdateConfig (ConfigData) returns (Empty);
   rpc DeleteConfig (ConfigId) returns (Empty);
   
@@ -17,8 +17,8 @@ service CCOConfigManagement {
 message Empty {}
 
 message ConfigId {
-  string ccoName = 1;
-  string ccoVersion = 2;
+  string apiName = 1;
+  string apiVersion = 2;
 }
 message ConfigData {
   string data = 1;

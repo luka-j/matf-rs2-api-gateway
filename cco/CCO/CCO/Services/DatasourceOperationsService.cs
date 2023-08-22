@@ -83,12 +83,12 @@ namespace CCO.Services
 
         private CCOConfig getConfig (ConfigIdentifier id)
         {
-            CCOIdentifier identifier = new CCOIdentifier(id.CcoName, id.CcoVersion);
+            CCOIdentifier identifier = new CCOIdentifier(id.ApiName, id.ApiName);
             var config = _repository.GetCurrentConfig(identifier, DateTime.Now);
 
             if (config == null)
             {
-                throw new Exception("CCO " + id.CcoName + "/" + id.CcoVersion + " not found");
+                throw new Exception("CCO " + id.ApiName + "/" + id.ApiName + " not found");
             }
 
             return config;

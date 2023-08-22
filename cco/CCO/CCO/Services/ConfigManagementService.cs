@@ -4,7 +4,7 @@ using Grpc.Core;
 
 namespace CCO.Services
 {
-    public class ConfigManagementService : CCOConfigManagement.CCOConfigManagementBase
+    public class ConfigManagementService : ConfigManagement.ConfigManagementBase
     {
         private readonly CCORepository _repository;
 
@@ -20,7 +20,7 @@ namespace CCO.Services
                 try
                 {
                     var configData = _repository.GetCurrentConfig(
-                        new CCOIdentifier(request.CcoName, request.CcoVersion), DateTime.Now);
+                        new CCOIdentifier(request.ApiName, request.ApiVersion), DateTime.Now);
                     return new ConfigData
                     {
                         Data = configData?.GetDataString(),
@@ -38,7 +38,7 @@ namespace CCO.Services
         {
             return Task.Run(() =>
             {
-                var status = _repository.DeleteConfig(new CCOIdentifier(request.CcoName, request.CcoVersion));
+                var status = _repository.DeleteConfig(new CCOIdentifier(request.ApiName, request.ApiVersion));
                 if (!status)
                 {
                     throw new RpcException(new Status(StatusCode.NotFound, "Failed to delete Config"));
@@ -84,8 +84,8 @@ namespace CCO.Services
                 var configIds = _repository.GetAllConfigs(DateTime.Now)
                     .Select(id => new ConfigId
                     {
-                        CcoName = id.Name,
-                        CcoVersion = id.Version,
+                        ApiName = id.Name,
+                        ApiVersion = id.Version,
                     });
                 var ret = new ConfigList();
                 ret.Configs.AddRange(configIds);
