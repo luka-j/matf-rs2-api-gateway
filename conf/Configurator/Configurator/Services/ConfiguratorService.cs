@@ -10,16 +10,18 @@ namespace Configurator.Services
         private const int VALIDFROM_SECONDS = 10;
         private const int TIMEOUT_SECONDS = 5;
 
-
         private readonly IConfigRepository _configRepository;
 
-        private readonly APIGrpcService _apiService;        
-        //TODO add connections to other microservices when established
+        private readonly APIGrpcService _apiService;
+        private readonly RPGrpcService _rpService;
+        private readonly CCOGrpcService _ccoService;
 
-        public ConfiguratorService(IConfigRepository configRepository, APIGrpcService apiService)
+        public ConfiguratorService(IConfigRepository configRepository, APIGrpcService apiService, RPGrpcService rpService, CCOGrpcService ccoService)
         {
             _configRepository = configRepository ?? throw new ArgumentNullException(nameof(configRepository));
             _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
+            _rpService = rpService ?? throw new ArgumentNullException(nameof(rpService));
+            _ccoService = ccoService ?? throw new ArgumentNullException(nameof(ccoService));
         }
 
         public async Task<bool> Update(IEnumerable<Config> configs)
@@ -40,8 +42,12 @@ namespace Configurator.Services
                     case "backends":
                         task = _apiService.UpdateBackend(config.Data, validFrom.ToString());
                         break;
-                    case "middlewares": //TODO
-                    case "datasources": //TODO
+                    case "middlewares":
+                        task = _rpService.Update(config.Data, validFrom.ToString());
+                        break;
+                    case "datasources":
+                        task = _ccoService.Update(config.Data, validFrom.ToString());
+                        break;
                     default:
                         break;
                 }
@@ -55,7 +61,8 @@ namespace Configurator.Services
                 if (!await complete)
                 {
                     await _apiService.RevertPendingChanges();
-                    //TODO call revert for all other conections
+                    await _rpService.RevertPendingChanges();
+                    await _ccoService.RevertPendingChanges();
                     return false;
                 };
 
@@ -99,8 +106,12 @@ namespace Configurator.Services
                         case "backends":
                             await _apiService.DeleteBackend(config.ApiName, config.ApiVersion);
                             break;
-                        case "middlewares": //TODO
-                        case "datasources": //TODO
+                        case "middlewares":
+                            await _rpService.Delete(config.ApiName, config.ApiVersion);
+                            break;
+                        case "datasources":
+                            await _ccoService.Delete(config.ApiName, config.ApiVersion);
+                            break;
                         default:
                             break;
                     }

@@ -1,4 +1,5 @@
 ﻿using ApiGatewayApi;
+using Configurator.DTOs;
 using Configurator.Entities;
 using Configurator.GrpcServices;
 using Configurator.Repositories;
@@ -20,16 +21,16 @@ namespace Configurator.Controllers
         }
 
         [HttpGet("frontend")]
-        [ProducesResponseType(typeof(ConfigList), StatusCodes.Status200OK)]
-        public async Task<ActionResult<ConfigList>> GetFrontendConfigs() 
+        [ProducesResponseType(typeof(IEnumerable<ConfigMetadataDTO>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<ConfigMetadataDTO>>> GetFrontendConfigs() 
         {
             return Ok(await _apiService.GetAllFrontend());
         }
 
         [HttpGet("frontend/{apiName}/{apiVersion}")]
-        [ProducesResponseType(typeof(ConfigList), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ConfigDataDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ConfigData>> GetFrontendConfig(string apiName, string apiVersion)
+        public async Task<ActionResult<ConfigDataDTO>> GetFrontendConfig(string apiName, string apiVersion)
         {
             try
             {
@@ -64,16 +65,16 @@ namespace Configurator.Controllers
         }
 
         [HttpGet("backend")]
-        [ProducesResponseType(typeof(ConfigList), StatusCodes.Status200OK)]
-        public async Task<ActionResult<ConfigList>> GetBackendConfigs()
+        [ProducesResponseType(typeof(IEnumerable<ConfigMetadataDTO>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<ConfigMetadataDTO>>> GetBackendConfigs()
         {
             return Ok(await _apiService.GetAllBackend());
         }
 
         [HttpGet("backend/{apiName}/{apiVersion}")]
-        [ProducesResponseType(typeof(ConfigList), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ConfigDataDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ConfigData>> GetBackendConfig(string apiName, string apiVersion)
+        public async Task<ActionResult<ConfigDataDTO>> GetBackendConfig(string apiName, string apiVersion)
         {
             try
             {

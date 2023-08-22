@@ -25,29 +25,16 @@ else
 
 if (bool.Parse(builder.Configuration["UseKubernetes"]))
 {
-    var config = KubernetesClientConfiguration.InClusterConfig();
-    var client = new Kubernetes(config);
-    builder.Services.AddScoped<IClientNameService, KubernetesClientNameService>();
-    var APIPort = builder.Configuration["APIPort"];
-
-    string namespaceName = "api-gateway";
-
-    V1PodList podList = client.ListNamespacedPod(namespaceName, labelSelector: "app=api");
-    foreach (V1Pod pod in podList.Items)
-    {
-        var name = pod.Metadata.Name;
-        var URI = pod.Status.PodIP + ":" + APIPort;
-        builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>(name, op => op.Address = new Uri(URI));
-    }
+    builder.Services.AddScoped<IClientGenerator, KubernetesClientGenerator>();
 }
 else
 {
-    builder.Services.AddScoped<IClientNameService, DefaultClientNameService>();
-    builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>("API",
-                options => options.Address = new Uri(builder.Configuration["GrpcSettings:APIURL"]));
+    builder.Services.AddScoped<IClientGenerator, ClientGenerator>();
 }
 
 builder.Services.AddScoped<APIGrpcService>();
+builder.Services.AddScoped<RPGrpcService>();
+builder.Services.AddScoped<CCOGrpcService>();
 builder.Services.AddScoped<ConfiguratorService>();
 builder.Services.AddSingleton<SchedulerService>();
 

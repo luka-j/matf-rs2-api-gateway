@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Protos\api.proto" />
+	  <None Remove="Protos\api.proto" />
+	  <None Remove="Protos\rp.proto" />
+	  <None Remove="Protos\cco.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,11 +17,13 @@
     <PackageReference Include="KubernetesClient" Version="11.0.44" />
     <PackageReference Include="LibGit2Sharp" Version="0.27.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-    <PackageReference Include="Zitadel" Version="5.2.16" />
+    <PackageReference Include="Zitadel" Version="5.2.20" />
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\api.proto" GrpcServices="Client" />
+	  <Protobuf Include="Protos\api.proto" GrpcServices="Client" />
+	  <Protobuf Include="Protos\rp.proto" GrpcServices="Client" />
+	  <Protobuf Include="Protos\cco.proto" GrpcServices="Client" />
   </ItemGroup>
 
   <ItemGroup>

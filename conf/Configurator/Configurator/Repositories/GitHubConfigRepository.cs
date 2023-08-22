@@ -12,17 +12,16 @@ namespace Configurator.Repositories
         private readonly string _repositoryName;
         private readonly string _repositoryURL;
         private readonly string _gitUsername;
-        private readonly string _gitPassword;
         private readonly string _gitEmail;
-
+        private readonly string _gitPat;
         public GitHubConfigRepository(IConfiguration configuration)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _repositoryName = _configuration["GitHubSettings:GitHubRepoName"];
             _repositoryURL = _configuration["GithubSettings:GitHubRepoURL"];
             _gitUsername = _configuration["GithubSettings:GitUsername"];
-            _gitPassword = _configuration["GithubSettings:GitPassword"];
             _gitEmail = _configuration["GithubSettings:GitEmail"];
+            _gitPat = _configuration["GithubSettings:PAT"];
 
             var options = new CloneOptions
             {
@@ -61,12 +60,12 @@ namespace Configurator.Repositories
 
         private LibGit2Sharp.Handlers.CredentialsHandler GetCredentialsHandler()
         {
-
             return (_url, _user, _cred) => new UsernamePasswordCredentials
             {
-                Username = _gitUsername,
-                Password = _gitPassword
+                Username = _gitPat,
+                Password = _gitPat
             };
+
         }
         private void CommitAndPush()
         {
@@ -101,7 +100,6 @@ namespace Configurator.Repositories
                     CredentialsProvider = GetCredentialsHandler()
                 }
             };
-
             Commands.Pull(repo, new Signature(_gitUsername, _gitEmail, DateTimeOffset.Now), pullOptions);
             InitDirectories();
         }
