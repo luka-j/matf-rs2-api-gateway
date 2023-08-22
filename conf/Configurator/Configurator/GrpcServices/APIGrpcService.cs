@@ -6,25 +6,14 @@ namespace Configurator.GrpcServices
 {
     public class APIGrpcService
     {
-        private readonly IClientGenerator _clientNameService;
+        private readonly IClientGenerator _clientGenerator;
         private readonly IEnumerable<ConfigManagement.ConfigManagementClient> _configManagementClients;
 
-        public APIGrpcService(IClientGenerator clientNameService, GrpcClientFactory clientFactory)
+        public APIGrpcService(IClientGenerator clientGenerator)
         {
-            _clientNameService = clientNameService ?? throw new ArgumentNullException(nameof(clientNameService));
-            var clients = new List<ConfigManagement.ConfigManagementClient>();
+            _clientGenerator = clientGenerator ?? throw new ArgumentNullException(nameof(clientGenerator));
 
-            foreach (var clientName in _clientNameService.GetAPIClients())
-            {
-                try
-                {
-                    clients.Add(clientFactory.CreateClient<ConfigManagement.ConfigManagementClient>(clientName));
-                }
-                catch {}
-            }
-            _configManagementClients = clients;
-            if (_configManagementClients.IsNullOrEmpty()) throw new ArgumentNullException(nameof(clientFactory));
-
+            _configManagementClients = _clientGenerator.GetAPIClients();
         }
         public async Task UpdateFrontend(string data, string validFrom)
         {
@@ -81,7 +70,6 @@ namespace Configurator.GrpcServices
 
         public async Task RevertPendingChanges()
         {
-            // TODO: check if responses are the same
             foreach (var client in _configManagementClients)
             {
                 await client.RevertPendingUpdatesAsync(new Empty());
@@ -90,8 +78,6 @@ namespace Configurator.GrpcServices
 
         public async Task<ConfigList> GetAllFrontend()
         {
-            // take from first?
-            // take from all and compare?
             var client = _configManagementClients.First();
             return await client.GetAllFrontendConfigsAsync(new Empty());
         }

@@ -43,8 +43,6 @@ if (bool.Parse(builder.Configuration["UseKubernetes"]))
 else
 {
     builder.Services.AddScoped<IClientGenerator, ClientGenerator>();
-    builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>("API",
-                options => options.Address = new Uri(builder.Configuration["GrpcSettings:APIURL"]));
 }
 
 builder.Services.AddScoped<APIGrpcService>();
