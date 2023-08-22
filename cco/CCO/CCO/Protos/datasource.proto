@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+option csharp_namespace = "CCO";
+
+package datasource;
+
+service DatasourceOperations {
+  rpc DatabaseRead (DatabaseReadRequest) returns (DatabaseReadResponse);
+  rpc DatabaseWrite (DatabaseWriteRequest) returns (DatabaseWriteResponse);
+  rpc DatabaseDelete (DatabaseDeleteRequest) returns (DatabaseDeleteResponse);
+
+  rpc CacheRead (CacheReadRequest) returns (CacheReadResponse);
+  rpc CacheWrite (CacheWriteRequest) returns (CacheWriteResponse);
+
+  rpc QueueWrite (QueueWriteRequest) returns (QueueWriteResponse);
+}
+
+
+message ConfigIdentifier {
+  string apiName = 1;
+  string apiVersion = 2;
+}
+
+message DatabaseReadRequest {
+	ConfigIdentifier identifier = 1;
+}
+
+message DatabaseReadResponse {
+	repeated DatabaseItem items = 1;
+}
+
+message DatabaseItem {
+	string id = 1;
+	int32 amount = 2;
+}
+
+message DatabaseWriteRequest {
+	ConfigIdentifier identifier = 1;
+	int32 amount = 2;
+}
+
+message DatabaseWriteResponse {
+	bool success = 1;
+}
+
+message DatabaseDeleteRequest {
+	ConfigIdentifier identifier = 1;
+	string id = 2;
+}
+
+message DatabaseDeleteResponse {
+	bool success = 1;
+}
+
+message CacheReadRequest {
+	ConfigIdentifier identifier = 1;
+	string key = 2;
+}
+
+message CacheReadResponse {
+	string value = 1;
+}
+
+message CacheWriteRequest {
+	ConfigIdentifier identifier = 1;
+	string key = 2;
+	string value = 3;
+	string ttl = 4;
+}
+
+message CacheWriteResponse {
+	bool success = 1;
+}
+
+message QueueWriteRequest {
+	ConfigIdentifier identifier = 1;
+	string queueName = 2;
+	string message = 3;
+}
+
+message QueueWriteResponse {
+}
