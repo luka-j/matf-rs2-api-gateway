@@ -32,6 +32,11 @@ spec:
           value: "https://github.com/vita-ride/rs2-config-repo.git"
         - name: "GitHubSettings__GitHubRepoName"
           value: "rs2-config-repo"
+        - name: "GitHubSettings__PAT"
+          valueFrom:
+            secretKeyRef:
+              name: conf-secret
+              key: github_pat
         - name: "GitHubSettings__GitUserName"
           valueFrom:
             secretKeyRef:
