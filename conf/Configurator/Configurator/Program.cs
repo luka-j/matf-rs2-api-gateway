@@ -25,20 +25,7 @@ else
 
 if (bool.Parse(builder.Configuration["UseKubernetes"]))
 {
-    var config = KubernetesClientConfiguration.InClusterConfig();
-    var client = new Kubernetes(config);
     builder.Services.AddScoped<IClientGenerator, KubernetesClientGenerator>();
-    var APIPort = builder.Configuration["APIPort"];
-
-    string namespaceName = "api-gateway";
-
-    V1PodList podList = client.ListNamespacedPod(namespaceName, labelSelector: "app=api");
-    foreach (V1Pod pod in podList.Items)
-    {
-        var name = pod.Metadata.Name;
-        var URI = pod.Status.PodIP + ":" + APIPort;
-        builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>(name, op => op.Address = new Uri(URI));
-    }
 }
 else
 {
@@ -46,6 +33,8 @@ else
 }
 
 builder.Services.AddScoped<APIGrpcService>();
+builder.Services.AddScoped<RPGrpcService>();
+builder.Services.AddScoped<CCOGrpcService>();
 builder.Services.AddScoped<ConfiguratorService>();
 builder.Services.AddSingleton<SchedulerService>();
 

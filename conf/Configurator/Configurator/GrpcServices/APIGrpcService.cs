@@ -12,7 +12,6 @@ namespace Configurator.GrpcServices
         public APIGrpcService(IClientGenerator clientGenerator)
         {
             _clientGenerator = clientGenerator ?? throw new ArgumentNullException(nameof(clientGenerator));
-
             _configManagementClients = _clientGenerator.GetAPIClients();
         }
         public async Task UpdateFrontend(string data, string validFrom)
