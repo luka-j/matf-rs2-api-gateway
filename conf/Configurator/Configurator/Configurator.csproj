@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Protos\api.proto" />
+	  <None Remove="Protos\api.proto" />
+	  <None Remove="Protos\rp.proto" />
+	  <None Remove="Protos\cco.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,7 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\api.proto" GrpcServices="Client" />
+	  <Protobuf Include="Protos\api.proto" GrpcServices="Client" />
+	  <Protobuf Include="Protos\rp.proto" GrpcServices="Client" />
+	  <Protobuf Include="Protos\cco.proto" GrpcServices="Client" />
   </ItemGroup>
 
   <ItemGroup>

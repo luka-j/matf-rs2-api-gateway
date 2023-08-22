@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option csharp_namespace = "CCO";
+
+package config;
+
+service ConfigManagement {
+  rpc UpdateConfig (ConfigData) returns (Empty);
+  rpc DeleteConfig (ConfigId) returns (Empty);
+  
+  rpc RevertPendingUpdates(Empty) returns (RevertChangesResponse);
+  
+  rpc GetAllConfigs (Empty) returns (ConfigList);
+  rpc GetConfig (ConfigId) returns (ConfigData);
+}
+
+message Empty {}
+
+message ConfigId {
+  string apiName = 1;
+  string apiVersion = 2;
+}
+message ConfigData {
+  string data = 1;
+  string validFrom = 2;
+}
+message ConfigList {
+  repeated ConfigId configs = 1;
+}
+message RevertChangesResponse {
+  int32 reverted = 1;
+}
