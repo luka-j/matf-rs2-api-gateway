@@ -27,7 +27,7 @@ if (bool.Parse(builder.Configuration["UseKubernetes"]))
 {
     var config = KubernetesClientConfiguration.InClusterConfig();
     var client = new Kubernetes(config);
-    builder.Services.AddScoped<IClientNameService, KubernetesClientNameService>();
+    builder.Services.AddScoped<IClientGenerator, KubernetesClientGenerator>();
     var APIPort = builder.Configuration["APIPort"];
 
     string namespaceName = "api-gateway";
@@ -42,7 +42,7 @@ if (bool.Parse(builder.Configuration["UseKubernetes"]))
 }
 else
 {
-    builder.Services.AddScoped<IClientNameService, DefaultClientNameService>();
+    builder.Services.AddScoped<IClientGenerator, ClientGenerator>();
     builder.Services.AddGrpcClient<ApiGatewayApi.ConfigManagement.ConfigManagementClient>("API",
                 options => options.Address = new Uri(builder.Configuration["GrpcSettings:APIURL"]));
 }

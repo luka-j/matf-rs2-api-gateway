@@ -6,15 +6,15 @@ namespace Configurator.GrpcServices
 {
     public class APIGrpcService
     {
-        private readonly IClientNameService _clientNameService;
+        private readonly IClientGenerator _clientNameService;
         private readonly IEnumerable<ConfigManagement.ConfigManagementClient> _configManagementClients;
 
-        public APIGrpcService(IClientNameService clientNameService, GrpcClientFactory clientFactory)
+        public APIGrpcService(IClientGenerator clientNameService, GrpcClientFactory clientFactory)
         {
             _clientNameService = clientNameService ?? throw new ArgumentNullException(nameof(clientNameService));
             var clients = new List<ConfigManagement.ConfigManagementClient>();
 
-            foreach (var clientName in _clientNameService.GetAPIClientNames())
+            foreach (var clientName in _clientNameService.GetAPIClients())
             {
                 try
                 {

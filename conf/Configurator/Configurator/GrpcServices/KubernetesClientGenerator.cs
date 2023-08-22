@@ -3,17 +3,17 @@ using k8s.Models;
 
 namespace Configurator.GrpcServices
 {
-    public class KubernetesClientNameService : IClientNameService
+    public class KubernetesClientGenerator : IClientGenerator
     {
         private readonly Kubernetes _client;
-        public KubernetesClientNameService() {
+        public KubernetesClientGenerator() {
             var config = KubernetesClientConfiguration.InClusterConfig();
             _client = new Kubernetes(config);
 
         }
-
-        public IEnumerable<string> GetAPIClientNames()
+        public IEnumerable<ApiGatewayApi.ConfigManagement.ConfigManagementClient> GetAPIClients()
         {
+            throw new NotImplementedException();
             List<string> names = new();
             string namespaceName = "api-gateway";
             string serviceName = "api-service";
@@ -33,7 +33,12 @@ namespace Configurator.GrpcServices
             return names;
         }
 
-        public IEnumerable<string> GetRPClientNames()
+        public IEnumerable<ApiGatewayRp.ConfigManagement.ConfigManagementClient> GetRPClients()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<CCO.ConfigManagement.ConfigManagementClient> GetCCOClients()
         {
             throw new NotImplementedException();
         }
