@@ -20,7 +20,7 @@ const handleInterceptors = (apiInstance: AxiosInstance) => {
     (config) => {
       const token = localStorage.getItem("token");
 
-      if (token) config.headers["Authorization"] = `Bearer ${token}`;
+      if (token) config.headers["Authorization"] = `${token}`;
 
       return config;
     },
@@ -30,15 +30,13 @@ const handleInterceptors = (apiInstance: AxiosInstance) => {
 
 interface IApiOptions extends AxiosRequestConfig {
   commonPrefix: string;
-  port: number;
-  prodURL: string;
 }
 
-const createApi = ({ port, commonPrefix, prodURL, ...rest }: IApiOptions) => {
+const createApi = ({ commonPrefix, ...rest }: IApiOptions) => {
   const api = axios.create({
     baseURL: import.meta.env.DEV
-      ? `http://localhost:${port}/api/v1/${commonPrefix}/`
-      : `${prodURL}/api/v1/${commonPrefix}/`,
+      ? `http://localhost:5002/${commonPrefix}/`
+      : `https://dashboard-rs2.luka-j.rocks/${commonPrefix}/`,
     ...rest,
   });
 

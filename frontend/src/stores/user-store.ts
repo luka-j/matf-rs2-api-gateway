@@ -24,14 +24,15 @@ export const useUserStore = create<IUserStore>()(
         setCurrentUser: (user: User) => set({ currentUser: user }),
         loginUser: () => userManager.signinRedirect({ state: "a2123a67ff11413fa19217a9ea0fbad5" }),
         logoutUser: () => {
-          userManager.signoutRedirect();
+          userManager.signoutSilent();
           set({ currentUser: null });
+          localStorage.removeItem("token");
         },
         loginAndSetUser: async () => {
           return userManager.signinRedirectCallback().then((user) => {
-            const access_token = user.access_token;
+            const accessToken = user.access_token;
             if (user) get().setCurrentUser(user);
-            localStorage.setItem("token", access_token);
+            localStorage.setItem("token", accessToken);
           });
         },
       }),
