@@ -10,9 +10,14 @@ const Frontends = () => {
     <div className="container mt-8 flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <Typography variant="h1">Frontends</Typography>
-        <Button variant="ghost" size="icon">
-          <PlusCircle size={60} />
-        </Button>
+        <div className="flex gap-8">
+          <Button variant="ghost" size="icon">
+            <RefreshCcw size={60} />
+          </Button>
+          <Button variant="ghost" size="icon">
+            <PlusCircle size={60} />
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -20,9 +25,6 @@ const Frontends = () => {
           {frontends.map((frontend) => (
             <Card key={frontend.id} className="w-96">
               <CardHeader className="flex flex-row items-center justify-between">
-                <Button variant="ghost" size="icon">
-                  <RefreshCcw />
-                </Button>
                 <CardTitle>{frontend.name}</CardTitle>
                 <Button variant="destructive" size="icon">
                   <Trash />
@@ -33,14 +35,11 @@ const Frontends = () => {
                 <Typography variant="large" className="text-center">
                   {frontend.url}
                 </Typography>
-                <Typography variant="small" className="text-center">
-                  {frontend.endpoints} endpoints
-                </Typography>
               </CardContent>
 
               <CardFooter className="flex flex-row items-center justify-between">
                 <Button asChild variant="secondary">
-                  <a href="/">View spec</a>
+                  <a href="/dasbhoard/spec">View spec</a>
                 </Button>
                 <Button asChild variant="secondary">
                   <a href="/">View middleware</a>

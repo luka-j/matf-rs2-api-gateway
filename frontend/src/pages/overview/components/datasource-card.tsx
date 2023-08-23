@@ -8,7 +8,6 @@ interface IDatasourceCardProps {
   description: string;
   upNum: number;
   totalNum: number;
-  viewAllURL: string;
   datasourceList: Cache[];
 }
 
@@ -17,7 +16,6 @@ const DatasourceCard = ({
   description,
   upNum,
   totalNum,
-  viewAllURL,
   datasourceList,
 }: IDatasourceCardProps) => {
   return (
@@ -25,9 +23,6 @@ const DatasourceCard = ({
       <CardHeader>
         <CardTitle className="flex justify-between">
           {title}: {upNum}/{totalNum} up
-          <Button asChild variant="outline" className="-mt-1">
-            <a href={viewAllURL}>View all</a>
-          </Button>
         </CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>

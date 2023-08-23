@@ -6,7 +6,7 @@ import OuterCard from "./components/outer-card";
 
 const Datasources = () => {
   return (
-    <div className="container mt-8 flex flex-col gap-8">
+    <div className="container mt-8 flex flex-col gap-8 pb-8">
       <div className="flex justify-center">
         <Typography variant="h1">Datasources</Typography>
       </div>

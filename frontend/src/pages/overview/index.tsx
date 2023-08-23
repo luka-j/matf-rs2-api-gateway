@@ -43,7 +43,6 @@ const Dashboard = () => {
           upNum={5}
           totalNum={7}
           description="Here you can preview and edit your caches."
-          viewAllURL="/dashboard/datasources/caches"
           datasourceList={caches}
         />
 
@@ -52,7 +51,6 @@ const Dashboard = () => {
           upNum={3}
           totalNum={7}
           description="Here you can preview and edit your databases."
-          viewAllURL="/dashboard/datasources/databases"
           datasourceList={databases}
         />
 
@@ -61,7 +59,6 @@ const Dashboard = () => {
           upNum={1}
           totalNum={7}
           description="Here you can preview and edit your queues."
-          viewAllURL="/dashboard/datasources/queues"
           datasourceList={queues}
         />
       </OuterCard>

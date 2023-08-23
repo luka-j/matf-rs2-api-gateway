@@ -10,9 +10,14 @@ const Backends = () => {
     <div className="container mt-8 flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <Typography variant="h1">Backends</Typography>
-        <Button variant="ghost" size="icon">
-          <PlusCircle size={60} />
-        </Button>
+        <div className="flex gap-8">
+          <Button variant="ghost" size="icon">
+            <RefreshCcw size={60} />
+          </Button>
+          <Button variant="ghost" size="icon">
+            <PlusCircle size={60} />
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -20,9 +25,6 @@ const Backends = () => {
           {backends.map((backend) => (
             <Card key={backend.id} className="w-96">
               <CardHeader className="flex flex-row items-center justify-between">
-                <Button variant="ghost" size="icon">
-                  <RefreshCcw />
-                </Button>
                 <CardTitle>{backend.name}</CardTitle>
                 <Button variant="destructive" size="icon">
                   <Trash />
@@ -33,17 +35,11 @@ const Backends = () => {
                 <Typography variant="large" className="text-center">
                   {backend.url}
                 </Typography>
-                <Typography variant="small" className="text-center">
-                  {backend.endpoints} endpoints
-                </Typography>
               </CardContent>
 
-              <CardFooter className="flex flex-row items-center justify-between">
+              <CardFooter className="flex flex-row items-center justify-center">
                 <Button asChild variant="secondary">
-                  <a href="/">View spec</a>
-                </Button>
-                <Button asChild variant="secondary">
-                  <a href="/">View middleware</a>
+                  <a href="/dasbhoard/spec">View spec</a>
                 </Button>
               </CardFooter>
             </Card>

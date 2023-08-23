@@ -13,6 +13,7 @@ const Overview = lazy(() => import("../pages/overview"));
 const Datasources = lazy(() => import("../pages/datasources"));
 const Frontends = lazy(() => import("../pages/frontends"));
 const Backends = lazy(() => import("../pages/backends"));
+const Spec = lazy(() => import("../pages/spec"));
 const Editor = lazy(() => import("../pages/editor"));
 
 export const router = createBrowserRouter(
@@ -30,6 +31,7 @@ export const router = createBrowserRouter(
             <Route path="frontends" element={<Frontends />} />
             <Route path="backends" element={<Backends />} />
             <Route path="editor" element={<Editor />} />
+            <Route path="spec/*" element={<Spec />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Route>
 
