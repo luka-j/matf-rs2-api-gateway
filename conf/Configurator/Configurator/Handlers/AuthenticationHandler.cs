@@ -19,28 +19,25 @@ namespace Configurator.Handlers
         {
             if (context.Request.Headers.ContainsKey("Authorization"))
             {
+                string token = context.Request.Headers.Authorization.ToString();
+                string personalAccessToken = token.Replace("Bearer ", "");
                 try
                 {
-                    string token = context.Request.Headers.Authorization.ToString();
-
-                    var client = Clients.AuthService(new(apiUrl, ITokenProvider.Static(token)));
+                    var client = Clients.AuthService(new(apiUrl, ITokenProvider.Static(personalAccessToken)));
                     var result = await client.GetMyUserAsync(new());
+
                     if (result != null)
                     {
                         await next(context);
                         return;
                     }
-                } catch
-                {
-                    context.Response.StatusCode = 401;
-                    await context.Response.WriteAsync("Unauthorized");
-                    return;
-                }
-
+                } catch { }
             }
             context.Response.StatusCode = 401;
             await context.Response.WriteAsync("Unauthorized");
             return;
+
         }
     }
+
 }
