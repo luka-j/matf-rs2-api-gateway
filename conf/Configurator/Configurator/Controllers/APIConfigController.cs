@@ -1,8 +1,7 @@
-﻿using ApiGatewayApi;
-using Configurator.DTOs;
+﻿using Configurator.DTOs;
 using Configurator.Entities;
 using Configurator.GrpcServices;
-using Configurator.Repositories;
+using Configurator.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Configurator.Controllers
@@ -12,12 +11,12 @@ namespace Configurator.Controllers
     public class APIConfigController : ControllerBase
     {
         private readonly APIGrpcService _apiService;
-        private readonly IConfigRepository _configRepository;
+        private readonly ConfiguratorService _configuratorService;
 
-        public APIConfigController(APIGrpcService apiService, IConfigRepository configRepository)
+        public APIConfigController(APIGrpcService apiService, ConfiguratorService configuratorService)
         {
             _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
-            _configRepository = configRepository ?? throw new ArgumentNullException(nameof(configRepository));
+            _configuratorService = configuratorService ?? throw new ArgumentNullException(nameof(configuratorService));
         }
 
         [HttpGet("frontend")]
@@ -41,13 +40,12 @@ namespace Configurator.Controllers
 
         [HttpPost("frontend")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> AddFrontend([FromBody] string data)
+        public async Task<ActionResult<bool>> AddFrontend([FromBody] ConfigPostDTO data)
         {
-            //TODO make this work with repository
-            //api name & api version from body
             try
             {
-                await _apiService.UpdateFrontend(data, DateTime.Now.AddSeconds(10).ToString());
+                Config config = new("frontends", data.ApiName, data.ApiVersion, data.Data);
+                await _configuratorService.ModifyAndUpdate(new[] { config });
                 return Ok(true);
             } catch { return Ok(false); } 
         }
@@ -59,8 +57,7 @@ namespace Configurator.Controllers
             try
             {
                 var config = new Config("frontends", apiName, apiVersion, "");
-                await _configRepository.DeleteConfigs(new[] { config });
-                await _apiService.DeleteFrontend(apiName, apiVersion);
+                await _configuratorService.DeleteConfigs(new[] { config });
                 return Ok(true);
             }
             catch { return Ok(false); }
@@ -86,11 +83,12 @@ namespace Configurator.Controllers
 
         [HttpPost("backend")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> AddBackend([FromBody] string data)
+        public async Task<ActionResult<bool>> AddBackend([FromBody] ConfigPostDTO data)
         {
             try
             {
-                await _apiService.UpdateBackend(data, DateTime.Now.AddSeconds(10).ToString());
+                Config config = new("backends", data.ApiName, data.ApiVersion, data.Data);
+                await _configuratorService.ModifyAndUpdate(new[] { config });
                 return Ok(true);
             }
             catch { return Ok(false); }
@@ -103,8 +101,7 @@ namespace Configurator.Controllers
             try
             {
                 var config = new Config("backends", apiName, apiVersion, "");
-                await _configRepository.DeleteConfigs(new[] { config });
-                await _apiService.DeleteBackend(apiName, apiVersion);
+                await _configuratorService.DeleteConfigs(new[] { config });
                 return Ok(true);
             }
             catch { return Ok(false); }

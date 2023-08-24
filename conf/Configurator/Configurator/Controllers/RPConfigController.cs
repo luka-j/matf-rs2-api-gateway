@@ -1,8 +1,7 @@
-﻿using ApiGatewayRp;
-using Configurator.DTOs;
+﻿using Configurator.DTOs;
 using Configurator.Entities;
 using Configurator.GrpcServices;
-using Configurator.Repositories;
+using Configurator.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Configurator.Controllers
@@ -12,12 +11,12 @@ namespace Configurator.Controllers
     public class RPConfigController : ControllerBase
     {
         private readonly RPGrpcService _rpService;
-        private readonly IConfigRepository _configRepository;
+        private readonly ConfiguratorService _configuratorService;
 
-        public RPConfigController(RPGrpcService rpService, IConfigRepository configRepository)
+        public RPConfigController(RPGrpcService rpService, ConfiguratorService configuratorService)
         {
             _rpService = rpService ?? throw new ArgumentNullException(nameof(rpService));
-            _configRepository = configRepository ?? throw new ArgumentNullException(nameof(configRepository));
+            _configuratorService = configuratorService ?? throw new ArgumentNullException(nameof(configuratorService));
         }
 
         [HttpGet]
@@ -41,11 +40,12 @@ namespace Configurator.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> Add([FromBody] string data)
+        public async Task<ActionResult<bool>> Add([FromBody] ConfigPostDTO data)
         {
             try
             {
-                await _rpService.Update(data, DateTime.Now.AddSeconds(10).ToString());
+                Config config = new("middlewares", data.ApiName, data.ApiVersion, data.Data);
+                await _configuratorService.ModifyAndUpdate(new[] { config });
                 return Ok(true);
             }
             catch { return Ok(false); }
@@ -57,9 +57,8 @@ namespace Configurator.Controllers
         {
             try
             {
-                var config = new Config("frontends", apiName, apiVersion, "");
-                await _configRepository.DeleteConfigs(new[] { config });
-                await _rpService.Delete(apiName, apiVersion);
+                var config = new Config("middlewares", apiName, apiVersion, "");
+                await _configuratorService.DeleteConfigs(new[] { config });
                 return Ok(true);
             }
             catch { return Ok(false); }
