@@ -43,6 +43,8 @@ namespace Configurator.Controllers
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public async Task<ActionResult<bool>> AddFrontend([FromBody] string data)
         {
+            //TODO make this work with repository
+            //api name & api version from body
             try
             {
                 await _apiService.UpdateFrontend(data, DateTime.Now.AddSeconds(10).ToString());

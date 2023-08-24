@@ -3,6 +3,7 @@ using Configurator.DTOs;
 using Configurator.Entities;
 using Configurator.GrpcServices;
 using Configurator.Repositories;
+using Configurator.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Configurator.Controllers
@@ -11,26 +12,29 @@ namespace Configurator.Controllers
     [Route("cco")]
     public class CCOConfigController : ControllerBase
     {
-        private readonly CCOGrpcService _ccoService;
+        //todo 
+        //post request should change repo 
+
+        private readonly CCOService _ccoService;
         private readonly IConfigRepository _configRepository;
 
-        public CCOConfigController(CCOGrpcService ccoService, IConfigRepository configRepository)
+        public CCOConfigController(CCOService ccoService, IConfigRepository configRepository)
         {
             _ccoService = ccoService ?? throw new ArgumentNullException(nameof(ccoService));
             _configRepository = configRepository ?? throw new ArgumentNullException(nameof(configRepository));
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<ConfigMetadataDTO>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<ConfigMetadataDTO>>> GetConfigs()
+        [ProducesResponseType(typeof(IEnumerable<CCOSpec>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<CCOSpec>>> GetConfigs()
         {
             return Ok(await _ccoService.GetAll());
         }
 
         [HttpGet("{apiName}/{apiVersion}")]
-        [ProducesResponseType(typeof(ConfigDataDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CCOSpec), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ConfigDataDTO>> GetConfig(string apiName, string apiVersion)
+        public async Task<ActionResult<CCOSpec>> GetConfig(string apiName, string apiVersion)
         {
             try
             {
@@ -41,7 +45,7 @@ namespace Configurator.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> Add([FromBody] string data)
+        public async Task<ActionResult<bool>> Add([FromBody] CCOSpec data)
         {
             try
             {

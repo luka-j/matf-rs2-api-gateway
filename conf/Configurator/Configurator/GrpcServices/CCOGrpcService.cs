@@ -52,7 +52,21 @@ namespace Configurator.GrpcServices
             var client = _configManagementClients.First();
             return await client.GetAllConfigsAsync(new Empty());
         }
+        
+        public async Task<IEnumerable<ConfigData>> GetAllData()
+        {
+            var client = _configManagementClients.First();
+            var configList = await client.GetAllConfigsAsync(new Empty());
 
+            IEnumerable<ConfigData> configs = new List<ConfigData>();
+
+            foreach(ConfigId configId in configList.Configs)
+            {
+                configs.Append(await client.GetConfigAsync(configId));
+            }
+
+            return configs;
+        }
         public async Task<ConfigData> Get(string apiName, string apiVersion)
         {
             ConfigId getRequest = new()

@@ -26,7 +26,6 @@ message ConfigData {
 message ConfigMetadata {
   string apiName = 1;
   string apiVersion = 2;
-  // todo probably other stuff
 }
 message ConfigList {
   repeated ConfigMetadata configs = 1;

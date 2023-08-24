@@ -1,5 +1,4 @@
 ﻿using Configurator.Entities;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Configurator.Repositories
 {
@@ -29,7 +28,7 @@ namespace Configurator.Repositories
             }
         }
 
-        public virtual async Task<IEnumerable<ConfigId>> DeleteConfigs(IEnumerable<ConfigId> configs)
+        public virtual Task<IEnumerable<ConfigId>> DeleteConfigs(IEnumerable<ConfigId> configs)
         {
             List<ConfigId> deletedConfigs = new();
 
@@ -49,7 +48,7 @@ namespace Configurator.Repositories
             {
                 Console.WriteLine(e.Message);
             }
-            return deletedConfigs;
+            return Task.FromResult(deletedConfigs as IEnumerable<ConfigId>);
         }
         private async Task<IEnumerable<Config>> GetCategoryConfigs(string category)
         {
