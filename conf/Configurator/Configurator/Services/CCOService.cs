@@ -1,8 +1,7 @@
 ﻿using Configurator.Entities;
 using Configurator.GrpcServices;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization;
 using CCO;
+using System.Text.Json;
 
 namespace Configurator.Services
 {
@@ -15,22 +14,11 @@ namespace Configurator.Services
             _ccoGrpcService = ccoGrpcService ?? throw new ArgumentNullException(nameof(ccoGrpcService));
         }
 
-        public async Task Update(CCOSpec spec, string validFrom)
-        {
-            string data = GetDataString(spec);
-            await _ccoGrpcService.Update(data, validFrom);
-        }
-
-        public async Task Delete(string apiName, string apiVersion)
-        {
-            await _ccoGrpcService.Delete(apiName, apiVersion);
-        }
-
         public async Task<IEnumerable<CCOSpec>> GetAll()
         {
             var configs = await _ccoGrpcService.GetAllData();
 
-            var allConfigs = configs.Select(config => ParseYamlString(config.Data));
+            var allConfigs = configs.Select(config => ParseJsonString(config.Data));
 
             return allConfigs;
         }
@@ -39,21 +27,29 @@ namespace Configurator.Services
         {
             ConfigData data = await _ccoGrpcService.Get(apiName, apiVersion);
 
-            return ParseYamlString(data.Data);
+            return ParseJsonString(data.Data);
         }
 
-        public static CCOSpec ParseYamlString(string yamlString)
+        public static CCOSpec ParseJsonString(string jsonString)
         {
-            var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .Build();
+            JsonSerializerOptions options = new()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
 
-            return deserializer.Deserialize<CCOSpec>(yamlString);
+            return JsonSerializer.Deserialize<CCOSpec>(jsonString, options) ?? throw new Exception("Exception during deserialization");
         }
         public static string GetDataString(CCOSpec spec)
         {
-            var serializer = new SerializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
-            return serializer.Serialize(spec);
+            JsonSerializerOptions options = new()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+
+            return JsonSerializer.Serialize(spec, options);
         }
+
+        
     }
 }

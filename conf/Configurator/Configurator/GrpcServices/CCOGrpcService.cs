@@ -62,9 +62,8 @@ namespace Configurator.GrpcServices
 
             foreach(ConfigId configId in configList.Configs)
             {
-                configs.Append(await client.GetConfigAsync(configId));
+                configs = configs.Append(await client.GetConfigAsync(configId));
             }
-
             return configs;
         }
         public async Task<ConfigData> Get(string apiName, string apiVersion)

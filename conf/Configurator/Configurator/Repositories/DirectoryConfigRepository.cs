@@ -36,7 +36,8 @@ namespace Configurator.Repositories
             {
                 foreach (var config in configs)
                 {
-                    string filePath = RootDir + "\\" + config.Category + "\\" + config.ApiName + "-" + config.ApiVersion + ".yaml";
+                    string extension = config.Category == "datasources" ? ".json" : ".yaml";
+                    string filePath = RootDir + "\\" + config.Category + "\\" + config.ApiName + "-" + config.ApiVersion + extension;
 
                     if (File.Exists(filePath))
                     {
@@ -61,7 +62,9 @@ namespace Configurator.Repositories
 
             try
             {
-                var files = Directory.GetFiles(RootDir + "\\" + category, "*.yaml");
+                string extension = category == "datasources" ? "*.json" : "*.yaml";
+
+                var files = Directory.GetFiles(RootDir + "\\" + category, extension);
 
                 foreach (var file in files)
                 {
@@ -117,7 +120,8 @@ namespace Configurator.Repositories
             {
                 foreach (var config in configs)
                 {
-                    string filePath = RootDir + "\\" + config.Category + "\\" + config.ApiName + "-" + config.ApiVersion + ".yaml";
+                    string extension = config.Category == "datasources" ? ".json" : ".yaml";
+                    string filePath = RootDir + "\\" + config.Category + "\\" + config.ApiName + "-" + config.ApiVersion + extension;
 
                     await File.WriteAllTextAsync(filePath, config.Data);
                 }

@@ -1,8 +1,4 @@
-﻿using CCO;
-using Configurator.DTOs;
-using Configurator.Entities;
-using Configurator.GrpcServices;
-using Configurator.Repositories;
+﻿using Configurator.Entities;
 using Configurator.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,16 +8,13 @@ namespace Configurator.Controllers
     [Route("cco")]
     public class CCOConfigController : ControllerBase
     {
-        //todo 
-        //post request should change repo 
-
         private readonly CCOService _ccoService;
-        private readonly IConfigRepository _configRepository;
+        private readonly ConfiguratorService _configuratorService;
 
-        public CCOConfigController(CCOService ccoService, IConfigRepository configRepository)
+        public CCOConfigController(CCOService ccoService, ConfiguratorService configuratorService)
         {
             _ccoService = ccoService ?? throw new ArgumentNullException(nameof(ccoService));
-            _configRepository = configRepository ?? throw new ArgumentNullException(nameof(configRepository));
+            _configuratorService = configuratorService ?? throw new ArgumentNullException(nameof(configuratorService));
         }
 
         [HttpGet]
@@ -49,7 +42,10 @@ namespace Configurator.Controllers
         {
             try
             {
-                await _ccoService.Update(data, DateTime.Now.AddSeconds(10).ToString());
+                string configData = CCOService.GetDataString(data);
+                Config config = new("datasources", data.Title, data.Version, configData);
+
+                await _configuratorService.ModifyAndUpdate(new[] { config });
                 return Ok(true);
             }
             catch { return Ok(false); }
@@ -61,9 +57,8 @@ namespace Configurator.Controllers
         {
             try
             {
-                var config = new Config("frontends", apiName, apiVersion, "");
-                await _configRepository.DeleteConfigs(new[] { config });
-                await _ccoService.Delete(apiName, apiVersion);
+                var config = new Config("datasources", apiName, apiVersion, "");
+                await _configuratorService.DeleteConfigs(new[] { config });
                 return Ok(true);
             }
             catch { return Ok(false); }

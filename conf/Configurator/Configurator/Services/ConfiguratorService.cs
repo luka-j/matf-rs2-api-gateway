@@ -1,7 +1,6 @@
 ﻿using Configurator.Entities;
 using Configurator.GrpcServices;
 using Configurator.Repositories;
-using System.Threading.Tasks;
 
 namespace Configurator.Services
 {

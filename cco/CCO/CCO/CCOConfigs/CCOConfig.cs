@@ -1,6 +1,5 @@
 ﻿using CCO.Entities;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
+using System.Text.Json;
 
 namespace CCO.CCOConfigs
 {
@@ -11,10 +10,10 @@ namespace CCO.CCOConfigs
         public Spec Data { get; }
 
 
-        public CCOConfig(DateTime validFrom, string yamlString)
+        public CCOConfig(DateTime validFrom, string jsonString)
         {
             ValidFrom = validFrom;
-            Data = ParseYamlString(yamlString);
+            Data = ParseJsonString(jsonString);
             Id = new CCOIdentifier(Data.Title, Data.Version);
         }
 
@@ -23,18 +22,24 @@ namespace CCO.CCOConfigs
             return now >= ValidFrom;
         }
 
-        public Spec ParseYamlString(string yamlString)
+        public static Spec ParseJsonString(string jsonString)
         {
-            var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .Build();
+            JsonSerializerOptions options = new()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
 
-            return deserializer.Deserialize<Spec>(yamlString);
+            return JsonSerializer.Deserialize<Spec>(jsonString, options) ?? throw new Exception("Exception during deserialization");
         }
         public string GetDataString()
         {
-            var serializer = new SerializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
-            return serializer.Serialize(Data);
+            JsonSerializerOptions options = new()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+
+            return JsonSerializer.Serialize(Data, options);
         }
     }
 }
