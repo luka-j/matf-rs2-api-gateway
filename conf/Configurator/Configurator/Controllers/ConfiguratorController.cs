@@ -42,11 +42,12 @@ namespace Configurator.Controllers
             return Ok(await _configuratorService.ModifyAndUpdate(configs));
         }
 
-        [HttpDelete("")]
+        [HttpDelete("{category}/{apiName}/{apiVersion")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> DeleteConfigs([FromBody] IEnumerable<ConfigId> configs)
+        public async Task<ActionResult<bool>> DeleteConfigs(string category, string apiName, string apiVersion)
         {
-            return Ok(await _configuratorService.DeleteConfigs(configs));
+            var config = new Config(category, apiName, apiVersion, ""); 
+            return Ok(await _configuratorService.DeleteConfigs(new[] { config }));
         }
     }
 }
