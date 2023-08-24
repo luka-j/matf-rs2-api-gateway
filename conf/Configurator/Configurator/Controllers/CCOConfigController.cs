@@ -1,8 +1,5 @@
-﻿using CCO;
-using Configurator.DTOs;
-using Configurator.Entities;
-using Configurator.GrpcServices;
-using Configurator.Repositories;
+﻿using Configurator.Entities;
+using Configurator.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Configurator.Controllers
@@ -11,26 +8,26 @@ namespace Configurator.Controllers
     [Route("cco")]
     public class CCOConfigController : ControllerBase
     {
-        private readonly CCOGrpcService _ccoService;
-        private readonly IConfigRepository _configRepository;
+        private readonly CCOService _ccoService;
+        private readonly ConfiguratorService _configuratorService;
 
-        public CCOConfigController(CCOGrpcService ccoService, IConfigRepository configRepository)
+        public CCOConfigController(CCOService ccoService, ConfiguratorService configuratorService)
         {
             _ccoService = ccoService ?? throw new ArgumentNullException(nameof(ccoService));
-            _configRepository = configRepository ?? throw new ArgumentNullException(nameof(configRepository));
+            _configuratorService = configuratorService ?? throw new ArgumentNullException(nameof(configuratorService));
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<ConfigMetadataDTO>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<ConfigMetadataDTO>>> GetConfigs()
+        [ProducesResponseType(typeof(IEnumerable<CCOSpec>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<CCOSpec>>> GetConfigs()
         {
             return Ok(await _ccoService.GetAll());
         }
 
         [HttpGet("{apiName}/{apiVersion}")]
-        [ProducesResponseType(typeof(ConfigDataDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CCOSpec), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ConfigDataDTO>> GetConfig(string apiName, string apiVersion)
+        public async Task<ActionResult<CCOSpec>> GetConfig(string apiName, string apiVersion)
         {
             try
             {
@@ -41,11 +38,14 @@ namespace Configurator.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> Add([FromBody] string data)
+        public async Task<ActionResult<bool>> Add([FromBody] CCOSpec data)
         {
             try
             {
-                await _ccoService.Update(data, DateTime.Now.AddSeconds(10).ToString());
+                string configData = CCOService.GetDataString(data);
+                Config config = new("datasources", data.Title, data.Version, configData);
+
+                await _configuratorService.ModifyAndUpdate(new[] { config });
                 return Ok(true);
             }
             catch { return Ok(false); }
@@ -57,9 +57,8 @@ namespace Configurator.Controllers
         {
             try
             {
-                var config = new Config("frontends", apiName, apiVersion, "");
-                await _configRepository.DeleteConfigs(new[] { config });
-                await _ccoService.Delete(apiName, apiVersion);
+                var config = new Config("datasources", apiName, apiVersion, "");
+                await _configuratorService.DeleteConfigs(new[] { config });
                 return Ok(true);
             }
             catch { return Ok(false); }

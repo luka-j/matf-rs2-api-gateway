@@ -35,6 +35,7 @@ else
 builder.Services.AddScoped<APIGrpcService>();
 builder.Services.AddScoped<RPGrpcService>();
 builder.Services.AddScoped<CCOGrpcService>();
+builder.Services.AddScoped<CCOService>();
 builder.Services.AddScoped<ConfiguratorService>();
 builder.Services.AddSingleton<SchedulerService>();
 
@@ -50,7 +51,10 @@ if (app.Environment.IsDevelopment())
     app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000"));
 }
 
-// app.UseMiddleware<AuthenticationHandler>("test", builder.Configuration["AuthSettings:AuthUrl"]);
+if (bool.Parse(builder.Configuration["AuthSettings:UseAuth"]))
+{
+    app.UseMiddleware<AuthenticationHandler>("test", builder.Configuration["AuthSettings:AuthUrl"]);
+}
 
 app.MapControllers();
 
