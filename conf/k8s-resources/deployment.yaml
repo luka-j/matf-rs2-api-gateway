@@ -19,7 +19,7 @@ spec:
       serviceAccountName: conf-sa
       containers:
       - name: conf
-        image: ghcr.io/luka-j/matf-rs2-api-gateway-conf:sha-3e3197a55cef29ecd147d574fbf3cb1affc21889
+        image: ghcr.io/luka-j/matf-rs2-api-gateway-conf:sha-35a2eec47adc6384345a92d3c2a07e306d874dc8
         imagePullPolicy: Always
         ports:
         - containerPort: 5001
