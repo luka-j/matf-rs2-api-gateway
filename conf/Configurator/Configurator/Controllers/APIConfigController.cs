@@ -68,7 +68,8 @@ namespace Configurator.Controllers
         [ProducesResponseType(typeof(IEnumerable<ConfigMetadataDTO>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<ConfigMetadataDTO>>> GetBackendConfigs()
         {
-            return Ok(await _apiService.GetAllBackend());
+            var configs = await _apiService.GetAllBackend();
+            return Ok(configs.Configs);
         }
 
         [HttpGet("backend/{apiName}/{apiVersion}")]
