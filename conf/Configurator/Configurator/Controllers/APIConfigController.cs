@@ -23,7 +23,8 @@ namespace Configurator.Controllers
         [ProducesResponseType(typeof(IEnumerable<ConfigMetadataDTO>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<ConfigMetadataDTO>>> GetFrontendConfigs() 
         {
-            return Ok(await _apiService.GetAllFrontend());
+            var configs = await _apiService.GetAllFrontend();
+            return Ok(configs.Configs);
         }
 
         [HttpGet("frontend/{apiName}/{apiVersion}")]

@@ -2,6 +2,7 @@
 using Configurator.Entities;
 using Configurator.GrpcServices;
 using Configurator.Services;
+using k8s.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Configurator.Controllers
@@ -23,7 +24,8 @@ namespace Configurator.Controllers
         [ProducesResponseType(typeof(IEnumerable<ConfigMetadataDTO>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<ConfigMetadataDTO>>> GetConfigs()
         {
-            return Ok(await _rpService.GetAll());
+            var configs = await _rpService.GetAll();
+            return Ok(configs.Configs);
         }
 
         [HttpGet("{apiName}/{apiVersion}")]
