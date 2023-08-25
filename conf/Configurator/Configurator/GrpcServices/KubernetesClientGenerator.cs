@@ -29,6 +29,7 @@ namespace Configurator.GrpcServices
             foreach (V1Pod pod in podList.Items)
             {
                 var URI = pod.Status.PodIP + ":" + APIPort;
+                Console.WriteLine(URI);
 
                 var channel = GrpcChannel.ForAddress(URI);
                 var client = new ApiGatewayApi.ConfigManagement.ConfigManagementClient(channel);
