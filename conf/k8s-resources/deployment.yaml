@@ -19,7 +19,7 @@ spec:
       serviceAccountName: conf-sa
       containers:
       - name: conf
-        image: ghcr.io/luka-j/matf-rs2-api-gateway-conf:sha-816266adc311490dec402bb121f302041d658d5d
+        image: ghcr.io/luka-j/matf-rs2-api-gateway-conf:sha-d03059b6df27588e86ae6f2cee50cb09f5f61730
         imagePullPolicy: Always
         ports:
         - containerPort: 5001
@@ -32,6 +32,8 @@ spec:
           value: "https://github.com/vita-ride/rs2-config-repo.git"
         - name: "GitHubSettings__GitHubRepoName"
           value: "rs2-config-repo"
+        - name: "GitHubSettings__GitEmail"
+          value: "****@****.***"
         - name: "GitHubSettings__PAT"
           valueFrom:
             secretKeyRef:
@@ -48,6 +50,6 @@ spec:
                name: conf-secret
                key: github_password
         - name: "AuthSettings__UseAuth"
-          value: "true"
+          value: "false"
         - name: "AuthSettings__AuthUrl"
           value: "https://github.com/vita-ride/rs2-config-repo.git"

@@ -95,7 +95,7 @@ namespace Configurator.Services
             {
                 var deletedConfigs = await _configRepository.DeleteConfigs(configs);
 
-                foreach (var config in deletedConfigs)
+                foreach (var config in configs)
                 {
                     switch (config.Category)
                     {
