@@ -8,7 +8,7 @@ namespace Configurator.Repositories
  
         public DirectoryConfigRepository()
         {
-            RootDir = "local\\configs";
+            RootDir = Path.Combine("local", "configs");
             InitDirectories();
         }
 
@@ -20,10 +20,10 @@ namespace Configurator.Repositories
             }
             foreach (int i in Enum.GetValues(typeof(IConfigRepository.CATEGORIES)))
             {
-                var category = Enum.GetName(typeof(IConfigRepository.CATEGORIES), i);
-                if (!Directory.Exists(RootDir + "/" + category))
+                var category = Enum.GetName(typeof(IConfigRepository.CATEGORIES), i) ?? throw new Exception("Enum error");
+                if (!Directory.Exists(Path.Combine(RootDir, category)))
                 {
-                    Directory.CreateDirectory(RootDir + "/" + category);
+                    Directory.CreateDirectory(Path.Combine(RootDir, category));
                 }
             }
         }
@@ -37,7 +37,7 @@ namespace Configurator.Repositories
                 foreach (var config in configs)
                 {
                     string extension = config.Category == "datasources" ? ".json" : ".yaml";
-                    string filePath = RootDir + "\\" + config.Category + "\\" + config.ApiName + "-" + config.ApiVersion + extension;
+                    string filePath = Path.Combine(RootDir, config.Category, config.ApiName + "-" + config.ApiVersion + extension);
 
                     if (File.Exists(filePath))
                     {
@@ -59,12 +59,11 @@ namespace Configurator.Repositories
             {
                 return configs;
             }
-
             try
             {
                 string extension = category == "datasources" ? "*.json" : "*.yaml";
 
-                var files = Directory.GetFiles(RootDir + "\\" + category, extension);
+                var files = Directory.GetFiles(Path.Combine(RootDir, category), extension);
 
                 foreach (var file in files)
                 {
@@ -121,7 +120,7 @@ namespace Configurator.Repositories
                 foreach (var config in configs)
                 {
                     string extension = config.Category == "datasources" ? ".json" : ".yaml";
-                    string filePath = RootDir + "\\" + config.Category + "\\" + config.ApiName + "-" + config.ApiVersion + extension;
+                    string filePath = Path.Combine(RootDir, config.Category, config.ApiName + "-" + config.ApiVersion + extension);
 
                     await File.WriteAllTextAsync(filePath, config.Data);
                 }

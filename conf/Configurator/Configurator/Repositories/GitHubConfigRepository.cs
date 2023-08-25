@@ -7,7 +7,7 @@ namespace Configurator.Repositories
     {
         private readonly IConfiguration _configuration;
 
-        private readonly string REPO_DIR = "local\\repo";
+        private readonly string REPO_DIR = Path.Combine("local", "repo");
 
         private readonly string _repositoryName;
         private readonly string _repositoryURL;
@@ -27,7 +27,7 @@ namespace Configurator.Repositories
             {
                 CredentialsProvider = GetCredentialsHandler(),
             };
-            RootDir = REPO_DIR + "\\" + _repositoryName;
+            RootDir = Path.Combine(REPO_DIR, _repositoryName);
             if (!Repository.IsValid(RootDir))
                 Repository.Clone(_repositoryURL, RootDir, options);
         }
