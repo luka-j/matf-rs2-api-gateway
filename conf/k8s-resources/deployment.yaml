@@ -48,6 +48,6 @@ spec:
                name: conf-secret
                key: github_password
         - name: "AuthSettings__UseAuth"
-          value: "true"
+          value: "false"
         - name: "AuthSettings__AuthUrl"
           value: "https://github.com/vita-ride/rs2-config-repo.git"
