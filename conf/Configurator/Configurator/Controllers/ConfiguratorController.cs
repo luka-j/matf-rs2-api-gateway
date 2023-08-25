@@ -42,9 +42,9 @@ namespace Configurator.Controllers
             return Ok(await _configuratorService.ModifyAndUpdate(configs));
         }
 
-        [HttpDelete("{category}/{apiName}/{apiVersion")]
+        [HttpDelete("{category}/{apiName}/{apiVersion}")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> DeleteConfigs(string category, string apiName, string apiVersion)
+        public async Task<ActionResult<bool>> DeleteConfig(string category, string apiName, string apiVersion)
         {
             var config = new Config(category, apiName, apiVersion, ""); 
             return Ok(await _configuratorService.DeleteConfigs(new[] { config }));
