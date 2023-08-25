@@ -12,7 +12,6 @@ const Callback = lazy(() => import("../pages/callback"));
 const Overview = lazy(() => import("../pages/overview"));
 const Datasources = lazy(() => import("../pages/datasources"));
 const Frontends = lazy(() => import("../pages/frontends"));
-const Backends = lazy(() => import("../pages/backends"));
 const Spec = lazy(() => import("../pages/spec"));
 const Editor = lazy(() => import("../pages/editor"));
 
