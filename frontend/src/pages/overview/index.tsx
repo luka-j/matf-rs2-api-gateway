@@ -1,5 +1,7 @@
-import { apis, backends, caches, databases, frontends, queues, rps } from "@/mock/overview";
+import useGetFrontendsBackends from "@/hooks/use-get-frontends-backends";
+import { apis, caches, databases, queues, rps } from "@/mock/overview";
 import { Typography } from "@/components/ui/typography";
+import PageLoader from "@/components/page-loader";
 
 import ConfigOverviewCard from "./components/config-overview-card";
 import DatasourceCard from "./components/datasource-card";
@@ -7,6 +9,15 @@ import OuterCard from "./components/outer-card";
 import SystemOverviewCard from "./components/system-overview-card";
 
 const Dashboard = () => {
+  const { data: frontends, isLoading: isLoadingFrontends } = useGetFrontendsBackends("frontend");
+  const { data: backends, isLoading: isLoadingBackends } = useGetFrontendsBackends("backend");
+  // const { data: ccoConfigs, isLoading: isLoadingCCOConfigs } = useGetDatasources();
+  // const { data: rps, isLoading: isLoadingRps } = useGetRps();
+
+  if (isLoadingFrontends || isLoadingBackends) return <PageLoader />;
+
+  if (!frontends || !backends) return <div>Something went wrong</div>;
+
   return (
     <main className="mx-auto mt-8 max-w-7xl space-y-8 pb-8">
       <Typography variant="h1" className="text-center">
@@ -16,18 +27,12 @@ const Dashboard = () => {
       <OuterCard title="Config Overview" description="Here you can preview and edit your configs.">
         <ConfigOverviewCard
           title="Frontends"
-          description="Here you can preview and edit your frontends."
-          upNum={5}
-          totalNum={7}
           viewAllURL="/dashboard/frontends"
           frontBackList={frontends}
         />
 
         <ConfigOverviewCard
           title="Backends"
-          description="Here you can preview and edit your backends."
-          upNum={3}
-          totalNum={7}
           viewAllURL="/dashboard/backends"
           frontBackList={backends}
         />

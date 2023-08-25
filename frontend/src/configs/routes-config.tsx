@@ -28,10 +28,10 @@ export const router = createBrowserRouter(
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route path="overview" element={<Overview />} />
             <Route path="datasources" element={<Datasources />} />
-            <Route path="frontends" element={<Frontends />} />
-            <Route path="backends" element={<Backends />} />
+            <Route path="frontends" element={<Frontends key="frontends" />} />
+            <Route path="backends" element={<Frontends key="backends" />} />
             <Route path="editor" element={<Editor />} />
-            <Route path="spec/*" element={<Spec />} />
+            <Route path="spec" element={<Spec />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Route>
 

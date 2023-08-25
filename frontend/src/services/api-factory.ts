@@ -35,7 +35,7 @@ interface IApiOptions extends AxiosRequestConfig {
 const createApi = ({ commonPrefix, ...rest }: IApiOptions) => {
   const api = axios.create({
     baseURL: import.meta.env.DEV
-      ? `http://localhost:5002/${commonPrefix}/`
+      ? `https://dashboard-rs2.luka-j.rocks/${commonPrefix}/` // `http://localhost:5002/${commonPrefix}/`
       : `https://dashboard-rs2.luka-j.rocks/${commonPrefix}/`,
     ...rest,
   });
