@@ -48,7 +48,7 @@ namespace Configurator.GrpcServices
 
             foreach (V1Pod pod in podList.Items)
             {
-                var URI = pod.Status.PodIP + ":" + RPPort;
+                var URI = $"http://{pod.Status.PodIP}:{RPPort}";
 
                 var channel = GrpcChannel.ForAddress(URI);
                 var client = new ApiGatewayRp.ConfigManagement.ConfigManagementClient(channel);
@@ -67,7 +67,7 @@ namespace Configurator.GrpcServices
 
             foreach (V1Pod pod in podList.Items)
             {
-                var URI = pod.Status.PodIP + ":" + CCOPort;
+                var URI = $"http://{pod.Status.PodIP}:{CCOPort}";
 
                 var channel = GrpcChannel.ForAddress(URI);
                 var client = new CCO.ConfigManagement.ConfigManagementClient(channel);
