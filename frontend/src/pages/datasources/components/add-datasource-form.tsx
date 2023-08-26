@@ -22,6 +22,12 @@ interface IAddDatasourceFormProps {
 const AddDatasourceForm = ({ type }: IAddDatasourceFormProps) => {
   const form = useForm<IAddDatasourceSchema>({
     resolver: zodResolver(addDatasourceSchema),
+    defaultValues: {
+      name: "",
+      type: "",
+      url: "",
+      username: "",
+    },
   });
 
   const onSubmit: SubmitHandler<IAddDatasourceSchema> = (data) => {

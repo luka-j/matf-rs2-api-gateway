@@ -11,9 +11,9 @@ const Callback = lazy(() => import("../pages/callback"));
 
 const Overview = lazy(() => import("../pages/overview"));
 const Datasources = lazy(() => import("../pages/datasources"));
-const Frontends = lazy(() => import("../pages/frontends"));
+const FrontendsBackends = lazy(() => import("../pages/frontends-backends"));
 const Spec = lazy(() => import("../pages/spec"));
-const Editor = lazy(() => import("../pages/editor"));
+const Middleware = lazy(() => import("../pages/middleware"));
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,9 +27,9 @@ export const router = createBrowserRouter(
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route path="overview" element={<Overview />} />
             <Route path="datasources" element={<Datasources />} />
-            <Route path="frontends" element={<Frontends key="frontends" />} />
-            <Route path="backends" element={<Frontends key="backends" />} />
-            <Route path="editor" element={<Editor />} />
+            <Route path="frontends" element={<FrontendsBackends key="frontends" />} />
+            <Route path="backends" element={<FrontendsBackends key="backends" />} />
+            <Route path="middleware" element={<Middleware />} />
             <Route path="spec" element={<Spec />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Route>

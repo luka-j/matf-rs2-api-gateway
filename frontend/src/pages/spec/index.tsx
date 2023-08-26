@@ -19,9 +19,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import CustomCodeEditor from "@/components/custom-code-editor";
 import PageLoader from "@/components/page-loader";
 
-import CustomEditor from "./components/custom-editor";
 import useCreateFrontendBackend from "./hooks/use-create-frontend-backend";
 import useGetDetailFrontendBackend from "./hooks/use-get-detail-frontend-backend";
 import {
@@ -79,7 +79,7 @@ const Spec = () => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col">
         <div className="flex h-[80vh] w-full">
           <ScrollArea className="w-1/2 rounded-md border">
-            <CustomEditor data={data} setData={form.setValue} />
+            <CustomCodeEditor data={data} setData={form.setValue} />
           </ScrollArea>
 
           <ScrollArea className="w-1/2 rounded-md border">

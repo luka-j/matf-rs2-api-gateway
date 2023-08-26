@@ -1,22 +1,21 @@
+import useGetDatasources from "@/hooks/use-get-datasources";
 import useGetFrontendsBackends from "@/hooks/use-get-frontends-backends";
-import { apis, caches, databases, queues, rps } from "@/mock/overview";
+import { caches, databases, queues } from "@/mock/overview";
 import { Typography } from "@/components/ui/typography";
 import PageLoader from "@/components/page-loader";
 
 import ConfigOverviewCard from "./components/config-overview-card";
 import DatasourceCard from "./components/datasource-card";
 import OuterCard from "./components/outer-card";
-import SystemOverviewCard from "./components/system-overview-card";
 
 const Dashboard = () => {
   const { data: frontends, isLoading: isLoadingFrontends } = useGetFrontendsBackends("frontend");
   const { data: backends, isLoading: isLoadingBackends } = useGetFrontendsBackends("backend");
-  // const { data: ccoConfigs, isLoading: isLoadingCCOConfigs } = useGetDatasources();
-  // const { data: rps, isLoading: isLoadingRps } = useGetRps();
+  const { data: ccoConfigs, isLoading: isLoadingCCOConfigs } = useGetDatasources();
 
-  if (isLoadingFrontends || isLoadingBackends) return <PageLoader />;
+  if (isLoadingFrontends || isLoadingBackends || isLoadingCCOConfigs) return <PageLoader />;
 
-  if (!frontends || !backends) return <div>Something went wrong</div>;
+  if (!frontends || !backends || !ccoConfigs) return <div>Something went wrong</div>;
 
   return (
     <main className="mx-auto mt-8 max-w-7xl space-y-8 pb-8">
@@ -65,26 +64,6 @@ const Dashboard = () => {
           totalNum={7}
           description="Here you can preview and edit your queues."
           datasourceList={queues}
-        />
-      </OuterCard>
-
-      <OuterCard title="System Overview" description="Here you can preview and edit your systems.">
-        <SystemOverviewCard
-          title="APIs"
-          numInstances={5}
-          viewAllURL="/dashboard/systems/apis"
-          description="Here you can preview and edit your APIs."
-          systemOverviewList={apis}
-          seeMetricsURL="/dashboard/metrics/apis"
-        />
-
-        <SystemOverviewCard
-          title="RPs"
-          numInstances={3}
-          viewAllURL="/dashboard/systems/rps"
-          description="Here you can preview and edit your RPs."
-          systemOverviewList={rps}
-          seeMetricsURL="/dashboard/metrics/rps"
         />
       </OuterCard>
     </main>

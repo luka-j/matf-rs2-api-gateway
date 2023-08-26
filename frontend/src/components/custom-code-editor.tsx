@@ -7,14 +7,14 @@ import { UseFormSetValue } from "react-hook-form";
 
 import { cn } from "@/utils/style-utils";
 
-import { IAddFrontendBackendSchema } from "../schemas/add-frontend-backend-schema";
+import { IAddFrontendBackendSchema } from "../pages/spec/schemas/add-frontend-backend-schema";
 
 interface ICustomeEditorProps {
   data: string;
   setData: UseFormSetValue<IAddFrontendBackendSchema>;
 }
 
-const CustomEditor = ({ data, setData }: ICustomeEditorProps) => {
+const CustomCodeEditor = ({ data, setData }: ICustomeEditorProps) => {
   const highlight = (code: string) => (
     <Highlight code={code} language="yaml" theme={themes.vsDark}>
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
@@ -43,4 +43,4 @@ const CustomEditor = ({ data, setData }: ICustomeEditorProps) => {
   );
 };
 
-export default CustomEditor;
+export default CustomCodeEditor;

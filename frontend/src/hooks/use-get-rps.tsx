@@ -5,7 +5,7 @@ import rpConfigService, { rpConfigKey } from "@/services/rp-config.service";
 const useGetRps = () => {
   return useQuery({
     queryKey: [rpConfigKey],
-    queryFn: () => rpConfigService.getFrontendsBackends(),
+    queryFn: () => rpConfigService.getRps(),
   });
 };
 

@@ -1,3 +1,5 @@
+import { useLocation, useNavigate } from "react-router-dom";
+
 import { FrontendsBackendsConfig } from "@/types/api-configs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,11 +11,16 @@ interface IConfigOverviewCardProps {
 }
 
 const ConfigOverviewCard = ({ title, viewAllURL, frontBackList }: IConfigOverviewCardProps) => {
+  const location = useLocation();
+  const frontOrBack = location.pathname.includes("frontend") ? "frontend" : "backend";
+
+  const navigate = useNavigate();
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex justify-between">
-          {title}: {frontBackList.configs.length}/{frontBackList.configs.length} up
+          {title}: {frontBackList.length}/{frontBackList.length} up
           <Button asChild variant="outline" className="-mt-1">
             <a href={viewAllURL}>View all</a>
           </Button>
@@ -21,7 +28,7 @@ const ConfigOverviewCard = ({ title, viewAllURL, frontBackList }: IConfigOvervie
         <CardDescription>Here you can preview and edit your {title.toLowerCase()}.</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-6">
-        {frontBackList.configs.slice(0, 3).map((frontBack) => (
+        {frontBackList.slice(0, 3).map((frontBack) => (
           <div key={frontBack.basePath} className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
               {/* {frontBack.status === "up" && <CheckIcon color="#10B981" />} */}
@@ -32,7 +39,16 @@ const ConfigOverviewCard = ({ title, viewAllURL, frontBackList }: IConfigOvervie
                 <p className="text-sm text-muted-foreground">Version {frontBack.apiVersion}</p>
               </div>
             </div>
-            <Button variant="ghost">View spec</Button>
+            <Button
+              variant="ghost"
+              onClick={() =>
+                navigate("/dashboard/spec", {
+                  state: { configType: frontOrBack, ...frontBack },
+                })
+              }
+            >
+              View spec
+            </Button>
           </div>
         ))}
       </CardContent>
