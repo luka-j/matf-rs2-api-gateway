@@ -9,8 +9,8 @@ namespace ApiGatewayRequestProcessor.Steps;
 
 public class HttpStep : Step
 {
-    private static ApiGateway _apiGateway = new(); // not the prettiest solution (making ApiGateway not really a
-                                                   // singleton), but also not quite harmful
+    private static readonly ApiGateway ApiGateway = new(); // not the prettiest solution (making ApiGateway not really a
+                                                           // singleton), but also not quite harmful
     
     private string _api;
     private string _version;
@@ -45,7 +45,7 @@ public class HttpStep : Step
     public override async Task<ObjectEntity> Execute(ObjectEntity state, Dictionary<string, List<Step>>? stepRepository)
     {
         var executionRequest = PackToExecutionRequest(state);
-        var response = await _apiGateway.InvokeRequest(executionRequest);
+        var response = await ApiGateway.InvokeRequest(executionRequest);
         var responseEntity = ApiOperation.UnpackFromExecutionResponse(response);
         if (Result != null)
         {

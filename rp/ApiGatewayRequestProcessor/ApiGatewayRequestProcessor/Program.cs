@@ -13,6 +13,7 @@ builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
 builder.Services.AddSingleton<ConfigRepository>();
 builder.Services.AddSingleton<ApiGateway>();
+builder.Services.AddSingleton<CcoGateway>();
 
 Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
     .Enrich.WithThreadId()

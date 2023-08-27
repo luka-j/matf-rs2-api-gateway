@@ -24,6 +24,9 @@ public class ApiSpec
             { "invoke", typeof(InvokeStep) },
             { "log", typeof(LogStep) },
             { "return", typeof(ReturnStep) },
+            { "database", typeof(DatabaseStep) },
+            { "cache", typeof(CacheStep) },
+            { "queue", typeof(QueueStep) }
         };
         o.AddUniqueKeyTypeDiscriminator<Step>(keyMappings);
     };
