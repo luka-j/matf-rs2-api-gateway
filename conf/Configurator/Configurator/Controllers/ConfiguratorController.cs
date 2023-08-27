@@ -14,6 +14,7 @@ namespace Configurator.Controllers
         {
             _configuratorService = configuratorService ?? throw new ArgumentNullException(nameof(configuratorService));
         }
+
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<Config>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Config>>> GetAllConfigs()
@@ -26,28 +27,6 @@ namespace Configurator.Controllers
         public async Task<ActionResult<IEnumerable<Config>>> GetConfigsByCategory(string category)
         {
             return Ok(await _configuratorService.GetConfigsByCategory(category));
-        }
-
-        [HttpPatch("update")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> UpdateConfigs()
-        {
-            return Ok(await _configuratorService.UpdateConfigs());
-        }
-
-        [HttpPost("")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> ModifyAndUpdateConfigs([FromBody] IEnumerable<Config> configs)
-        {
-            return Ok(await _configuratorService.ModifyAndUpdate(configs));
-        }
-
-        [HttpDelete("{category}/{apiName}/{apiVersion}")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> DeleteConfig(string category, string apiName, string apiVersion)
-        {
-            var config = new Config(category, apiName, apiVersion, ""); 
-            return Ok(await _configuratorService.DeleteConfigs(new[] { config }));
         }
     }
 }

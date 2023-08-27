@@ -30,14 +30,13 @@ namespace Configurator.Controllers
 
         [HttpGet("{apiName}/{apiVersion}")]
         [ProducesResponseType(typeof(ConfigDataDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ConfigDataDTO>> GetConfig(string apiName, string apiVersion)
         {
             try
             {
                 return Ok(await _rpService.Get(apiName, apiVersion));
             }
-            catch { return NotFound(); }
+            catch { return Ok(); }
         }
 
         [HttpPost]
@@ -46,7 +45,7 @@ namespace Configurator.Controllers
         {
             try
             {
-                Config config = new("middlewares", data.ApiName, data.ApiVersion, data.Data);
+                Config config = new("middlewares", data.ApiName, data.ApiVersion, "", data.Data);
                 await _configuratorService.ModifyAndUpdate(new[] { config });
                 return Ok(true);
             }
@@ -59,7 +58,7 @@ namespace Configurator.Controllers
         {
             try
             {
-                var config = new Config("middlewares", apiName, apiVersion, "");
+                var config = new Config("middlewares", apiName, apiVersion, "", "");
                 await _configuratorService.DeleteConfigs(new[] { config });
                 return Ok(true);
             }

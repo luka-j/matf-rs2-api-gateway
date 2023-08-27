@@ -14,18 +14,48 @@ namespace Configurator.Services
             _ccoGrpcService = ccoGrpcService ?? throw new ArgumentNullException(nameof(ccoGrpcService));
         }
 
-        public async Task<IEnumerable<CCOSpec>> GetAll()
+        public async Task<IEnumerable<CCOSpec>> GetAllDatabases()
         {
-            var configs = await _ccoGrpcService.GetAllData();
+            var configs = await _ccoGrpcService.GetAllDatabaseData();
 
             var allConfigs = configs.Select(config => ParseJsonString(config.Data));
 
             return allConfigs;
         }
 
-        public async Task<CCOSpec> Get(string apiName, string apiVersion)
+        public async Task<CCOSpec> GetDatabase(string name)
         {
-            ConfigData data = await _ccoGrpcService.Get(apiName, apiVersion);
+            ConfigData data = await _ccoGrpcService.GetDatabase(name);
+
+            return ParseJsonString(data.Data);
+        }
+        public async Task<IEnumerable<CCOSpec>> GetAllCaches()
+        {
+            var configs = await _ccoGrpcService.GetAllCacheData();
+
+            var allConfigs = configs.Select(config => ParseJsonString(config.Data));
+
+            return allConfigs;
+        }
+
+        public async Task<CCOSpec> GetCache(string name)
+        {
+            ConfigData data = await _ccoGrpcService.GetCache(name);
+
+            return ParseJsonString(data.Data);
+        }
+        public async Task<IEnumerable<CCOSpec>> GetAllQueues()
+        {
+            var configs = await _ccoGrpcService.GetAllQueueData();
+
+            var allConfigs = configs.Select(config => ParseJsonString(config.Data));
+
+            return allConfigs;
+        }
+
+        public async Task<CCOSpec> GetQueue(string name)
+        {
+            ConfigData data = await _ccoGrpcService.GetQueue(name);
 
             return ParseJsonString(data.Data);
         }

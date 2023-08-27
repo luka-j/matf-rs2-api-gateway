@@ -1,6 +1,7 @@
 ﻿using Configurator.Entities;
 using Configurator.GrpcServices;
 using Configurator.Repositories;
+using System.Threading.Tasks;
 
 namespace Configurator.Services
 {
@@ -45,7 +46,20 @@ namespace Configurator.Services
                         task = _rpService.Update(config.Data, validFrom.ToString());
                         break;
                     case "datasources":
-                        task = _ccoService.Update(config.Data, validFrom.ToString());
+                        switch (config.Type)
+                        {
+                            case "databases":
+                                task = _ccoService.UpdateDatabase(config.Data, validFrom.ToString());
+                                break;
+                            case "caches":
+                                task = _ccoService.UpdateCache(config.Data, validFrom.ToString());
+                                break;
+                            case "queues":
+                                task = _ccoService.UpdateQueue(config.Data, validFrom.ToString());
+                                break;
+                            default:
+                                break;
+                        }
                         break;
                     default:
                         break;
@@ -109,7 +123,20 @@ namespace Configurator.Services
                             await _rpService.Delete(config.ApiName, config.ApiVersion);
                             break;
                         case "datasources":
-                            await _ccoService.Delete(config.ApiName, config.ApiVersion);
+                            switch (config.Type)
+                            {
+                                case "databases":
+                                    await _ccoService.DeleteDatabase(config.ApiName);
+                                    break;
+                                case "caches":
+                                    await _ccoService.DeleteCache(config.ApiName);
+                                    break;
+                                case "queues":
+                                    await _ccoService.DeleteQueue(config.ApiName);
+                                    break;
+                                default:
+                                    break;
+                            }
                             break;
                         default:
                             break;

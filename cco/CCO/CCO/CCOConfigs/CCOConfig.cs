@@ -6,7 +6,7 @@ namespace CCO.CCOConfigs
     public class CCOConfig
     {
         public DateTime ValidFrom { get; }
-        public CCOIdentifier Id { get; }
+        public CCOConfigIdentifier Id { get; }
         public Spec Data { get; }
 
 
@@ -14,7 +14,7 @@ namespace CCO.CCOConfigs
         {
             ValidFrom = validFrom;
             Data = ParseJsonString(jsonString);
-            Id = new CCOIdentifier(Data.Title, Data.Version);
+            Id = new CCOConfigIdentifier(Data.Title);
         }
 
         public bool IsActive(DateTime now)
