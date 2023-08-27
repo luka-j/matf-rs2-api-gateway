@@ -1,3 +1,4 @@
+using ApiGatewayRequestProcessor;
 using ApiGatewayRequestProcessor.Configs;
 using ApiGatewayRequestProcessor.Gateways;
 using ApiGatewayRequestProcessor.Services;
@@ -14,6 +15,8 @@ builder.Services.AddGrpcReflection();
 builder.Services.AddSingleton<ConfigRepository>();
 builder.Services.AddSingleton<ApiGateway>();
 builder.Services.AddSingleton<CcoGateway>();
+builder.Services.AddSingleton<ConfGateway>();
+builder.Services.AddSingleton<Initializer>();
 
 Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
     .Enrich.WithThreadId()
@@ -24,6 +27,8 @@ Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
 
 var app = builder.Build();
 
+app.Services.GetService<Initializer>(); // run config initialization
+    
 app.MapGrpcReflectionService();
 app.MapGrpcService<ConfigManagementService>();
 app.MapGrpcService<RequestProcessorService>();

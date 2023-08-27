@@ -11,6 +11,7 @@
         <Protobuf Include="Protos\api.proto" GrpcServices="Both" />
         <Protobuf Include="Protos\datasource.proto" GrpcServices="Client" />
         <Protobuf Include="Protos\config.proto" GrpcServices="Server" />
+        <Protobuf Include="Protos\conf_retriever.proto" GrpcServices="Client" />
     </ItemGroup>
 
     <ItemGroup>
@@ -20,8 +21,6 @@
         <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
         <PackageReference Include="YamlDotNet" Version="13.1.1" />
-
-
     </ItemGroup>
 
 

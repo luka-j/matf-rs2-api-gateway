@@ -10,6 +10,7 @@
     <ItemGroup>
         <Protobuf Include="Protos\api.proto" GrpcServices="Both" />
         <Protobuf Include="Protos\config.proto" GrpcServices="Server" />
+        <Protobuf Include="Protos\conf_retriever.proto" GrpcServices="Client" />
     </ItemGroup>
 
     <ItemGroup>
