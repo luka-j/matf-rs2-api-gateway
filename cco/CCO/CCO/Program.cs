@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddGrpc();
-builder.Services.AddSingleton<CCORepository>();
+builder.Services.AddSingleton<ConfigRepository>();
 builder.Services.AddScoped<DatabaseRepository>();
 builder.Services.AddScoped<CacheRepository>();
 builder.Services.AddScoped<QueueRepository>();

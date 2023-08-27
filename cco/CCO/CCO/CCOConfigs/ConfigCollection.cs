@@ -1,8 +1,8 @@
 ﻿namespace CCO.CCOConfigs
 {
-    public class CCORepository
+    public class ConfigCollection
     {
-        private readonly Dictionary<CCOIdentifier, SortedSet<CCOConfig>> _configs = new();
+        private readonly Dictionary<CCOConfigIdentifier, SortedSet<CCOConfig>> _configs = new();
 
         private static readonly TimeSpan VALIDITY_MIN_OFFSET = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan PRUNE_AFTER = TimeSpan.FromMinutes(1);
@@ -20,7 +20,7 @@
             }
         }
 
-        public void AddConfig(CCOSpec spec)
+        public void AddConfig(ConfigSpec spec)
         {
             var now = DateTime.Now;
             CheckStartDateValidity(spec.ValidFrom, now);
@@ -36,19 +36,19 @@
             Prune(now);
         }
 
-        public bool HasConfig(CCOIdentifier id)
+        public bool HasConfig(CCOConfigIdentifier id)
         {
             return _configs.ContainsKey(id);
         }
 
-        public IEnumerable<CCOIdentifier> GetAllConfigs(DateTime now)
+        public IEnumerable<CCOConfigIdentifier> GetAllConfigs(DateTime now)
         {
             return _configs.Select(kv => GetCurrentConfig(kv.Key, now))
                 .Where(kv => kv != null)
                 .Select(config => config!.Id);
         }
 
-        public CCOConfig? GetCurrentConfig(CCOIdentifier id, DateTime now)
+        public CCOConfig? GetCurrentConfig(CCOConfigIdentifier id, DateTime now)
         {
             if (!_configs.ContainsKey(id)) return null;
             var eligibleConfigs = _configs[id];
@@ -62,7 +62,7 @@
             }
         }
 
-        public bool DeleteConfig(CCOIdentifier id)
+        public bool DeleteConfig(CCOConfigIdentifier id)
         {
             return _configs.Remove(id);
         }
@@ -118,3 +118,4 @@
         }
     }
 }
+
