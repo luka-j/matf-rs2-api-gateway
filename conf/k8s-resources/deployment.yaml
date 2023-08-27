@@ -22,7 +22,8 @@ spec:
         image: ghcr.io/luka-j/matf-rs2-api-gateway-conf:sha-9048cccc9d24b62ef89285a85f6f36966eec351f
         imagePullPolicy: Always
         ports:
-        - containerPort: 5001
+        - containerPort: 80
+        - containerPort: 5000
         env:
         - name: "UseKubernetes"
           value: "true"

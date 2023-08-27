@@ -10,10 +10,12 @@
 	  <None Remove="Protos\api.proto" />
 	  <None Remove="Protos\rp.proto" />
 	  <None Remove="Protos\cco.proto" />
+      <None Remove="Protos\conf.proto" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.55.0" />
+    <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.56.0" />
     <PackageReference Include="KubernetesClient" Version="11.0.44" />
     <PackageReference Include="LibGit2Sharp" Version="0.27.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
@@ -24,6 +26,7 @@
 	  <Protobuf Include="Protos\api.proto" GrpcServices="Client" />
 	  <Protobuf Include="Protos\rp.proto" GrpcServices="Client" />
 	  <Protobuf Include="Protos\cco.proto" GrpcServices="Client" />
+      <Protobuf Include="Protos\conf.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>
