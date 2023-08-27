@@ -1,4 +1,5 @@
 ﻿using Configurator.Entities;
+using Google.Protobuf;
 
 namespace Configurator.Repositories
 {
@@ -21,9 +22,19 @@ namespace Configurator.Repositories
             foreach (int i in Enum.GetValues(typeof(IConfigRepository.CATEGORIES)))
             {
                 var category = Enum.GetName(typeof(IConfigRepository.CATEGORIES), i) ?? throw new Exception("Enum error");
-                if (!Directory.Exists(Path.Combine(RootDir, category)))
+                var path = Path.Combine(RootDir, category);
+                if (!Directory.Exists(path))
                 {
-                    Directory.CreateDirectory(Path.Combine(RootDir, category));
+                    Directory.CreateDirectory(path);
+                }
+            }
+            foreach (int i in Enum.GetValues(typeof(IConfigRepository.DATASOURCES)))
+            {
+                var datasource = Enum.GetName(typeof(IConfigRepository.DATASOURCES), i) ?? throw new Exception("Enum error");
+                var path = Path.Combine(RootDir, "datasources", datasource);
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
                 }
             }
         }
@@ -36,8 +47,14 @@ namespace Configurator.Repositories
             {
                 foreach (var config in configs)
                 {
-                    string extension = config.Category == "datasources" ? ".json" : ".yaml";
-                    string filePath = Path.Combine(RootDir, config.Category, config.ApiName + "-" + config.ApiVersion + extension);
+                    string filePath;
+                    if (config.Category == "datasources")
+                    {
+                        filePath = Path.Combine(RootDir, config.Category, config.Type, config.ApiName + ".json");
+                    } else
+                    {
+                        filePath = Path.Combine(RootDir, config.Category, config.ApiName + "-" + config.ApiVersion + ".yaml");
+                    }
 
                     if (File.Exists(filePath))
                     {
@@ -61,18 +78,38 @@ namespace Configurator.Repositories
             }
             try
             {
-                string extension = category == "datasources" ? "*.json" : "*.yaml";
-
-                var files = Directory.GetFiles(Path.Combine(RootDir, category), extension);
-
-                foreach (var file in files)
+                if (category == "datasources")
                 {
-                    string data = await File.ReadAllTextAsync(file);
-                    string fileName = Path.GetFileName(file);
-                    string[] splitFileName = fileName.Split("-");
-                    string apiName = splitFileName[0];
-                    string apiVersion = splitFileName[1].Split(".")[0];
-                    configs.Add(new(category, apiName, apiVersion, data));
+                    foreach (int i in Enum.GetValues(typeof(IConfigRepository.DATASOURCES)))
+                    {
+                        var type = Enum.GetName(typeof(IConfigRepository.DATASOURCES), i) ?? throw new Exception("Enum error");
+
+                        var files = Directory.GetFiles(Path.Combine(RootDir, category, type), "*.json");
+
+                        foreach (var file in files)
+                        {
+                            string data = await File.ReadAllTextAsync(file);
+                            string fileName = Path.GetFileName(file);
+                            string name = fileName.Split(".")[0];
+                            configs.Add(new(category, name, "", type, data));
+                        }
+
+                    }
+                    
+                }
+                else
+                {
+                    var files = Directory.GetFiles(Path.Combine(RootDir, category), "*.yaml");
+
+                    foreach (var file in files)
+                    {
+                        string data = await File.ReadAllTextAsync(file);
+                        string fileName = Path.GetFileName(file);
+                        string[] splitFileName = fileName.Split("-");
+                        string apiName = splitFileName[0];
+                        string apiVersion = splitFileName[1].Split(".")[0];
+                        configs.Add(new(category, apiName, apiVersion, "", data));
+                    }
                 }
             }
             catch (Exception e)
@@ -119,8 +156,15 @@ namespace Configurator.Repositories
             {
                 foreach (var config in configs)
                 {
-                    string extension = config.Category == "datasources" ? ".json" : ".yaml";
-                    string filePath = Path.Combine(RootDir, config.Category, config.ApiName + "-" + config.ApiVersion + extension);
+                    string filePath;
+                    if (config.Category == "datasources")
+                    {
+                        filePath = Path.Combine(RootDir, config.Category, config.Type, config.ApiName + ".json");
+                    }
+                    else
+                    {
+                        filePath = Path.Combine(RootDir, config.Category, config.ApiName + "-" + config.ApiVersion + ".yaml");
+                    }
 
                     await File.WriteAllTextAsync(filePath, config.Data);
                 }

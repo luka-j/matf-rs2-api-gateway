@@ -5,20 +5,27 @@ option csharp_namespace = "CCO";
 package config;
 
 service ConfigManagement {
-  rpc UpdateConfig (ConfigData) returns (Empty);
-  rpc DeleteConfig (ConfigId) returns (Empty);
+  rpc UpdateDatabaseConfig (ConfigData) returns (Empty);
+  rpc DeleteDatabaseConfig (ConfigId) returns (Empty);
+  rpc UpdateCacheConfig (ConfigData) returns (Empty);
+  rpc DeleteCacheConfig (ConfigId) returns (Empty);
+  rpc UpdateQueueConfig (ConfigData) returns (Empty);
+  rpc DeleteQueueConfig (ConfigId) returns (Empty);
   
   rpc RevertPendingUpdates(Empty) returns (RevertChangesResponse);
   
-  rpc GetAllConfigs (Empty) returns (ConfigList);
-  rpc GetConfig (ConfigId) returns (ConfigData);
+  rpc GetAllDatabaseConfigs (Empty) returns (ConfigList);
+  rpc GetDatabaseConfig (ConfigId) returns (ConfigData);
+  rpc GetAllCacheConfigs (Empty) returns (ConfigList);
+  rpc GetCacheConfig (ConfigId) returns (ConfigData);
+  rpc GetAllQueueConfigs (Empty) returns (ConfigList);
+  rpc GetQueueConfig (ConfigId) returns (ConfigData);
 }
 
 message Empty {}
 
 message ConfigId {
-  string apiName = 1;
-  string apiVersion = 2;
+  string name = 1;
 }
 message ConfigData {
   string data = 1;
@@ -28,5 +35,7 @@ message ConfigList {
   repeated ConfigId configs = 1;
 }
 message RevertChangesResponse {
-  int32 reverted = 1;
+  int32 revertedDatabases = 1;
+  int32 revertedCaches = 2;
+  int32 revertedQueues = 3;
 }

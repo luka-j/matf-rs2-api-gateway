@@ -29,14 +29,13 @@ namespace Configurator.Controllers
 
         [HttpGet("frontend/{apiName}/{apiVersion}")]
         [ProducesResponseType(typeof(ConfigDataDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ConfigDataDTO>> GetFrontendConfig(string apiName, string apiVersion)
         {
             try
             {
                 return Ok(await _apiService.GetFrontend(apiName, apiVersion));
 
-            } catch{ return NotFound(); }
+            } catch{ return Ok(); }
         }
 
         [HttpPost("frontend")]
@@ -45,7 +44,7 @@ namespace Configurator.Controllers
         {
             try
             {
-                Config config = new("frontends", data.ApiName, data.ApiVersion, data.Data);
+                Config config = new("frontends", data.ApiName, data.ApiVersion, "", data.Data);
                 await _configuratorService.ModifyAndUpdate(new[] { config });
                 return Ok(true);
             } catch { return Ok(false); } 
@@ -57,7 +56,7 @@ namespace Configurator.Controllers
         {
             try
             {
-                var config = new Config("frontends", apiName, apiVersion, "");
+                var config = new Config("frontends", apiName, apiVersion, "", "");
                 await _configuratorService.DeleteConfigs(new[] { config });
                 return Ok(true);
             }
@@ -74,13 +73,12 @@ namespace Configurator.Controllers
 
         [HttpGet("backend/{apiName}/{apiVersion}")]
         [ProducesResponseType(typeof(ConfigDataDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ConfigDataDTO>> GetBackendConfig(string apiName, string apiVersion)
         {
             try
             {
                 return Ok(await _apiService.GetBackend(apiName, apiVersion));
-            } catch { return NotFound(); }
+            } catch { return Ok(); }
         }
 
         [HttpPost("backend")]
@@ -89,7 +87,7 @@ namespace Configurator.Controllers
         {
             try
             {
-                Config config = new("backends", data.ApiName, data.ApiVersion, data.Data);
+                Config config = new("backends", data.ApiName, data.ApiVersion, "", data.Data);
                 await _configuratorService.ModifyAndUpdate(new[] { config });
                 return Ok(true);
             }
@@ -102,7 +100,7 @@ namespace Configurator.Controllers
         {
             try
             {
-                var config = new Config("backends", apiName, apiVersion, "");
+                var config = new Config("backends", apiName, apiVersion, "", "");
                 await _configuratorService.DeleteConfigs(new[] { config });
                 return Ok(true);
             }
