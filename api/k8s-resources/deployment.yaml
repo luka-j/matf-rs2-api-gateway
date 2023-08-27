@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: ghcr.io/luka-j/matf-rs2-api-gateway-api:sha-e8c44fd0038dd476e7cca685a17a0db7c5efa95c
+        image: ghcr.io/luka-j/matf-rs2-api-gateway-api:sha-a7d4b202f61ccf25898fae7718e8bb506916131c
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
