@@ -1,0 +1,23 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Retriever";
+
+package config;
+
+service ConfigRetriever {
+  rpc GetAllFrontendConfigs (Empty) returns (Specs);
+  rpc GetAllBackendConfigs (Empty) returns (Specs);
+  rpc GetAllRpConfigs (Empty) returns (Specs);
+}
+
+message Empty {}
+
+message Specs {
+  repeated Spec specs = 1;
+}
+
+message Spec {
+  string apiName = 1;
+  string apiVersion = 2;
+  string data = 3;
+}
