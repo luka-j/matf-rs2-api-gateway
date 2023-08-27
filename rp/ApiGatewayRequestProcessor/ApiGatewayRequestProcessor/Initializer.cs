@@ -16,7 +16,7 @@ public class Initializer
             var specs = confGateway.GetSpecs();
             foreach (var spec in specs.Specs_)
             {
-                configRepository.UpdateConfig(spec.Data, DateTime.Now);
+                configRepository.UpdateConfig(spec.Data, DateTime.Now, false);
             }
             _logger.Information("Initialized {Count} configs", specs.Specs_.Count);
         }

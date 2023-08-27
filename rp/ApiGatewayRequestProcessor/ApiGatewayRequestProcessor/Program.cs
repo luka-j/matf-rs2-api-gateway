@@ -27,7 +27,7 @@ Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
 
 var app = builder.Build();
 
-app.Services.GetService<Initializer>(); // run initialization
+app.Services.GetService<Initializer>(); // run config initialization
     
 app.MapGrpcReflectionService();
 app.MapGrpcService<ConfigManagementService>();
