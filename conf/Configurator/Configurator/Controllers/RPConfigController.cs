@@ -36,7 +36,7 @@ namespace Configurator.Controllers
             {
                 return Ok(await _rpService.Get(apiName, apiVersion));
             }
-            catch { return Ok(); }
+            catch { return Ok(new ConfigDataDTO("", "")); }
         }
 
         [HttpPost]

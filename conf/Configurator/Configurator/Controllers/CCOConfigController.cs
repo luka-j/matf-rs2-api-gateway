@@ -1,4 +1,5 @@
-﻿using Configurator.Entities;
+﻿using Configurator.DTOs;
+using Configurator.Entities;
 using Configurator.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,17 @@ namespace Configurator.Controllers
         {
             _ccoService = ccoService ?? throw new ArgumentNullException(nameof(ccoService));
             _configuratorService = configuratorService ?? throw new ArgumentNullException(nameof(configuratorService));
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(CCOConfigListDTO), StatusCodes.Status200OK)]
+        public async Task<ActionResult<CCOConfigListDTO>> GetConfigs()
+        {
+            var databases = await _ccoService.GetAllDatabases();
+            var caches = await _ccoService.GetAllCaches();
+            var queues = await _ccoService.GetAllQueues();
+
+            return Ok(new CCOConfigListDTO(databases, caches, queues));
         }
 
         [HttpGet("databases")]
@@ -80,7 +92,7 @@ namespace Configurator.Controllers
             catch { return Ok(); }
         }
 
-        [HttpPost("cache")]
+        [HttpPost("caches")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public async Task<ActionResult<bool>> AddCache([FromBody] CCOSpec data)
         {
@@ -95,7 +107,7 @@ namespace Configurator.Controllers
             catch { return Ok(false); }
         }
 
-        [HttpDelete("cache/{apiName}")]
+        [HttpDelete("caches/{apiName}")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public async Task<ActionResult<bool>> DeleteCacheConfig(string apiName)
         {

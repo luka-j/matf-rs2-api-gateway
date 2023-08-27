@@ -35,7 +35,7 @@ namespace Configurator.Controllers
             {
                 return Ok(await _apiService.GetFrontend(apiName, apiVersion));
 
-            } catch{ return Ok(); }
+            } catch{ return Ok(new ConfigDataDTO("", "")); }
         }
 
         [HttpPost("frontend")]
@@ -78,7 +78,7 @@ namespace Configurator.Controllers
             try
             {
                 return Ok(await _apiService.GetBackend(apiName, apiVersion));
-            } catch { return Ok(); }
+            } catch { return Ok(new ConfigDataDTO("", "")); }
         }
 
         [HttpPost("backend")]
