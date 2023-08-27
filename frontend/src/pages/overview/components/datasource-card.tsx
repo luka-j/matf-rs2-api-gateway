@@ -1,37 +1,28 @@
-import { Cache } from "@/mock/overview";
+import { Datasource } from "@/types/cco-config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
 
 interface IDatasourceCardProps {
   title: string;
-  description: string;
-  upNum: number;
-  totalNum: number;
-  datasourceList: Cache[];
+  datasourceList: Datasource[];
 }
 
-const DatasourceCard = ({
-  title,
-  description,
-  upNum,
-  totalNum,
-  datasourceList,
-}: IDatasourceCardProps) => {
+const DatasourceCard = ({ title, datasourceList }: IDatasourceCardProps) => {
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex justify-between">
-          {title}: {upNum}/{totalNum} up
+          {title}: {datasourceList.length}/{datasourceList.length} up
         </CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardDescription>Here you can preview and edit your {title.toLowerCase()}.</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-6">
         {datasourceList.slice(0, 3).map((datasource) => (
-          <Typography key={datasource.url} variant="large">
-            {datasource.type} on{" "}
+          <Typography key={datasource.datasource.connectionString} variant="large">
+            {datasource.title} on{" "}
             <Button className="m-0 p-0" variant="link">
-              {datasource.url}
+              {datasource.datasource.url}
             </Button>
           </Typography>
         ))}

@@ -1,6 +1,5 @@
 import useGetDatasources from "@/hooks/use-get-datasources";
 import useGetFrontendsBackends from "@/hooks/use-get-frontends-backends";
-import { caches, databases, queues } from "@/mock/overview";
 import { Typography } from "@/components/ui/typography";
 import PageLoader from "@/components/page-loader";
 
@@ -42,29 +41,11 @@ const Dashboard = () => {
         description="Here you can preview and edit your datasources."
         viewAllURL="/dashboard/datasources"
       >
-        <DatasourceCard
-          title="Caches"
-          upNum={5}
-          totalNum={7}
-          description="Here you can preview and edit your caches."
-          datasourceList={caches}
-        />
+        <DatasourceCard title="Caches" datasourceList={ccoConfigs.caches} />
 
-        <DatasourceCard
-          title="Databases"
-          upNum={3}
-          totalNum={7}
-          description="Here you can preview and edit your databases."
-          datasourceList={databases}
-        />
+        <DatasourceCard title="Databases" datasourceList={ccoConfigs.databases} />
 
-        <DatasourceCard
-          title="Queues"
-          upNum={1}
-          totalNum={7}
-          description="Here you can preview and edit your queues."
-          datasourceList={queues}
-        />
+        <DatasourceCard title="Queues" datasourceList={ccoConfigs.queues} />
       </OuterCard>
     </main>
   );

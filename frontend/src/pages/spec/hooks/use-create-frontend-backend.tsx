@@ -18,7 +18,11 @@ const useCreateFrontendBackend = ({ isEditing, configType }: IUseCreateFrontendB
     mutationFn: apiConfigService.createFrontendBackend,
     onSuccess: () => {
       queryClient.invalidateQueries([apiConfigKey, configType]);
-      toast.success(`Successfully ${isEditing ? "edited" : "created"} ${configType}!`);
+      toast.success(
+        `${configType.slice(0, 1).toUpperCase() + configType.slice(1)} will be ${
+          isEditing ? "edited" : "created"
+        } soon.`,
+      );
       navigate(`/dashboard/${configType}s`);
     },
   });

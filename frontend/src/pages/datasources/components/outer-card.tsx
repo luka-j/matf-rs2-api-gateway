@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { PlusCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -15,18 +15,19 @@ import {
 import AddDatasourceForm from "./add-datasource-form";
 
 interface IOuterCardProps {
-  title: string;
-  description: string;
+  datasourceType: string;
   children: React.ReactNode;
 }
 
-const OuterCard = ({ title, description, children }: IOuterCardProps) => {
+const OuterCard = ({ datasourceType, children }: IOuterCardProps) => {
+  const [openDialog, setOpenDialog] = useState(false);
+
   return (
     <Card className="mx-4">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          {title}
-          <Dialog>
+          {datasourceType}
+          <Dialog open={openDialog} onOpenChange={setOpenDialog}>
             <DialogTrigger asChild>
               <Button variant="ghost" size="icon" className="mt-1">
                 <PlusCircle />
@@ -35,17 +36,22 @@ const OuterCard = ({ title, description, children }: IOuterCardProps) => {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle className="text-center text-xl">
-                  Add a {title.slice(0, -1)}
+                  Add a {datasourceType.slice(0, -1)}
                 </DialogTitle>
                 <DialogDescription>
-                  Fill the form below to add a {title.slice(0, -1)}:
+                  Fill the form below to add a {datasourceType.slice(0, -1)}:
                 </DialogDescription>
               </DialogHeader>
-              <AddDatasourceForm type={title.slice(0, -1).toLowerCase()} />
+              <AddDatasourceForm
+                setOpenDialog={setOpenDialog}
+                datasourceType={datasourceType.slice(0, -1).toLowerCase()}
+              />
             </DialogContent>
           </Dialog>
         </CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardDescription>
+          Here you can preview and edit your {datasourceType.toLowerCase()}.
+        </CardDescription>
       </CardHeader>
 
       <CardContent className="flex flex-col items-center justify-between gap-8 md:flex-row">

@@ -1,17 +1,19 @@
 import { z } from "zod";
 
+export type DatasourceType = "databases" | "caches" | "queues";
+
 export const datasourceSchema = z.object({
-  name: z.string(),
-  type: z.string(),
-  url: z.string(),
-  username: z.string(),
-  password: z.string(),
-  connectionString: z.string(),
+  title: z.string(),
+  datasource: z.object({
+    type: z.string(),
+    url: z.string(),
+    username: z.string(),
+    password: z.string(),
+    connectionString: z.string(),
+  }),
 });
 
 export const ccoConfigsSchema = z.object({
-  title: z.string(),
-  version: z.string(),
   databases: z.array(datasourceSchema),
   caches: z.array(datasourceSchema),
   queues: z.array(datasourceSchema),

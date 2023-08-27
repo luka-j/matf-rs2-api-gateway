@@ -13,7 +13,7 @@ const useCreateRp = () => {
     mutationFn: rpConfigService.createRp,
     onSuccess: () => {
       queryClient.invalidateQueries([rpConfigKey]);
-      toast.success(`Successfully edited RP!`);
+      toast.success("Rp will be created soon.");
       navigate("/dashboard/frontends");
     },
   });
