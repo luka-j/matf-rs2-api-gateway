@@ -26,7 +26,7 @@ namespace CCO.Services
 
             var entries = await _databaseRepository.ReadAll(database);
             var response = new DatabaseReadResponse();
-            response.Items.AddRange(entries.Select((entry) => new DatabaseItem { Id = entry.Id, Amount = entry.Amount }));
+            response.Items.AddRange(entries.Select((entry) => new DatabaseItem { Id = entry.Id.ToString(), Amount = entry.Amount }));
 
             return response;
         }
