@@ -76,7 +76,7 @@ const Spec = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col">
+      <div className="flex w-full flex-col">
         <div className="flex h-[80vh] w-full flex-col md:flex-row">
           <ScrollArea className="font-code w-full rounded-md border md:w-1/2">
             <CustomCodeEditor data={data} setData={form.setValue} />
@@ -113,11 +113,11 @@ const Spec = () => {
               </FormItem>
             )}
           />
-          <Button className="px-8" type="submit" disabled={isCreating}>
+          <Button className="px-8" disabled={isCreating} onClick={form.handleSubmit(onSubmit)}>
             {isCreating ? <Loader2 className="animate-spin" /> : "Save & Publish"}
           </Button>
         </div>
-      </form>
+      </div>
     </Form>
   );
 };

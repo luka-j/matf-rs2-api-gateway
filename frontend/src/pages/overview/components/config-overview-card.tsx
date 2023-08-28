@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { FrontendsBackendsConfig } from "@/types/api-configs";
 import { Button } from "@/components/ui/button";
@@ -11,8 +11,7 @@ interface IConfigOverviewCardProps {
 }
 
 const ConfigOverviewCard = ({ title, viewAllURL, frontBackList }: IConfigOverviewCardProps) => {
-  const location = useLocation();
-  const frontOrBack = location.pathname.includes("frontend") ? "frontend" : "backend";
+  const frontOrBack = title.toLowerCase().slice(0, -1);
 
   const navigate = useNavigate();
 
