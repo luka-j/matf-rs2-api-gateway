@@ -59,7 +59,7 @@ const Middlewares = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col">
         <div className="mt-4 flex h-[80vh] w-full justify-center">
-          <ScrollArea className="w-1/2 rounded-md border">
+          <ScrollArea className="w-full rounded-md border md:w-1/2">
             <CustomCodeEditor data={data} setData={form.setValue} />
           </ScrollArea>
         </div>

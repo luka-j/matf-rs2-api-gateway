@@ -94,7 +94,9 @@ const AddDatasourceForm = ({ setOpenDialog, datasourceType }: IAddDatasourceForm
               <FormControl>
                 <Input placeholder="tom12345@admin" {...field} />
               </FormControl>
-              <FormDescription>This is the username you will use to connect.</FormDescription>
+              <FormDescription>
+                This is the username you will use to connect to your {datasourceType}.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -108,7 +110,9 @@ const AddDatasourceForm = ({ setOpenDialog, datasourceType }: IAddDatasourceForm
               <FormControl>
                 <Input placeholder="tom12345@admin" type="password" {...field} />
               </FormControl>
-              <FormDescription>This is the password you will use to connect.</FormDescription>
+              <FormDescription>
+                This is the password you will use to connect to your {datasourceType}.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

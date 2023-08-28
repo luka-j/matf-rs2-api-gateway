@@ -77,12 +77,12 @@ const Spec = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col">
-        <div className="flex h-[80vh] w-full">
-          <ScrollArea className="w-1/2 rounded-md border">
+        <div className="flex h-[80vh] w-full flex-col md:flex-row">
+          <ScrollArea className="w-full rounded-md border md:w-1/2">
             <CustomCodeEditor data={data} setData={form.setValue} />
           </ScrollArea>
 
-          <ScrollArea className="w-1/2 rounded-md border">
+          <ScrollArea className="w-full rounded-md border md:w-1/2">
             <SwaggerUI spec={data} />
           </ScrollArea>
         </div>
