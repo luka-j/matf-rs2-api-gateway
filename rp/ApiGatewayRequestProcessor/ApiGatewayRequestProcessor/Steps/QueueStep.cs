@@ -16,7 +16,7 @@ public class QueueStep : Step
     }
 
     private QueueOperation _operation;
-    public string Cache
+    public string Queue
     {
         set
         {
