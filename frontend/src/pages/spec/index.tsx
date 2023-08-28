@@ -78,7 +78,7 @@ const Spec = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col">
         <div className="flex h-[80vh] w-full flex-col md:flex-row">
-          <ScrollArea className="w-full rounded-md border md:w-1/2">
+          <ScrollArea className="font-code w-full rounded-md border md:w-1/2">
             <CustomCodeEditor data={data} setData={form.setValue} />
           </ScrollArea>
 

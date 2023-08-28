@@ -18,7 +18,7 @@ const CustomCodeEditor = ({ data, setData }: ICustomeEditorProps) => {
   const highlight = (code: string) => (
     <Highlight code={code} language="yaml" theme={themes.vsDark}>
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <div style={style} className={cn(className, "font-code")}>
+        <div style={style} className={cn(className, "")}>
           {tokens.map((line, i) => (
             <div key={i} {...getLineProps({ line, key: i })}>
               {line.map((token, key) => (
