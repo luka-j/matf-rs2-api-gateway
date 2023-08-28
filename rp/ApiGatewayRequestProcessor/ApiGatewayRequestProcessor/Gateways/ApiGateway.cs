@@ -15,7 +15,7 @@ public class ApiGateway
 
     public ApiGateway()
     {
-        _channel = GrpcChannel.ForAddress("http://api-svc:5000");
+        _channel = GrpcChannel.ForAddress("http://api-service:5000");
         _client = new HttpRequester.HttpRequesterClient(_channel);
     }
 

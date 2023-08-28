@@ -23,3 +23,20 @@ spec:
         ports:
         - containerPort: 5000
         - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          failureThreshold: 3
+          periodSeconds: 5
+        startupProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          failureThreshold: 12
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          periodSeconds: 3

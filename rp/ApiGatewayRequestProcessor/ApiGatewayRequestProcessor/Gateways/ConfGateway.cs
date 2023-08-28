@@ -15,7 +15,7 @@ public class ConfGateway
     
     public ConfGateway()
     {
-        _channel = GrpcChannel.ForAddress("http://conf-svc:5000");
+        _channel = GrpcChannel.ForAddress("http://conf-service:5000");
         _client = new ConfigRetriever.ConfigRetrieverClient(_channel);
     }
 

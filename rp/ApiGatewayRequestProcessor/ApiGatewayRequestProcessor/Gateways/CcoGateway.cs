@@ -17,7 +17,7 @@ public class CcoGateway
     
     public CcoGateway()
     {
-        _channel = GrpcChannel.ForAddress("http://cco-svc:80");
+        _channel = GrpcChannel.ForAddress("http://cco-service:80");
         _client = new DatasourceOperations.DatasourceOperationsClient(_channel);
     }
 

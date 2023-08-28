@@ -29,6 +29,8 @@ builder.Services.AddSingleton<MetricsService>();
 builder.Services.AddSingleton<ConfGateway>();
 builder.Services.AddSingleton<Initializer>();
 
+builder.Services.AddHealthChecks();
+
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .Enrich.WithThreadId()
@@ -48,5 +50,6 @@ app.MapControllers();
 
 app.UseHttpMetrics();
 app.MapMetrics();
+app.MapHealthChecks("/healthz");
 
 app.Run();
