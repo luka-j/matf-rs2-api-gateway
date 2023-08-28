@@ -35,13 +35,20 @@ public class DatabaseStep : Step
         set
         {
             var parts= value.Split("/");
-            if (parts.Length != 2)
+            if (parts.Length == 2)
             {
-                throw new ApiConfigException("Database id must be in form 'name/version'");
+                _name = parts[0];
+                _version = parts[1];
+            }
+            else if (parts.Length == 1)
+            {
+                _name = value;
+            }
+            else
+            {
+                throw new ApiConfigException("Invalid database id: " + value);
             }
 
-            _name = parts[0];
-            _version = parts[0];
         }
     }
     
