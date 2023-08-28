@@ -1,9 +1,11 @@
+using ApiGatewayApi;
 using ApiGatewayApi.ApiConfigs;
 using ApiGatewayApi.Controllers;
 using ApiGatewayApi.Processing;
 using ApiGatewayApi.Services;
 using Prometheus;
 using Serilog;
+using HttpRequester = ApiGatewayApi.Processing.HttpRequester;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,10 @@ builder.Services.AddSingleton<RequestExecutor>();
 builder.Services.AddSingleton<RequestProcessorGateway>();
 builder.Services.AddSingleton<ControllerUtils>();
 builder.Services.AddSingleton<MetricsService>();
+builder.Services.AddSingleton<ConfGateway>();
+builder.Services.AddSingleton<Initializer>();
+
+builder.Services.AddHealthChecks();
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -35,6 +41,8 @@ Log.Logger = new LoggerConfiguration()
 
 var app = builder.Build();
 
+app.Services.GetService<Initializer>(); // run config initialization
+
 app.MapGrpcReflectionService();
 app.MapGrpcService<HttpRequesterService>();
 app.MapGrpcService<ConfigManagementService>();
@@ -42,5 +50,6 @@ app.MapControllers();
 
 app.UseHttpMetrics();
 app.MapMetrics();
+app.MapHealthChecks("/healthz");
 
 app.Run();

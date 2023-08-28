@@ -28,5 +28,12 @@ namespace Configurator.Controllers
         {
             return Ok(await _configuratorService.GetConfigsByCategory(category));
         }
+
+        [HttpPatch("update")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public async Task<ActionResult<bool>> UpdateConfigs()
+        {
+            return Ok(await _configuratorService.UpdateConfigs());
+        }
     }
 }

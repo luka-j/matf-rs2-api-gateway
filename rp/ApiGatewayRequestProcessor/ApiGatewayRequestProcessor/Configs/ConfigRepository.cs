@@ -23,10 +23,13 @@ public class ConfigRepository
         }
     }
     
-    public void UpdateConfig(string data, DateTime validFrom)
+    public void UpdateConfig(string data, DateTime validFrom, bool checkStartDateValidity = true)
     {        
         var now = DateTime.Now;
-        CheckStartDateValidity(validFrom, now);
+        if (checkStartDateValidity)
+        {
+            CheckStartDateValidity(validFrom, now);
+        }
 
         var parsedConfig = new ApiSpec(data, validFrom);
         var id = parsedConfig.Id;

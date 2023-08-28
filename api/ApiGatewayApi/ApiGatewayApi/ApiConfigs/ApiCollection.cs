@@ -34,12 +34,17 @@ public class ApiCollection
     /// spec string must be a valid OAS3 spec.
     /// </summary>
     /// <param name="spec">ApiSpec containing spec string and validity start time.</param>
+    /// <param name="checkStartDateValidity">Should ValidFrom check be enforced.</param>
     /// <exception cref="ApiConfigException">If there's an issue with the config, e.g. validity
     /// start date is too early or config is in bad format.</exception>
-    public void AddConfig(ApiSpec spec)
+    public void AddConfig(ApiSpec spec, bool checkStartDateValidity = true)
     {
         var now = DateTime.Now;
-        CheckStartDateValidity(spec.ValidFrom, now);
+        if (checkStartDateValidity)
+        {
+            CheckStartDateValidity(spec.ValidFrom, now);
+        }
+
         var parsedOas = ParseSpec(spec.Spec);
 
         var parsedConfig = new ApiConfig(parsedOas, spec.ValidFrom);

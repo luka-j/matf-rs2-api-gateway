@@ -19,10 +19,11 @@ spec:
       serviceAccountName: conf-sa
       containers:
       - name: conf
-        image: ghcr.io/luka-j/matf-rs2-api-gateway-conf:sha-6892e2eaddcefee735c1efdadf1adf43bf7392e4
+        image: ghcr.io/luka-j/matf-rs2-api-gateway-conf:sha-a7d4b202f61ccf25898fae7718e8bb506916131c
         imagePullPolicy: Always
         ports:
-        - containerPort: 5001
+        - containerPort: 80
+        - containerPort: 5000
         env:
         - name: "UseKubernetes"
           value: "true"

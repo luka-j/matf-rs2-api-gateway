@@ -2,8 +2,6 @@ using Configurator.GrpcServices;
 using Configurator.Handlers;
 using Configurator.Repositories;
 using Configurator.Services;
-using k8s;
-using k8s.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddGrpc();
+builder.Services.AddGrpcReflection();
 
 builder.Services.AddControllers();
 
@@ -55,6 +56,9 @@ if (bool.Parse(builder.Configuration["AuthSettings:UseAuth"]))
 {
     app.UseMiddleware<AuthenticationHandler>("test", builder.Configuration["AuthSettings:AuthUrl"]);
 }
+
+app.MapGrpcReflectionService();
+app.MapGrpcService<ConfigRetrieverService>();
 
 app.MapControllers();
 

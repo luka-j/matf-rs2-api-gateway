@@ -1,6 +1,8 @@
+using ApiGatewayRequestProcessor;
 using ApiGatewayRequestProcessor.Configs;
 using ApiGatewayRequestProcessor.Gateways;
 using ApiGatewayRequestProcessor.Services;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +15,12 @@ builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
 builder.Services.AddSingleton<ConfigRepository>();
 builder.Services.AddSingleton<ApiGateway>();
+builder.Services.AddSingleton<CcoGateway>();
+builder.Services.AddSingleton<ConfGateway>();
+builder.Services.AddSingleton<Initializer>();
+
+builder.Services.AddGrpcHealthChecks()
+    .AddCheck("Health", () => HealthCheckResult.Healthy());
 
 Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
     .Enrich.WithThreadId()
@@ -23,7 +31,10 @@ Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
 
 var app = builder.Build();
 
+app.Services.GetService<Initializer>(); // run config initialization
+    
 app.MapGrpcReflectionService();
+app.MapGrpcHealthChecksService();
 app.MapGrpcService<ConfigManagementService>();
 app.MapGrpcService<RequestProcessorService>();
 app.MapGet("/",

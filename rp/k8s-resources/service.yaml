@@ -5,7 +5,7 @@ metadata:
   namespace: api-gateway
 spec:
   selector:
-    app: api
+    app: rp
   ports:
     - name: grpc
       protocol: TCP
