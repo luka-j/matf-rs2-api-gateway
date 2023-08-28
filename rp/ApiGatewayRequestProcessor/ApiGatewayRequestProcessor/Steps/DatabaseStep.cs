@@ -43,6 +43,7 @@ public class DatabaseStep : Step
             else if (parts.Length == 1)
             {
                 _name = value;
+                _version = "";
             }
             else
             {
