@@ -6,18 +6,18 @@ namespace CCO.Repositories
 {
     public class DatabaseRepository
     {
-        public async Task<IEnumerable<DatabaseEntry>> ReadAll (Datasource database)
+        public async Task<IEnumerable<DatabaseEntry>> ReadAll (DatabaseSource database)
         {
-            using var connection = GetConnection(database.ConnectionString);
+            using var connection = GetConnection(database);
 
             var entries = await connection.QueryAsync<DatabaseEntry>("SELECT * FROM public.test");
 
             return entries;
         }
 
-        public async Task<bool> Create (Datasource database, int amount)
+        public async Task<bool> Create (DatabaseSource database, int amount)
         {
-            using var connection = GetConnection(database.ConnectionString);
+            using var connection = GetConnection(database);
 
             var affected = await connection.ExecuteAsync(
                 "INSERT INTO public.test (amount) VALUES (@Amount)", new { Amount = amount });
@@ -25,9 +25,9 @@ namespace CCO.Repositories
             return affected != 0;
         }
 
-        public async Task<bool> Delete (Datasource database, string id)
+        public async Task<bool> Delete (DatabaseSource database, string id)
         {
-            using var connection = GetConnection(database.ConnectionString);
+            using var connection = GetConnection(database);
 
             var affected = await connection.ExecuteAsync("DELETE FROM public.test WHERE id = @Id", new { Id = id });
 
@@ -35,8 +35,10 @@ namespace CCO.Repositories
         }
 
 
-        private static NpgsqlConnection GetConnection (string connectionString)
+        private static NpgsqlConnection GetConnection (DatabaseSource database)
         {
+            string connectionString = $"Server={database.Url};Port={database.Port};Database={database.DatabaseName};User Id={database.Username};Password={database.Password}";
+
             return new NpgsqlConnection(connectionString);
         }
     }

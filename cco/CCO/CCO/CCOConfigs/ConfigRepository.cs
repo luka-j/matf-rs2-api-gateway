@@ -1,12 +1,14 @@
-﻿namespace CCO.CCOConfigs
+﻿using CCO.Entities;
+
+namespace CCO.CCOConfigs
 {
     public class ConfigRepository
     {
-        public ConfigCollection Databases { get; set; } = new();
+        public ConfigCollection<DatabaseSpec> Databases { get; set; } = new();
 
-        public ConfigCollection Caches { get; set; } = new();
+        public ConfigCollection<CacheSpec> Caches { get; set; } = new();
 
-        public ConfigCollection Queues { get; set; } = new();
+        public ConfigCollection<QueueSpec> Queues { get; set; } = new();
 
     }
 }
