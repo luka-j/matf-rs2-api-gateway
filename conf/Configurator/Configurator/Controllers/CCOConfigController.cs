@@ -1,4 +1,5 @@
-﻿using Configurator.DTOs;
+﻿using Configurator.CCOEntities;
+using Configurator.DTOs;
 using Configurator.Entities;
 using Configurator.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -30,15 +31,15 @@ namespace Configurator.Controllers
         }
 
         [HttpGet("databases")]
-        [ProducesResponseType(typeof(IEnumerable<CCOSpec>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<CCOSpec>>> GetDatabaseConfigs()
+        [ProducesResponseType(typeof(IEnumerable<DatabaseSpec>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<DatabaseSpec>>> GetDatabaseConfigs()
         {
             return Ok(await _ccoService.GetAllDatabases());
         }
 
         [HttpGet("databases/{apiName}")]
-        [ProducesResponseType(typeof(CCOSpec), StatusCodes.Status200OK)]
-        public async Task<ActionResult<CCOSpec>> GetDatabaseConfig(string apiName)
+        [ProducesResponseType(typeof(DatabaseSpec), StatusCodes.Status200OK)]
+        public async Task<ActionResult<DatabaseSpec>> GetDatabaseConfig(string apiName)
         {
             try
             {
@@ -49,11 +50,11 @@ namespace Configurator.Controllers
 
         [HttpPost("databases")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> AddDatabase([FromBody] CCOSpec data)
+        public async Task<ActionResult<bool>> AddDatabase([FromBody] DatabaseSpec data)
         {
             try
             {
-                string configData = CCOService.GetDataString(data);
+                string configData = CCOService.GetDatabaseString(data);
                 Config config = new("datasources", data.Title, "", "databases", configData);
 
                 await _configuratorService.ModifyAndUpdate(new[] { config });
@@ -75,15 +76,15 @@ namespace Configurator.Controllers
             catch { return Ok(false); }
         }
         [HttpGet("caches")]
-        [ProducesResponseType(typeof(IEnumerable<CCOSpec>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<CCOSpec>>> GetCacheConfigs()
+        [ProducesResponseType(typeof(IEnumerable<CacheSpec>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<CacheSpec>>> GetCacheConfigs()
         {
             return Ok(await _ccoService.GetAllCaches());
         }
 
         [HttpGet("caches/{apiName}")]
-        [ProducesResponseType(typeof(CCOSpec), StatusCodes.Status200OK)]
-        public async Task<ActionResult<CCOSpec>> GetCacheConfig(string apiName)
+        [ProducesResponseType(typeof(CacheSpec), StatusCodes.Status200OK)]
+        public async Task<ActionResult<CacheSpec>> GetCacheConfig(string apiName)
         {
             try
             {
@@ -94,11 +95,11 @@ namespace Configurator.Controllers
 
         [HttpPost("caches")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> AddCache([FromBody] CCOSpec data)
+        public async Task<ActionResult<bool>> AddCache([FromBody] CacheSpec data)
         {
             try
             {
-                string configData = CCOService.GetDataString(data);
+                string configData = CCOService.GetCacheSpec(data);
                 Config config = new("datasources", data.Title, "", "caches", configData);
 
                 await _configuratorService.ModifyAndUpdate(new[] { config });
@@ -120,15 +121,15 @@ namespace Configurator.Controllers
             catch { return Ok(false); }
         }
         [HttpGet("queues")]
-        [ProducesResponseType(typeof(IEnumerable<CCOSpec>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<CCOSpec>>> GetQueueConfigs()
+        [ProducesResponseType(typeof(IEnumerable<QueueSpec>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<QueueSpec>>> GetQueueConfigs()
         {
             return Ok(await _ccoService.GetAllQueues());
         }
 
         [HttpGet("queues/{apiName}")]
-        [ProducesResponseType(typeof(CCOSpec), StatusCodes.Status200OK)]
-        public async Task<ActionResult<CCOSpec>> GetQueueConfig(string apiName)
+        [ProducesResponseType(typeof(QueueSpec), StatusCodes.Status200OK)]
+        public async Task<ActionResult<QueueSpec>> GetQueueConfig(string apiName)
         {
             try
             {
@@ -139,11 +140,11 @@ namespace Configurator.Controllers
 
         [HttpPost("queues")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> AddQueue([FromBody] CCOSpec data)
+        public async Task<ActionResult<bool>> AddQueue([FromBody] QueueSpec data)
         {
             try
             {
-                string configData = CCOService.GetDataString(data);
+                string configData = CCOService.GetQueueSpec(data);
                 Config config = new("datasources", data.Title, "", "queues", configData);
 
                 await _configuratorService.ModifyAndUpdate(new[] { config });
