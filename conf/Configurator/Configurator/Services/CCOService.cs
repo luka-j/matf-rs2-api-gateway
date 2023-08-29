@@ -1,7 +1,7 @@
-﻿using Configurator.Entities;
-using Configurator.GrpcServices;
+﻿using Configurator.GrpcServices;
 using CCO;
 using System.Text.Json;
+using Configurator.CCOEntities;
 
 namespace Configurator.Services
 {
@@ -14,62 +14,82 @@ namespace Configurator.Services
             _ccoGrpcService = ccoGrpcService ?? throw new ArgumentNullException(nameof(ccoGrpcService));
         }
 
-        public async Task<IEnumerable<CCOSpec>> GetAllDatabases()
+        public async Task<IEnumerable<DatabaseSpec>> GetAllDatabases()
         {
             var configs = await _ccoGrpcService.GetAllDatabaseData();
 
-            var allConfigs = configs.Select(config => ParseJsonString(config.Data));
+            var allConfigs = configs.Select(config => ParseDatabaseString(config.Data));
 
             return allConfigs;
         }
 
-        public async Task<CCOSpec> GetDatabase(string name)
+        public async Task<DatabaseSpec> GetDatabase(string name)
         {
             ConfigData data = await _ccoGrpcService.GetDatabase(name);
 
-            return ParseJsonString(data.Data);
+            return ParseDatabaseString(data.Data);
         }
-        public async Task<IEnumerable<CCOSpec>> GetAllCaches()
+        public async Task<IEnumerable<CacheSpec>> GetAllCaches()
         {
             var configs = await _ccoGrpcService.GetAllCacheData();
 
-            var allConfigs = configs.Select(config => ParseJsonString(config.Data));
+            var allConfigs = configs.Select(config => ParseCacheString(config.Data));
 
             return allConfigs;
         }
 
-        public async Task<CCOSpec> GetCache(string name)
+        public async Task<CacheSpec> GetCache(string name)
         {
             ConfigData data = await _ccoGrpcService.GetCache(name);
 
-            return ParseJsonString(data.Data);
+            return ParseCacheString(data.Data);
         }
-        public async Task<IEnumerable<CCOSpec>> GetAllQueues()
+        public async Task<IEnumerable<QueueSpec>> GetAllQueues()
         {
             var configs = await _ccoGrpcService.GetAllQueueData();
 
-            var allConfigs = configs.Select(config => ParseJsonString(config.Data));
+            var allConfigs = configs.Select(config => ParseQueueString(config.Data));
 
             return allConfigs;
         }
 
-        public async Task<CCOSpec> GetQueue(string name)
+        public async Task<QueueSpec> GetQueue(string name)
         {
             ConfigData data = await _ccoGrpcService.GetQueue(name);
 
-            return ParseJsonString(data.Data);
+            return ParseQueueString(data.Data);
         }
 
-        public static CCOSpec ParseJsonString(string jsonString)
+        public static DatabaseSpec ParseDatabaseString(string jsonString)
         {
             JsonSerializerOptions options = new()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
-            return JsonSerializer.Deserialize<CCOSpec>(jsonString, options) ?? throw new Exception("Exception during deserialization");
+            return JsonSerializer.Deserialize<DatabaseSpec>(jsonString, options) ?? throw new Exception("Exception during deserialization");
         }
-        public static string GetDataString(CCOSpec spec)
+        public static CacheSpec ParseCacheString(string jsonString)
+        {
+            JsonSerializerOptions options = new()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            return JsonSerializer.Deserialize<CacheSpec>(jsonString, options) ?? throw new Exception("Exception during deserialization");
+        }
+
+        public static QueueSpec ParseQueueString(string jsonString)
+        {
+            JsonSerializerOptions options = new()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            return JsonSerializer.Deserialize<QueueSpec>(jsonString, options) ?? throw new Exception("Exception during deserialization");
+        }
+
+        public static string GetDatabaseString(DatabaseSpec spec)
         {
             JsonSerializerOptions options = new()
             {
@@ -79,7 +99,26 @@ namespace Configurator.Services
 
             return JsonSerializer.Serialize(spec, options);
         }
+        public static string GetCacheSpec(CacheSpec spec)
+        {
+            JsonSerializerOptions options = new()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
 
+            return JsonSerializer.Serialize(spec, options);
+        }
+        public static string GetQueueSpec(QueueSpec spec)
+        {
+            JsonSerializerOptions options = new()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+
+            return JsonSerializer.Serialize(spec, options);
+        }
         
     }
 }

@@ -1,17 +1,19 @@
-﻿namespace CCO.CCOConfigs
+﻿using CCO.Entities;
+
+namespace CCO.CCOConfigs
 {
-    public class ConfigCollection
+    public class ConfigCollection<TSpec> where TSpec : ISpec
     {
-        private readonly Dictionary<CCOConfigIdentifier, SortedSet<CCOConfig>> _configs = new();
+        private readonly Dictionary<CCOConfigIdentifier, SortedSet<CCOConfig<TSpec>>> _configs = new();
 
         private static readonly TimeSpan VALIDITY_MIN_OFFSET = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan PRUNE_AFTER = TimeSpan.FromMinutes(1);
 
         private readonly object _pruningLock = new();
 
-        private class CCOConfigValidityStartComparer : IComparer<CCOConfig?>
+        private class CCOConfigValidityStartComparer : IComparer<CCOConfig<TSpec>?>
         {
-            public int Compare(CCOConfig? x, CCOConfig? y)
+            public int Compare(CCOConfig<TSpec>? x, CCOConfig<TSpec>? y)
             {
                 if (ReferenceEquals(x, y)) return 0;
                 if (y is null) return 1;
@@ -24,12 +26,12 @@
         {
             var now = DateTime.Now;
             CheckStartDateValidity(spec.ValidFrom, now);
+            var parsedConfig = new CCOConfig<TSpec>(spec.ValidFrom, spec.Spec);
 
-            var parsedConfig = new CCOConfig(spec.ValidFrom, spec.Spec);
             var id = parsedConfig.Id;
             if (!_configs.ContainsKey(id))
             {
-                _configs.Add(id, new SortedSet<CCOConfig>(new CCOConfigValidityStartComparer()));
+                _configs.Add(id, new SortedSet<CCOConfig<TSpec>>(new CCOConfigValidityStartComparer()));
             }
 
             _configs[id].Add(parsedConfig);
@@ -48,7 +50,7 @@
                 .Select(config => config!.Id);
         }
 
-        public CCOConfig? GetCurrentConfig(CCOConfigIdentifier id, DateTime now)
+        public CCOConfig<TSpec>? GetCurrentConfig(CCOConfigIdentifier id, DateTime now)
         {
             if (!_configs.ContainsKey(id)) return null;
             var eligibleConfigs = _configs[id];
@@ -87,8 +89,8 @@
             {
                 foreach (var (key, value) in _configs)
                 {
-                    var configs = new SortedSet<CCOConfig>(new CCOConfigValidityStartComparer());
-                    CCOConfig? newest = null;
+                    var configs = new SortedSet<CCOConfig<TSpec>>(new CCOConfigValidityStartComparer());
+                    CCOConfig<TSpec>? newest = null;
                     foreach (var config in value)
                     {
                         if (newest != null)
@@ -118,4 +120,3 @@
         }
     }
 }
-

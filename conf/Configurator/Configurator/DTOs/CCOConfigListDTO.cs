@@ -1,14 +1,14 @@
-﻿using Configurator.Entities;
+﻿using Configurator.CCOEntities;
 
 namespace Configurator.DTOs
 {
     public class CCOConfigListDTO
     {
-        public IEnumerable<CCOSpec> Databases { get; set; }
-        public IEnumerable<CCOSpec> Caches { get; set; }
-        public IEnumerable<CCOSpec> Queues { get; set; }
+        public IEnumerable<DatabaseSpec> Databases { get; set; }
+        public IEnumerable<CacheSpec> Caches { get; set; }
+        public IEnumerable<QueueSpec> Queues { get; set; }
 
-        public CCOConfigListDTO(IEnumerable<CCOSpec> databases, IEnumerable<CCOSpec> caches, IEnumerable<CCOSpec> queues)
+        public CCOConfigListDTO(IEnumerable<DatabaseSpec> databases, IEnumerable<CacheSpec> caches, IEnumerable<QueueSpec> queues)
         {
             Databases = databases;
             Caches = caches;

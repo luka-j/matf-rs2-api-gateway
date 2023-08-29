@@ -6,9 +6,9 @@ namespace CCO.Repositories
 {
     public class QueueRepository
     {
-        public void Publish(Datasource queue, string queueName, string message)
+        public void Publish(QueueSource queue, string queueName, string message)
         {
-            using var connection = CreateConnection(queue.ConnectionString);
+            using var connection = CreateConnection(queue);
             using var channel = connection.CreateModel();
 
             channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
@@ -18,8 +18,10 @@ namespace CCO.Repositories
             channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: null, body: body);
         }
 
-        private static IConnection CreateConnection(string connectionString)
+        private static IConnection CreateConnection(QueueSource queue)
         {
+            string connectionString = $"amqp://{queue.Username}:{queue.Password}@{queue.Url}";
+
             var factory = new ConnectionFactory{ Uri = new Uri(connectionString) };
 
             return factory.CreateConnection();

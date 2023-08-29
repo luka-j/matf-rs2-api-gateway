@@ -6,9 +6,9 @@ namespace CCO.Repositories
 {
     public class CacheRepository
     {
-        public async Task<string> GetAsync(Datasource cache, string key)
+        public async Task<string> GetAsync(CacheSource cache, string key)
         {
-            using var redis = ConnectionMultiplexer.Connect(cache.ConnectionString);
+            using var redis = ConnectionMultiplexer.Connect(GetConnectionString(cache));
             IDatabase database = redis.GetDatabase();
 
             var cachedValue = await database.StringGetAsync(key);
@@ -16,13 +16,17 @@ namespace CCO.Repositories
             return cachedValue.ToString();
         }
 
-        public async Task<bool> SetAsync(Datasource cache, string key, string value, TimeSpan ttl)
+        public async Task<bool> SetAsync(CacheSource cache, string key, string value, TimeSpan ttl)
         {
-            using var redis = ConnectionMultiplexer.Connect(cache.ConnectionString);
+            using var redis = ConnectionMultiplexer.Connect(GetConnectionString(cache));
             IDatabase database = redis.GetDatabase();
 
             return await database.StringSetAsync(key, value, ttl);
         }
 
+        public string GetConnectionString(CacheSource cache)
+        {
+            return $"{cache.Url},password={cache.Password}";
+        }
     }
 }
