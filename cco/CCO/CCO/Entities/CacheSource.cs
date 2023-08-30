@@ -1,6 +1,6 @@
 ﻿namespace CCO.Entities
 {
-    public class CacheSource
+    public class CacheSource : IDatasource
     {
         public string Type { get; set; }
         public string Url { get; set; }

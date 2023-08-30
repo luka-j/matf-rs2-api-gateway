@@ -3,11 +3,11 @@ using System.Text.Json;
 
 namespace CCO.CCOConfigs
 {
-    public class CCOConfig<TSpec> where TSpec : ISpec
+    public class CCOConfig<TSource> where TSource : IDatasource
     {
         public DateTime ValidFrom { get; }
         public CCOConfigIdentifier Id { get; }
-        public TSpec Data { get; }
+        public Spec<TSource> Data { get; }
 
         public CCOConfig(DateTime validFrom, string jsonString)
         {
@@ -21,14 +21,14 @@ namespace CCO.CCOConfigs
             return now >= ValidFrom;
         }
 
-        public static TSpec ParseJsonString(string jsonString)
+        public static Spec<TSource> ParseJsonString(string jsonString)
         {
             JsonSerializerOptions options = new()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
-            return JsonSerializer.Deserialize<TSpec>(jsonString, options) ?? throw new Exception("Exception during deserialization");
+            return JsonSerializer.Deserialize<Spec<TSource>>(jsonString, options) ?? throw new Exception("Exception during deserialization");
         }
         public string GetDataString()
         {

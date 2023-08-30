@@ -23,7 +23,7 @@ namespace CCO.Services
         public override async Task<DatabaseReadResponse> DatabaseRead (DatabaseReadRequest request, ServerCallContext context)
         {
             var config = GetDatabaseConfig(request.Identifier);
-            var database = config.Data.Database ?? throw new Exception("Database not found");
+            var database = config.Data.Datasource ?? throw new Exception("Database not found");
 
             var entries = await _databaseRepository.ReadAll(database);
             var response = new DatabaseReadResponse();
@@ -35,7 +35,7 @@ namespace CCO.Services
         public override async Task<DatabaseWriteResponse> DatabaseWrite (DatabaseWriteRequest request, ServerCallContext context) 
         {
             var config = GetDatabaseConfig(request.Identifier);
-            var database = config.Data.Database ?? throw new Exception("Database not found");
+            var database = config.Data.Datasource ?? throw new Exception("Database not found");
 
             var success = await _databaseRepository.Create(database, request.Amount);
 
@@ -45,7 +45,7 @@ namespace CCO.Services
         public override async Task<DatabaseDeleteResponse> DatabaseDelete(DatabaseDeleteRequest request, ServerCallContext context)
         {
             var config = GetDatabaseConfig(request.Identifier);
-            var database = config.Data.Database ?? throw new Exception("Database not found");
+            var database = config.Data.Datasource ?? throw new Exception("Database not found");
 
             var success = await _databaseRepository.Delete(database, request.Id);
 
@@ -55,7 +55,7 @@ namespace CCO.Services
         public override async Task<CacheReadResponse> CacheRead (CacheReadRequest request, ServerCallContext context)
         {
             var config = GetCacheConfig(request.Identifier);
-            var cache = config.Data.Cache ?? throw new Exception("Database not found");
+            var cache = config.Data.Datasource ?? throw new Exception("Database not found");
 
             string value = await _cacheRepository.GetAsync(cache, request.Key);
             
@@ -65,7 +65,7 @@ namespace CCO.Services
         public override async Task<CacheWriteResponse> CacheWrite (CacheWriteRequest request, ServerCallContext context)
         {
             var config = GetCacheConfig(request.Identifier);
-            var cache = config.Data.Cache ?? throw new Exception("Database not found");
+            var cache = config.Data.Datasource ?? throw new Exception("Database not found");
 
             var success = await _cacheRepository.SetAsync(cache, request.Key, request.Value, TimeSpan.Parse(request.Ttl));
 
@@ -75,14 +75,14 @@ namespace CCO.Services
         public override Task<QueueWriteResponse> QueueWrite (QueueWriteRequest request, ServerCallContext context)
         {
             var config = GetQueueConfig(request.Identifier);
-            var queue = config.Data.Queue ?? throw new Exception("Database not found");
+            var queue = config.Data.Datasource ?? throw new Exception("Database not found");
 
             _queueRepository.Publish(queue, request.QueueName, request.Message);
 
             return Task.FromResult(new QueueWriteResponse());
         }
 
-        private CCOConfig<DatabaseSpec> GetDatabaseConfig(ConfigIdentifier id)
+        private CCOConfig<DatabaseSource> GetDatabaseConfig(ConfigIdentifier id)
         {
             CCOConfigIdentifier identifier = new(id.Name);
             var config = _repository.Databases.GetCurrentConfig(identifier, DateTime.Now);
@@ -90,7 +90,7 @@ namespace CCO.Services
             return config ?? throw new Exception("Database config " + id.Name + " not found");
         }
 
-        private CCOConfig<CacheSpec> GetCacheConfig(ConfigIdentifier id)
+        private CCOConfig<CacheSource> GetCacheConfig(ConfigIdentifier id)
         {
             CCOConfigIdentifier identifier = new(id.Name);
             var config = _repository.Caches.GetCurrentConfig(identifier, DateTime.Now);
@@ -98,7 +98,7 @@ namespace CCO.Services
             return config ?? throw new Exception("Database config " + id.Name + " not found");
         }
 
-        private CCOConfig<QueueSpec> GetQueueConfig(ConfigIdentifier id)
+        private CCOConfig<QueueSource> GetQueueConfig(ConfigIdentifier id)
         {
             CCOConfigIdentifier identifier = new(id.Name);
             var config = _repository.Queues.GetCurrentConfig(identifier, DateTime.Now);

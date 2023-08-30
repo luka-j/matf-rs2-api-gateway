@@ -1,6 +1,6 @@
 ﻿namespace CCO.Entities
 {
-    public class DatabaseSource
+    public class DatabaseSource : IDatasource
     {
         public string Type { get; set; }
         public string Url { get; set; }

@@ -2,18 +2,18 @@
 
 namespace CCO.CCOConfigs
 {
-    public class ConfigCollection<TSpec> where TSpec : ISpec
+    public class ConfigCollection<TSource> where TSource : IDatasource
     {
-        private readonly Dictionary<CCOConfigIdentifier, SortedSet<CCOConfig<TSpec>>> _configs = new();
+        private readonly Dictionary<CCOConfigIdentifier, SortedSet<CCOConfig<TSource>>> _configs = new();
 
         private static readonly TimeSpan VALIDITY_MIN_OFFSET = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan PRUNE_AFTER = TimeSpan.FromMinutes(1);
 
         private readonly object _pruningLock = new();
 
-        private class CCOConfigValidityStartComparer : IComparer<CCOConfig<TSpec>?>
+        private class CCOConfigValidityStartComparer : IComparer<CCOConfig<TSource>?>
         {
-            public int Compare(CCOConfig<TSpec>? x, CCOConfig<TSpec>? y)
+            public int Compare(CCOConfig<TSource>? x, CCOConfig<TSource>? y)
             {
                 if (ReferenceEquals(x, y)) return 0;
                 if (y is null) return 1;
@@ -26,12 +26,12 @@ namespace CCO.CCOConfigs
         {
             var now = DateTime.Now;
             CheckStartDateValidity(spec.ValidFrom, now);
-            var parsedConfig = new CCOConfig<TSpec>(spec.ValidFrom, spec.Spec);
+            var parsedConfig = new CCOConfig<TSource>(spec.ValidFrom, spec.Spec);
 
             var id = parsedConfig.Id;
             if (!_configs.ContainsKey(id))
             {
-                _configs.Add(id, new SortedSet<CCOConfig<TSpec>>(new CCOConfigValidityStartComparer()));
+                _configs.Add(id, new SortedSet<CCOConfig<TSource>>(new CCOConfigValidityStartComparer()));
             }
 
             _configs[id].Add(parsedConfig);
@@ -50,7 +50,7 @@ namespace CCO.CCOConfigs
                 .Select(config => config!.Id);
         }
 
-        public CCOConfig<TSpec>? GetCurrentConfig(CCOConfigIdentifier id, DateTime now)
+        public CCOConfig<TSource>? GetCurrentConfig(CCOConfigIdentifier id, DateTime now)
         {
             if (!_configs.ContainsKey(id)) return null;
             var eligibleConfigs = _configs[id];
@@ -89,8 +89,8 @@ namespace CCO.CCOConfigs
             {
                 foreach (var (key, value) in _configs)
                 {
-                    var configs = new SortedSet<CCOConfig<TSpec>>(new CCOConfigValidityStartComparer());
-                    CCOConfig<TSpec>? newest = null;
+                    var configs = new SortedSet<CCOConfig<TSource>>(new CCOConfigValidityStartComparer());
+                    CCOConfig<TSource>? newest = null;
                     foreach (var config in value)
                     {
                         if (newest != null)
