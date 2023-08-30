@@ -29,7 +29,7 @@ namespace CCO.Repositories
         {
             using var connection = GetConnection(database);
 
-            var affected = await connection.ExecuteAsync("DELETE FROM public.test WHERE id = @Id", new { Id = id });
+            var affected = await connection.ExecuteAsync("DELETE FROM public.test WHERE id = @Id", new { Id = new Guid(id) });
 
             return affected != 0;
         }
