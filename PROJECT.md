@@ -1,4 +1,4 @@
-# Project outline
+# Project outline (plan)
 
 ## Microservices overview
 - API: Handles incoming and outgoing HTTP requests
