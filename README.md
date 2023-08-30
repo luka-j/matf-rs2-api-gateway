@@ -1,7 +1,7 @@
 # [MATF RS2] API Gateway
 
 Implementacija [API Gateway](https://microservices.io/patterns/apigateway.html) sistema kao 4 ASP.NET mikroservisa + React upravljački panel.
-Projekat za kurs [Razvoj softvera](https://matfrs2.github.io/RS2/) 2 @ [MATF](http://www.matf.bg.ac.rs).
+Projekat za kurs [Razvoj softvera 2](https://matfrs2.github.io/RS2/) @ [MATF](http://www.matf.bg.ac.rs).
 
 ## Slučaj(evi) upotrebe
 
@@ -44,8 +44,8 @@ Upravljački panel predstavlja frontend za konfiguraciju celog sistema. Sastoji 
 konfiguracije i zadužen je da ih dostavlja svim mikroservisima.
 
 Da bi se pristupilo upravljačkom panelu, potrebno je ulogovati se pomoću administratorskog naloga. Kao identity provider koristimo
-[Zitadel](https://zitadel.com/) instancu i sve naloge koji imaju grant na odgovarajućem klijentu smatramo administratorskim (integracija je
-standardni OAuth2). Na ovom panelu se mogu videti i izmeniti frontend konfiguracije, odgovarajući `RP` middleware-i, `backend` konfiguracije,
+[Zitadel](https://zitadel.com/) instancu i sve naloge koji imaju grant na odgovarajućem klijentu smatramo administratorskim (koristi se standardna
+OAuth2 integracija). Na ovom panelu se mogu videti i izmeniti frontend konfiguracije, odgovarajući `RP` middleware-i, `backend` konfiguracije,
 kao i parametri za pristup izvorima podataka.
 
 API frontend i backend konfiguracije su u standardnom OAS3 formatu i prikazuju se uz odgovarajuću vizualizaciju (slično <editor.swagger.io>).
