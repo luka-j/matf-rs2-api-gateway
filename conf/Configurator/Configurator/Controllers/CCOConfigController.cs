@@ -3,6 +3,7 @@ using Configurator.DTOs;
 using Configurator.Entities;
 using Configurator.Services;
 using Microsoft.AspNetCore.Mvc;
+using Retriever;
 
 namespace Configurator.Controllers
 {
@@ -31,15 +32,15 @@ namespace Configurator.Controllers
         }
 
         [HttpGet("databases")]
-        [ProducesResponseType(typeof(IEnumerable<DatabaseSpec>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<DatabaseSpec>>> GetDatabaseConfigs()
+        [ProducesResponseType(typeof(IEnumerable<CCOSpec<DatabaseSource>>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<CCOSpec<DatabaseSource>>>> GetDatabaseConfigs()
         {
             return Ok(await _ccoService.GetAllDatabases());
         }
 
         [HttpGet("databases/{apiName}")]
-        [ProducesResponseType(typeof(DatabaseSpec), StatusCodes.Status200OK)]
-        public async Task<ActionResult<DatabaseSpec>> GetDatabaseConfig(string apiName)
+        [ProducesResponseType(typeof(CCOSpec<DatabaseSource>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<CCOSpec<DatabaseSource>>> GetDatabaseConfig(string apiName)
         {
             try
             {
@@ -50,7 +51,7 @@ namespace Configurator.Controllers
 
         [HttpPost("databases")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> AddDatabase([FromBody] DatabaseSpec data)
+        public async Task<ActionResult<bool>> AddDatabase([FromBody] CCOSpec<DatabaseSource> data)
         {
             try
             {
@@ -76,15 +77,15 @@ namespace Configurator.Controllers
             catch { return Ok(false); }
         }
         [HttpGet("caches")]
-        [ProducesResponseType(typeof(IEnumerable<CacheSpec>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<CacheSpec>>> GetCacheConfigs()
+        [ProducesResponseType(typeof(IEnumerable<CCOSpec<CacheSource>>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<CCOSpec<CacheSource>>>> GetCacheConfigs()
         {
             return Ok(await _ccoService.GetAllCaches());
         }
 
         [HttpGet("caches/{apiName}")]
-        [ProducesResponseType(typeof(CacheSpec), StatusCodes.Status200OK)]
-        public async Task<ActionResult<CacheSpec>> GetCacheConfig(string apiName)
+        [ProducesResponseType(typeof(CCOSpec<CacheSource>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<CCOSpec<CacheSource>>> GetCacheConfig(string apiName)
         {
             try
             {
@@ -95,7 +96,7 @@ namespace Configurator.Controllers
 
         [HttpPost("caches")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> AddCache([FromBody] CacheSpec data)
+        public async Task<ActionResult<bool>> AddCache([FromBody] CCOSpec<CacheSource> data)
         {
             try
             {
@@ -121,15 +122,15 @@ namespace Configurator.Controllers
             catch { return Ok(false); }
         }
         [HttpGet("queues")]
-        [ProducesResponseType(typeof(IEnumerable<QueueSpec>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<QueueSpec>>> GetQueueConfigs()
+        [ProducesResponseType(typeof(IEnumerable<CCOSpec<QueueSource>>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<CCOSpec<QueueSource>>>> GetQueueConfigs()
         {
             return Ok(await _ccoService.GetAllQueues());
         }
 
         [HttpGet("queues/{apiName}")]
-        [ProducesResponseType(typeof(QueueSpec), StatusCodes.Status200OK)]
-        public async Task<ActionResult<QueueSpec>> GetQueueConfig(string apiName)
+        [ProducesResponseType(typeof(CCOSpec<QueueSource>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<CCOSpec<QueueSource>>> GetQueueConfig(string apiName)
         {
             try
             {
@@ -140,7 +141,7 @@ namespace Configurator.Controllers
 
         [HttpPost("queues")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<ActionResult<bool>> AddQueue([FromBody] QueueSpec data)
+        public async Task<ActionResult<bool>> AddQueue([FromBody] CCOSpec<QueueSource> data)
         {
             try
             {
