@@ -19,7 +19,7 @@ const DatasourceCard = ({ title, datasourceList }: IDatasourceCardProps) => {
       </CardHeader>
       <CardContent className="grid gap-6">
         {datasourceList.slice(0, 3).map((datasource) => (
-          <Typography key={datasource.datasource.connectionString} variant="large">
+          <Typography key={datasource.datasource.type + datasource.datasource.url} variant="large">
             {datasource.title} on{" "}
             <Button className="m-0 p-0" variant="link">
               {datasource.datasource.url}

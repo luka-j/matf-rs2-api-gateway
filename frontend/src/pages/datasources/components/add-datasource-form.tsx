@@ -34,7 +34,7 @@ const AddDatasourceForm = ({ setOpenDialog, datasourceType }: IAddDatasourceForm
       username: "",
       password: "",
       url: "",
-      connectionString: "",
+      databaseName: "",
     },
   });
 
@@ -85,22 +85,24 @@ const AddDatasourceForm = ({ setOpenDialog, datasourceType }: IAddDatasourceForm
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder="tom12345@admin" {...field} />
-              </FormControl>
-              <FormDescription>
-                This is the username you will use to connect to your {datasourceType}.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {datasourceType !== "cache" && (
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input placeholder="tom12345@admin" {...field} />
+                </FormControl>
+                <FormDescription>
+                  This is the username you will use to connect to your {datasourceType}.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         <FormField
           control={form.control}
           name="password"
@@ -121,7 +123,7 @@ const AddDatasourceForm = ({ setOpenDialog, datasourceType }: IAddDatasourceForm
           control={form.control}
           name="url"
           render={({ field }) => (
-            <FormItem className="col-span-1 md:col-span-2">
+            <FormItem>
               <FormLabel>URL</FormLabel>
               <FormControl>
                 <Input placeholder={`${datasourceType}://localhost:10000`} {...field} />
@@ -131,22 +133,38 @@ const AddDatasourceForm = ({ setOpenDialog, datasourceType }: IAddDatasourceForm
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="connectionString"
-          render={({ field }) => (
-            <FormItem className="col-span-1 md:col-span-2">
-              <FormLabel>Connection string</FormLabel>
-              <FormControl>
-                <Input placeholder={`${datasourceType}://localhost:10000`} {...field} />
-              </FormControl>
-              <FormDescription>
-                This is the connection string to your {datasourceType}.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {datasourceType === "database" && (
+          <>
+            <FormField
+              control={form.control}
+              name="port"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Port</FormLabel>
+                  <FormControl>
+                    <Input placeholder={`54321`} {...field} />
+                  </FormControl>
+                  <FormDescription>This is the port of your {datasourceType}.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="databaseName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Database name</FormLabel>
+                  <FormControl>
+                    <Input placeholder={`database name`} {...field} />
+                  </FormControl>
+                  <FormDescription>This is the name of your {datasourceType}.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
+        )}
         <Button type="submit" className="col-span-1 w-full md:col-span-2" disabled={isLoading}>
           {isLoading ? <Loader2 className="animate-spin" /> : `Add ${datasourceType}`}
         </Button>

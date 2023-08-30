@@ -11,7 +11,8 @@
     "lint:fix": "eslint ./src --ext .jsx,.js,.ts,.tsx --quiet --fix --ignore-path ./.gitignore",
     "format": "prettier --log-level warn --check \"./**/*.{js,jsx,ts,tsx,css,md,json}\" ",
     "format:fix": "prettier --log-level warn --write \"./**/*.{js,jsx,ts,tsx,css,md,json}\" ",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.2.0",

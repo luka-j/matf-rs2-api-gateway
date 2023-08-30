@@ -18,7 +18,7 @@ const DatasourceCard = ({ datasourceType, datasource }: IDatasourceCardProps) =>
   return (
     <Card className="w-96">
       <CardHeader className="flex items-center justify-center">
-        <CardTitle>{datasource.title}</CardTitle>
+        <CardTitle>Name: {datasource.title}</CardTitle>
       </CardHeader>
 
       {isEditing ? (
@@ -31,15 +31,15 @@ const DatasourceCard = ({ datasourceType, datasource }: IDatasourceCardProps) =>
         <>
           <CardContent className="flex flex-col justify-center gap-4">
             <Typography variant="h4" className="text-center">
-              {datasource.datasource.type}
+              Type: {datasource.datasource.type}
             </Typography>
             <Typography variant="small" className="text-center">
-              {datasource.datasource.url}
+              URL: {datasource.datasource.url}
             </Typography>
 
-            <Typography variant="large" className="text-center">
+            {/* <Typography variant="large" className="text-center">
               {datasource.datasource.username}
-            </Typography>
+            </Typography> */}
           </CardContent>
 
           <CardFooter className="flex flex-row items-center justify-end">

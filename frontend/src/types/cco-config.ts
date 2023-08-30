@@ -2,23 +2,47 @@ import { z } from "zod";
 
 export type DatasourceType = "databases" | "caches" | "queues";
 
-export const datasourceSchema = z.object({
+const baseDatasourceObjectSchema = z.object({
+  type: z.string(),
+  url: z.string(),
+  password: z.string(),
+});
+
+const baseDatasourceSchema = z.object({
   title: z.string(),
-  datasource: z.object({
-    type: z.string(),
-    url: z.string(),
+  datasource: baseDatasourceObjectSchema,
+});
+
+export const databaseSchema = baseDatasourceSchema.extend({
+  datasource: baseDatasourceObjectSchema.extend({
+    port: z.number(),
+    databaseName: z.string(),
     username: z.string(),
-    password: z.string(),
-    connectionString: z.string(),
+  }),
+});
+
+export const cacheSchema = baseDatasourceSchema.extend({
+  datasource: baseDatasourceObjectSchema,
+});
+
+export const queueSchema = baseDatasourceSchema.extend({
+  datasource: baseDatasourceObjectSchema.extend({
+    username: z.string(),
   }),
 });
 
 export const ccoConfigsSchema = z.object({
-  databases: z.array(datasourceSchema),
-  caches: z.array(datasourceSchema),
-  queues: z.array(datasourceSchema),
+  databases: z.array(databaseSchema),
+  caches: z.array(cacheSchema),
+  queues: z.array(queueSchema),
 });
 
-export type Datasource = z.infer<typeof datasourceSchema>;
+export type Database = z.infer<typeof databaseSchema>;
+
+export type Cache = z.infer<typeof cacheSchema>;
+
+export type Queue = z.infer<typeof queueSchema>;
+
+export type Datasource = Database | Cache | Queue;
 
 export type CCOConfigs = z.infer<typeof ccoConfigsSchema>;

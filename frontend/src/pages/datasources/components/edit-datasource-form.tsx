@@ -36,7 +36,7 @@ const EditDatasourceForm = ({
 
   const form = useForm<IAddDatasourceSchema>({
     resolver: zodResolver(addDatasourceSchema),
-    values: { ...datasource.datasource, name: datasource.title },
+    values: { ...(datasource.datasource as IAddDatasourceSchema), name: datasource.title },
   });
 
   const onSubmit: SubmitHandler<IAddDatasourceSchema> = (data) => {
@@ -87,19 +87,21 @@ const EditDatasourceForm = ({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {datasourceType !== "caches" && (
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
           <FormField
             control={form.control}
             name="password"
@@ -117,7 +119,7 @@ const EditDatasourceForm = ({
             control={form.control}
             name="url"
             render={({ field }) => (
-              <FormItem className="col-span-1 md:col-span-2">
+              <FormItem>
                 <FormLabel>URL</FormLabel>
                 <FormControl>
                   <Input {...field} />
@@ -126,19 +128,36 @@ const EditDatasourceForm = ({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="connectionString"
-            render={({ field }) => (
-              <FormItem className="col-span-1 md:col-span-2">
-                <FormLabel>Connection string</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {datasourceType === "databases" && (
+            <>
+              <FormField
+                control={form.control}
+                name="port"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Port</FormLabel>
+                    <FormControl>
+                      <Input placeholder={`54321`} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="databaseName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Database name</FormLabel>
+                    <FormControl>
+                      <Input placeholder={`database name`} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
         </CardContent>
 
         <CardFooter className="flex items-center justify-between">

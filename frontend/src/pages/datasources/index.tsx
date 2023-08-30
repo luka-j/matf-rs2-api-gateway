@@ -22,7 +22,7 @@ const Datasources = () => {
         {ccoConfigs.caches.map((cache) => (
           <DatasourceCard
             datasourceType="caches"
-            key={cache.datasource.connectionString}
+            key={cache.datasource.type + cache.datasource.url}
             datasource={cache}
           />
         ))}
@@ -32,7 +32,7 @@ const Datasources = () => {
         {ccoConfigs.databases.map((database) => (
           <DatasourceCard
             datasourceType="databases"
-            key={database.datasource.connectionString}
+            key={database.datasource.type + database.datasource.url}
             datasource={database}
           />
         ))}
@@ -42,7 +42,7 @@ const Datasources = () => {
         {ccoConfigs.queues.map((queue) => (
           <DatasourceCard
             datasourceType="queues"
-            key={queue.datasource.connectionString}
+            key={queue.datasource.type + queue.datasource.url}
             datasource={queue}
           />
         ))}
