@@ -4,11 +4,11 @@ namespace Configurator.DTOs
 {
     public class CCOConfigListDTO
     {
-        public IEnumerable<DatabaseSpec> Databases { get; set; }
-        public IEnumerable<CacheSpec> Caches { get; set; }
-        public IEnumerable<QueueSpec> Queues { get; set; }
+        public IEnumerable<CCOSpec<DatabaseSource>> Databases { get; set; }
+        public IEnumerable<CCOSpec<CacheSource>> Caches { get; set; }
+        public IEnumerable<CCOSpec<QueueSource>> Queues { get; set; }
 
-        public CCOConfigListDTO(IEnumerable<DatabaseSpec> databases, IEnumerable<CacheSpec> caches, IEnumerable<QueueSpec> queues)
+        public CCOConfigListDTO(IEnumerable<CCOSpec<DatabaseSource>> databases, IEnumerable<CCOSpec<CacheSource>> caches, IEnumerable<CCOSpec<QueueSource>> queues)
         {
             Databases = databases;
             Caches = caches;

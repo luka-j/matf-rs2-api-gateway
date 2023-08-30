@@ -14,7 +14,7 @@ namespace Configurator.Services
             _ccoGrpcService = ccoGrpcService ?? throw new ArgumentNullException(nameof(ccoGrpcService));
         }
 
-        public async Task<IEnumerable<DatabaseSpec>> GetAllDatabases()
+        public async Task<IEnumerable<CCOSpec<DatabaseSource>>> GetAllDatabases()
         {
             var configs = await _ccoGrpcService.GetAllDatabaseData();
 
@@ -23,13 +23,13 @@ namespace Configurator.Services
             return allConfigs;
         }
 
-        public async Task<DatabaseSpec> GetDatabase(string name)
+        public async Task<CCOSpec<DatabaseSource>> GetDatabase(string name)
         {
             ConfigData data = await _ccoGrpcService.GetDatabase(name);
 
             return ParseDatabaseString(data.Data);
         }
-        public async Task<IEnumerable<CacheSpec>> GetAllCaches()
+        public async Task<IEnumerable<CCOSpec<CacheSource>>> GetAllCaches()
         {
             var configs = await _ccoGrpcService.GetAllCacheData();
 
@@ -38,13 +38,13 @@ namespace Configurator.Services
             return allConfigs;
         }
 
-        public async Task<CacheSpec> GetCache(string name)
+        public async Task<CCOSpec<CacheSource>> GetCache(string name)
         {
             ConfigData data = await _ccoGrpcService.GetCache(name);
 
             return ParseCacheString(data.Data);
         }
-        public async Task<IEnumerable<QueueSpec>> GetAllQueues()
+        public async Task<IEnumerable<CCOSpec<QueueSource>>> GetAllQueues()
         {
             var configs = await _ccoGrpcService.GetAllQueueData();
 
@@ -53,43 +53,43 @@ namespace Configurator.Services
             return allConfigs;
         }
 
-        public async Task<QueueSpec> GetQueue(string name)
+        public async Task<CCOSpec<QueueSource>> GetQueue(string name)
         {
             ConfigData data = await _ccoGrpcService.GetQueue(name);
 
             return ParseQueueString(data.Data);
         }
 
-        public static DatabaseSpec ParseDatabaseString(string jsonString)
+        public static CCOSpec<DatabaseSource> ParseDatabaseString(string jsonString)
         {
             JsonSerializerOptions options = new()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
-            return JsonSerializer.Deserialize<DatabaseSpec>(jsonString, options) ?? throw new Exception("Exception during deserialization");
+            return JsonSerializer.Deserialize<CCOSpec<DatabaseSource>>(jsonString, options) ?? throw new Exception("Exception during deserialization");
         }
-        public static CacheSpec ParseCacheString(string jsonString)
+        public static CCOSpec<CacheSource> ParseCacheString(string jsonString)
         {
             JsonSerializerOptions options = new()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
-            return JsonSerializer.Deserialize<CacheSpec>(jsonString, options) ?? throw new Exception("Exception during deserialization");
+            return JsonSerializer.Deserialize<CCOSpec<CacheSource>>(jsonString, options) ?? throw new Exception("Exception during deserialization");
         }
 
-        public static QueueSpec ParseQueueString(string jsonString)
+        public static CCOSpec<QueueSource> ParseQueueString(string jsonString)
         {
             JsonSerializerOptions options = new()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
-            return JsonSerializer.Deserialize<QueueSpec>(jsonString, options) ?? throw new Exception("Exception during deserialization");
+            return JsonSerializer.Deserialize<CCOSpec<QueueSource>>(jsonString, options) ?? throw new Exception("Exception during deserialization");
         }
 
-        public static string GetDatabaseString(DatabaseSpec spec)
+        public static string GetDatabaseString(CCOSpec<DatabaseSource> spec)
         {
             JsonSerializerOptions options = new()
             {
@@ -99,7 +99,7 @@ namespace Configurator.Services
 
             return JsonSerializer.Serialize(spec, options);
         }
-        public static string GetCacheSpec(CacheSpec spec)
+        public static string GetCacheSpec(CCOSpec<CacheSource> spec)
         {
             JsonSerializerOptions options = new()
             {
@@ -109,7 +109,7 @@ namespace Configurator.Services
 
             return JsonSerializer.Serialize(spec, options);
         }
-        public static string GetQueueSpec(QueueSpec spec)
+        public static string GetQueueSpec(CCOSpec<QueueSource> spec)
         {
             JsonSerializerOptions options = new()
             {
