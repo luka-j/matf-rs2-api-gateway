@@ -1,6 +1,6 @@
 ﻿namespace CCO.Entities
 {
-    public class QueueSource
+    public class QueueSource : IDatasource
     {
         public string Type { get; set; }
         public string Url { get; set; }
