@@ -130,7 +130,7 @@ public class RequestExecutor
                 (q.Key, q.Value.ToList()!)), queryEntity);
         var pathEntity = ExtractPathParams(path, specPath);
 
-        var (filteredPath, filteredQuery, filteredHeaders) = 
+        var (filteredPath, filteredHeaders, filteredQuery) = 
             _filter.FilterParams(operation.Parameters, pathEntity, headersEntity, queryEntity);
         var filteredBody = _filter.FilterBody(operation.RequestBody, bodyEntity);
         
