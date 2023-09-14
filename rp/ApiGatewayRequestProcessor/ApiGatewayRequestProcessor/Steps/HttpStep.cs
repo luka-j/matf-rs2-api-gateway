@@ -64,7 +64,13 @@ public class HttpStep : Step
             Method = _operation,
             Path = _resource,
             Timeout = Timeout,
-            Repeat = Retries
+            Repeat = Retries,
+            RequestMetadata = new RequestMetadata
+            {
+                RequestId = state.Find("${request.id}")?.AsString(),
+                IpAddress = state.Find("${request.ip}")?.AsString(),
+                StartTime = state.Find("${request.startTime}")?.AsString()
+            }
         };
         
         if (Body != null)

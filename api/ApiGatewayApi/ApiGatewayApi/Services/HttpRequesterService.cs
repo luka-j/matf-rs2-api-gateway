@@ -21,7 +21,7 @@ public class HttpRequesterService : HttpRequester.HttpRequesterBase
     {
         return Task.Run(() =>
         {
-            LogContext.PushProperty("CorrelationId", request.RequestMetadata.RequestId);
+            LogContext.PushProperty("CorrelationId", request.RequestMetadata?.RequestId);
             _logger.Information("MakeHttpRequest request: {Request}", request);
             try
             {
