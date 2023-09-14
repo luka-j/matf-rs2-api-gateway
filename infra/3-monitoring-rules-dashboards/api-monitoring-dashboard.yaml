@@ -1,0 +1,613 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-monitoring-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  api-monitoring.json: |
+    {
+      "annotations": {
+          "list": [
+              {
+                  "builtIn": 1,
+                  "datasource": {
+                      "type": "grafana",
+                      "uid": "-- Grafana --"
+                  },
+                  "enable": true,
+                  "hide": true,
+                  "iconColor": "rgba(0, 211, 255, 1)",
+                  "name": "Annotations & Alerts",
+                  "type": "dashboard"
+              }
+          ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 28,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+          {
+              "datasource": {
+                  "type": "prometheus",
+                  "uid": "prometheus"
+              },
+              "description": "",
+              "fieldConfig": {
+                  "defaults": {
+                      "color": {
+                          "mode": "palette-classic"
+                      },
+                      "custom": {
+                          "axisCenteredZero": false,
+                          "axisColorMode": "text",
+                          "axisLabel": "",
+                          "axisPlacement": "auto",
+                          "barAlignment": 0,
+                          "drawStyle": "line",
+                          "fillOpacity": 0,
+                          "gradientMode": "none",
+                          "hideFrom": {
+                              "legend": false,
+                              "tooltip": false,
+                              "viz": false
+                          },
+                          "lineInterpolation": "linear",
+                          "lineWidth": 1,
+                          "pointSize": 5,
+                          "scaleDistribution": {
+                              "type": "linear"
+                          },
+                          "showPoints": "auto",
+                          "spanNulls": false,
+                          "stacking": {
+                              "group": "A",
+                              "mode": "none"
+                          },
+                          "thresholdsStyle": {
+                              "mode": "off"
+                          }
+                      },
+                      "mappings": [],
+                      "thresholds": {
+                          "mode": "absolute",
+                          "steps": [
+                              {
+                                  "color": "green",
+                                  "value": null
+                              },
+                              {
+                                  "color": "red",
+                                  "value": 80
+                              }
+                          ]
+                      }
+                  },
+                  "overrides": []
+              },
+              "gridPos": {
+                  "h": 12,
+                  "w": 12,
+                  "x": 0,
+                  "y": 0
+              },
+              "id": 1,
+              "options": {
+                  "legend": {
+                      "calcs": [],
+                      "displayMode": "list",
+                      "placement": "bottom",
+                      "showLegend": true
+                  },
+                  "tooltip": {
+                      "mode": "single",
+                      "sort": "none"
+                  }
+              },
+              "targets": [
+                  {
+                      "datasource": {
+                          "type": "prometheus",
+                          "uid": "prometheus"
+                      },
+                      "editorMode": "code",
+                      "expr": "sum by (code, path, status) (increase(apigtw_http_request_errors[1m]))",
+                      "instant": false,
+                      "legendFormat": "{{code}} {{status}} - {{path}}",
+                      "range": true,
+                      "refId": "A"
+                  }
+              ],
+              "title": "Frontend errors / min",
+              "type": "timeseries"
+          },
+          {
+              "datasource": {
+                  "type": "prometheus",
+                  "uid": "prometheus"
+              },
+              "fieldConfig": {
+                  "defaults": {
+                      "color": {
+                          "mode": "palette-classic"
+                      },
+                      "custom": {
+                          "axisCenteredZero": false,
+                          "axisColorMode": "text",
+                          "axisLabel": "",
+                          "axisPlacement": "auto",
+                          "barAlignment": 0,
+                          "drawStyle": "line",
+                          "fillOpacity": 0,
+                          "gradientMode": "none",
+                          "hideFrom": {
+                              "legend": false,
+                              "tooltip": false,
+                              "viz": false
+                          },
+                          "lineInterpolation": "linear",
+                          "lineWidth": 1,
+                          "pointSize": 5,
+                          "scaleDistribution": {
+                              "type": "linear"
+                          },
+                          "showPoints": "auto",
+                          "spanNulls": false,
+                          "stacking": {
+                              "group": "A",
+                              "mode": "none"
+                          },
+                          "thresholdsStyle": {
+                              "mode": "off"
+                          }
+                      },
+                      "mappings": [],
+                      "thresholds": {
+                          "mode": "absolute",
+                          "steps": [
+                              {
+                                  "color": "green",
+                                  "value": null
+                              },
+                              {
+                                  "color": "red",
+                                  "value": 80
+                              }
+                          ]
+                      }
+                  },
+                  "overrides": []
+              },
+              "gridPos": {
+                  "h": 12,
+                  "w": 12,
+                  "x": 12,
+                  "y": 0
+              },
+              "id": 2,
+              "options": {
+                  "legend": {
+                      "calcs": [],
+                      "displayMode": "list",
+                      "placement": "bottom",
+                      "showLegend": true
+                  },
+                  "tooltip": {
+                      "mode": "single",
+                      "sort": "none"
+                  }
+              },
+              "targets": [
+                  {
+                      "datasource": {
+                          "type": "prometheus",
+                          "uid": "prometheus"
+                      },
+                      "editorMode": "code",
+                      "expr": "sum by (api_name, api_version, endpoint, method, code) (increase(apigtw_service_request_errors[1m]))",
+                      "instant": false,
+                      "legendFormat": "{{code}} - {{api_name}}/{{api_version}} {{method}} {{endpoint}}",
+                      "range": true,
+                      "refId": "A"
+                  }
+              ],
+              "title": "Backend errors / min",
+              "type": "timeseries"
+          },
+          {
+              "datasource": {
+                  "type": "prometheus",
+                  "uid": "prometheus"
+              },
+              "fieldConfig": {
+                  "defaults": {
+                      "color": {
+                          "mode": "palette-classic"
+                      },
+                      "custom": {
+                          "axisCenteredZero": false,
+                          "axisColorMode": "text",
+                          "axisLabel": "",
+                          "axisPlacement": "auto",
+                          "barAlignment": 0,
+                          "drawStyle": "line",
+                          "fillOpacity": 0,
+                          "gradientMode": "none",
+                          "hideFrom": {
+                              "legend": false,
+                              "tooltip": false,
+                              "viz": false
+                          },
+                          "lineInterpolation": "linear",
+                          "lineWidth": 1,
+                          "pointSize": 5,
+                          "scaleDistribution": {
+                              "type": "linear"
+                          },
+                          "showPoints": "auto",
+                          "spanNulls": false,
+                          "stacking": {
+                              "group": "A",
+                              "mode": "none"
+                          },
+                          "thresholdsStyle": {
+                              "mode": "off"
+                          }
+                      },
+                      "mappings": [],
+                      "thresholds": {
+                          "mode": "absolute",
+                          "steps": [
+                              {
+                                  "color": "green",
+                                  "value": null
+                              },
+                              {
+                                  "color": "red",
+                                  "value": 80
+                              }
+                          ]
+                      }
+                  },
+                  "overrides": []
+              },
+              "gridPos": {
+                  "h": 11,
+                  "w": 12,
+                  "x": 0,
+                  "y": 12
+              },
+              "id": 4,
+              "options": {
+                  "legend": {
+                      "calcs": [],
+                      "displayMode": "list",
+                      "placement": "bottom",
+                      "showLegend": true
+                  },
+                  "tooltip": {
+                      "mode": "single",
+                      "sort": "none"
+                  }
+              },
+              "targets": [
+                  {
+                      "datasource": {
+                          "type": "prometheus",
+                          "uid": "prometheus"
+                      },
+                      "editorMode": "code",
+                      "expr": "sum by (api_name, api_version, endpoint, method, status, response_code) (increase(apigtw_api_request_time_count[1m]))",
+                      "instant": false,
+                      "legendFormat": "{{response_code}} {{status}} - {{api_name}}/{{api_version}}: {{method}} {{endpoint}}",
+                      "range": true,
+                      "refId": "A"
+                  }
+              ],
+              "title": "Frontend requests / min",
+              "type": "timeseries"
+          },
+          {
+              "datasource": {
+                  "type": "prometheus",
+                  "uid": "prometheus"
+              },
+              "fieldConfig": {
+                  "defaults": {
+                      "color": {
+                          "mode": "palette-classic"
+                      },
+                      "custom": {
+                          "axisCenteredZero": false,
+                          "axisColorMode": "text",
+                          "axisLabel": "",
+                          "axisPlacement": "auto",
+                          "barAlignment": 0,
+                          "drawStyle": "line",
+                          "fillOpacity": 0,
+                          "gradientMode": "none",
+                          "hideFrom": {
+                              "legend": false,
+                              "tooltip": false,
+                              "viz": false
+                          },
+                          "lineInterpolation": "linear",
+                          "lineWidth": 1,
+                          "pointSize": 5,
+                          "scaleDistribution": {
+                              "type": "linear"
+                          },
+                          "showPoints": "auto",
+                          "spanNulls": false,
+                          "stacking": {
+                              "group": "A",
+                              "mode": "none"
+                          },
+                          "thresholdsStyle": {
+                              "mode": "off"
+                          }
+                      },
+                      "mappings": [],
+                      "thresholds": {
+                          "mode": "absolute",
+                          "steps": [
+                              {
+                                  "color": "green",
+                                  "value": null
+                              },
+                              {
+                                  "color": "red",
+                                  "value": 80
+                              }
+                          ]
+                      }
+                  },
+                  "overrides": []
+              },
+              "gridPos": {
+                  "h": 11,
+                  "w": 12,
+                  "x": 12,
+                  "y": 12
+              },
+              "id": 3,
+              "options": {
+                  "legend": {
+                      "calcs": [],
+                      "displayMode": "list",
+                      "placement": "bottom",
+                      "showLegend": true
+                  },
+                  "tooltip": {
+                      "mode": "single",
+                      "sort": "none"
+                  }
+              },
+              "targets": [
+                  {
+                      "datasource": {
+                          "type": "prometheus",
+                          "uid": "prometheus"
+                      },
+                      "editorMode": "code",
+                      "expr": "sum by (api_name, api_version, endpoint, method, status, response_code) (increase(apigtw_service_request_time_count[1m]))",
+                      "instant": false,
+                      "legendFormat": "{{response_code}} {{status}} - {{api_name}}/{{api_version}}: {{method}} {{endpoint}}",
+                      "range": true,
+                      "refId": "A"
+                  }
+              ],
+              "title": "Backend requests / min",
+              "type": "timeseries"
+          },
+          {
+              "datasource": {
+                  "type": "prometheus",
+                  "uid": "prometheus"
+              },
+              "fieldConfig": {
+                  "defaults": {
+                      "color": {
+                          "mode": "palette-classic"
+                      },
+                      "custom": {
+                          "axisCenteredZero": false,
+                          "axisColorMode": "text",
+                          "axisLabel": "",
+                          "axisPlacement": "auto",
+                          "barAlignment": 0,
+                          "drawStyle": "line",
+                          "fillOpacity": 0,
+                          "gradientMode": "none",
+                          "hideFrom": {
+                              "legend": false,
+                              "tooltip": false,
+                              "viz": false
+                          },
+                          "lineInterpolation": "linear",
+                          "lineWidth": 1,
+                          "pointSize": 5,
+                          "scaleDistribution": {
+                              "type": "linear"
+                          },
+                          "showPoints": "auto",
+                          "spanNulls": false,
+                          "stacking": {
+                              "group": "A",
+                              "mode": "none"
+                          },
+                          "thresholdsStyle": {
+                              "mode": "off"
+                          }
+                      },
+                      "mappings": [],
+                      "thresholds": {
+                          "mode": "absolute",
+                          "steps": [
+                              {
+                                  "color": "green",
+                                  "value": null
+                              },
+                              {
+                                  "color": "red",
+                                  "value": 80
+                              }
+                          ]
+                      },
+                      "unit": "ms"
+                  },
+                  "overrides": []
+              },
+              "gridPos": {
+                  "h": 12,
+                  "w": 12,
+                  "x": 0,
+                  "y": 23
+              },
+              "id": 5,
+              "options": {
+                  "legend": {
+                      "calcs": [],
+                      "displayMode": "list",
+                      "placement": "bottom",
+                      "showLegend": true
+                  },
+                  "tooltip": {
+                      "mode": "single",
+                      "sort": "none"
+                  }
+              },
+              "targets": [
+                  {
+                      "datasource": {
+                          "type": "prometheus",
+                          "uid": "prometheus"
+                      },
+                      "editorMode": "code",
+                      "expr": "sum by (api_name, api_version, endpoint, method, status, response_code) (increase(apigtw_api_request_time_sum[1m]) / increase(apigtw_api_request_time_count[1m]))",
+                      "instant": false,
+                      "legendFormat": "{{response_code}} {{status}} - {{api_name}}/{{api_version}}: {{method}} {{endpoint}}",
+                      "range": true,
+                      "refId": "A"
+                  }
+              ],
+              "title": "Frontend request time",
+              "type": "timeseries"
+          },
+          {
+              "datasource": {
+                  "type": "prometheus",
+                  "uid": "prometheus"
+              },
+              "fieldConfig": {
+                  "defaults": {
+                      "color": {
+                          "mode": "palette-classic"
+                      },
+                      "custom": {
+                          "axisCenteredZero": false,
+                          "axisColorMode": "text",
+                          "axisLabel": "",
+                          "axisPlacement": "auto",
+                          "barAlignment": 0,
+                          "drawStyle": "line",
+                          "fillOpacity": 0,
+                          "gradientMode": "none",
+                          "hideFrom": {
+                              "legend": false,
+                              "tooltip": false,
+                              "viz": false
+                          },
+                          "lineInterpolation": "linear",
+                          "lineWidth": 1,
+                          "pointSize": 5,
+                          "scaleDistribution": {
+                              "type": "linear"
+                          },
+                          "showPoints": "auto",
+                          "spanNulls": false,
+                          "stacking": {
+                              "group": "A",
+                              "mode": "none"
+                          },
+                          "thresholdsStyle": {
+                              "mode": "off"
+                          }
+                      },
+                      "mappings": [],
+                      "thresholds": {
+                          "mode": "absolute",
+                          "steps": [
+                              {
+                                  "color": "green",
+                                  "value": null
+                              },
+                              {
+                                  "color": "red",
+                                  "value": 80
+                              }
+                          ]
+                      },
+                      "unit": "ms"
+                  },
+                  "overrides": []
+              },
+              "gridPos": {
+                  "h": 12,
+                  "w": 12,
+                  "x": 12,
+                  "y": 23
+              },
+              "id": 6,
+              "options": {
+                  "legend": {
+                      "calcs": [],
+                      "displayMode": "list",
+                      "placement": "bottom",
+                      "showLegend": true
+                  },
+                  "tooltip": {
+                      "mode": "single",
+                      "sort": "none"
+                  }
+              },
+              "targets": [
+                  {
+                      "datasource": {
+                          "type": "prometheus",
+                          "uid": "prometheus"
+                      },
+                      "editorMode": "code",
+                      "expr": "sum by (api_name, api_version, endpoint, method, status, response_code) (increase(apigtw_service_request_time_sum[1m]) / increase(apigtw_service_request_time_count[1m]))",
+                      "instant": false,
+                      "legendFormat": "{{response_code}} {{status}} - {{api_name}}/{{api_version}}: {{method}} {{endpoint}}",
+                      "range": true,
+                      "refId": "A"
+                  }
+              ],
+              "title": "Backend request time",
+              "type": "timeseries"
+          }
+      ],
+      "refresh": "",
+      "schemaVersion": 38,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+          "list": []
+      },
+      "time": {
+          "from": "now-6h",
+          "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "API monitoring",
+      "uid": "e131b029-3b64-421c-80b1-6aec76cc8b32",
+      "version": 2,
+      "weekStart": ""
+      }
